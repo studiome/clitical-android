@@ -43,7 +43,7 @@
     <string name="questionLocalInfectionSubtitle">あり：膿瘍あり、もしくは次から二つ [発熱・発赤・リンパ管炎・リンパ節腫脹・疼痛]</string>
     <string name="questionDLTitle">脂質異常症</string>
     <string name="questionDLSubtitle">はい: LDL-C &gt; 140 [mg/dl]</string>
-    <string name="questionSmokingTitle">Smoking Status</string>
+    <string name="questionSmokingTitle">喫煙歴</string>
     <string name="questionSmokingSubtitle">はい：喫煙中・喫煙歴あり</string>
     <string name="questionContraTitle">対側動脈病変</string>
     <string name="questionContraSubtitle">ありには治療後も含む。</string>
@@ -106,4 +106,14 @@
     <string name="appTerms">利用規約</string>
     <string name="refreshButtonLabel">解答画面を初期化する</string>
     <string name="summaryButtonLabel">設問一覧を表示する</string>
+    <string name="riskAssessmentTab">リスク評価</string>
+    <string name="basicInfo">基本情報</string>
+    <string name="socialHistory">生活歴</string>
+    <string name="clinicalInfo">臨床情報</string>
+    <string name="lesionInfo">血行再建対象病変</string>
+    <string name="otherLesionInfo">その他血管病変</string>
+    <string name="complications">合併症</string>
+    <string name="predictRisks">リスク解析実行</string>
+    <string name="reset">リセット</string>
 </resources>
+

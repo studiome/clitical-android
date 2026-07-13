@@ -106,4 +106,13 @@
     <string name="appTerms">Terms of service</string>
     <string name="refreshButtonLabel">Refresh Question Form</string>
     <string name="summaryButtonLabel">Move to Summary</string>
+    <string name="riskAssessmentTab">Risk Assessment</string>
+    <string name="basicInfo">Basic Info</string>
+    <string name="socialHistory">Social History</string>
+    <string name="clinicalInfo">Clinical Info</string>
+    <string name="lesionInfo">Artery Lesion Sites</string>
+    <string name="otherLesionInfo">Other Vascular Lesions</string>
+    <string name="complications">Complications</string>
+    <string name="predictRisks">Predict Risks</string>
+    <string name="reset">Reset</string>
 </resources>
