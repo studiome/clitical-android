@@ -1,12 +1,14 @@
 package org.studiomexx.clitical_android.ui
 
 import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsOn
-import androidx.compose.ui.test.hasAnySibling
+import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.hasScrollAction
 import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.isSelectable
 import androidx.compose.ui.test.isToggleable
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.performClick
@@ -49,13 +51,42 @@ class QuestionFormTest {
 
     private fun rowLabelled(label: String) = hasText(label)
 
-    // Each row is a ListItem holding its label and its control as siblings. ListItem
-    // merges its descendants, so the two are only distinguishable in the unmerged tree.
+    // Both controls carry their own label, so they are reachable the same way a
+    // screen reader reaches them: on the merged tree, by that label.
     private fun onSwitchLabelled(label: String) =
-        composeTestRule.onNode(isToggleable() and hasAnySibling(hasText(label)), useUnmergedTree = true)
+        composeTestRule.onNode(isToggleable() and hasText(label))
 
     private fun onFieldLabelled(label: String) =
-        composeTestRule.onNode(hasSetTextAction() and hasAnySibling(hasText(label)), useUnmergedTree = true)
+        composeTestRule.onNode(hasSetTextAction() and hasContentDescription(label))
+
+    // Accessibility: a control must carry its own label, otherwise a screen reader
+    // announces an anonymous "switch" or "edit box" next to a separate line of text.
+
+    @Test
+    fun switchIsAnnouncedWithItsLabel() {
+        showForm()
+
+        scrollTo(rowLabelled("喫煙歴"))
+        // Merged tree: what a screen reader actually focuses.
+        composeTestRule.onNode(isToggleable() and hasText("喫煙歴")).assertExists()
+    }
+
+    @Test
+    fun textFieldIsAnnouncedWithItsLabel() {
+        showForm()
+
+        composeTestRule.onNode(hasSetTextAction() and hasContentDescription("年齢 [歳]")).assertExists()
+    }
+
+    @Test
+    fun enumOptionIsASingleTargetAnnouncedAsARadioButton() {
+        showForm()
+
+        composeTestRule.onNode(rowLabelled("性別")).performClick()
+
+        // One selectable node per option, not a nested row-plus-radio pair.
+        composeTestRule.onAllNodes(isSelectable() and hasText("男性")).assertCountEquals(1)
+    }
 
     @Test
     fun rendersLabelsInTheSelectedLocale() {

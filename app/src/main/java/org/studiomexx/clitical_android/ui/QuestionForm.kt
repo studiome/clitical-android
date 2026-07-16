@@ -1,6 +1,7 @@
 package org.studiomexx.clitical_android.ui
 
 import android.widget.Toast
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Analytics
@@ -34,6 +36,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -326,7 +331,10 @@ fun TextEditRow(
             TextField(
                 value = value,
                 onValueChange = onValueChange,
-                modifier = Modifier.width(100.dp),
+                // The headline is a separate node, so the field needs its own label.
+                modifier = Modifier
+                    .width(100.dp)
+                    .semantics { contentDescription = label },
                 keyboardOptions = KeyboardOptions(
                     keyboardType = if (isDecimal) KeyboardType.Decimal else KeyboardType.Number
                 ),
@@ -347,14 +355,21 @@ fun SwitchRow(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit
 ) {
+    // Toggling on the row rather than the Switch merges the two into one node, so the
+    // switch is announced with its label and the whole row becomes a tap target.
     ListItem(
         headlineContent = { Text(label) },
         trailingContent = {
             Switch(
                 checked = checked,
-                onCheckedChange = onCheckedChange
+                onCheckedChange = null
             )
-        }
+        },
+        modifier = Modifier.toggleable(
+            value = checked,
+            onValueChange = onCheckedChange,
+            role = Role.Switch
+        )
     )
 }
 
@@ -372,19 +387,19 @@ fun <T> EnumChoiceRow(
         ListItem(
             headlineContent = { Text(label) },
             supportingContent = { Text(localizedString(selectedOption.stringResId, locale)) },
-            modifier = Modifier.selectable(
-                selected = false,
-                onClick = { expanded = !expanded }
-            )
+            // The row expands the options rather than selecting anything itself.
+            modifier = Modifier.clickable { expanded = !expanded }
         )
         if (expanded) {
             Column(modifier = Modifier.padding(start = 32.dp)) {
                 options.forEach { option ->
+                    // The row owns the click so the option is one target, not two.
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
                             .selectable(
                                 selected = (option == selectedOption),
+                                role = Role.RadioButton,
                                 onClick = {
                                     onOptionSelected(option)
                                     expanded = false
@@ -395,10 +410,7 @@ fun <T> EnumChoiceRow(
                     ) {
                         RadioButton(
                             selected = (option == selectedOption),
-                            onClick = {
-                                onOptionSelected(option)
-                                expanded = false
-                            }
+                            onClick = null
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(localizedString(option.stringResId, locale))
