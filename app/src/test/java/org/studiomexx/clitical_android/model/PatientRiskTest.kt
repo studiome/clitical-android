@@ -1,4 +1,4 @@
-package org.studiomexx.clitical_android
+package org.studiomexx.clitical_android.model
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertThrows
@@ -15,12 +15,12 @@ class PatientRiskTest {
 
     @Test
     fun normalCase() {
-        val pd = PatientData().apply {
-            age = 65
-            weight = 50.0
-            height = 1.50
+        val pd = PatientData(
+            age = 65,
+            weight = 50.0,
+            height = 1.50,
             alb = 4.0
-        }
+        )
 
         val want = Want(
             gnri = "101.3",
@@ -37,14 +37,14 @@ class PatientRiskTest {
 
     @Test
     fun errorCase() {
-        val pd = PatientData().apply {
-            sex = Sex.MALE
-            age = 70
-            height = 0.0
-            weight = 50.0
-            alb = 3.0
+        val pd = PatientData(
+            sex = Sex.MALE,
+            age = 70,
+            height = 0.0,
+            weight = 50.0,
+            alb = 3.0,
             activity = Activity.WHEELCHAIR
-        }
+        )
 
         val want = Want(
             gnri = "NaN",
@@ -61,31 +61,31 @@ class PatientRiskTest {
 
     @Test
     fun lowRiskCase() {
-        val pd = PatientData().apply {
-            sex = Sex.MALE
-            age = 50
-            height = 1.65
-            weight = 60.0
-            alb = 4.0
-            activity = Activity.AMBULATORY
-            hasCHF = false
-            hasCVD = true
-            ckd = CKD.G3
-            malignant = MalignantNeoplasm.NO
-            hasAILesion = false
-            hasFPLesion = true
-            hasBKLesion = false
-            isUrgent = true
-            hasFever = true
-            hasAbnormalWBC = true
-            hasLocalInfection = true
-            hasCAD = true
-            hasDyslipidemia = false
-            isSmoking = true
-            hasContraLateralLesion = false
-            hasOtherVD = true
+        val pd = PatientData(
+            sex = Sex.MALE,
+            age = 50,
+            height = 1.65,
+            weight = 60.0,
+            alb = 4.0,
+            activity = Activity.AMBULATORY,
+            hasCHF = false,
+            hasCVD = true,
+            ckd = CKD.G3,
+            malignant = MalignantNeoplasm.NO,
+            hasAILesion = false,
+            hasFPLesion = true,
+            hasBKLesion = false,
+            isUrgent = true,
+            hasFever = true,
+            hasAbnormalWBC = true,
+            hasLocalInfection = true,
+            hasCAD = true,
+            hasDyslipidemia = false,
+            isSmoking = true,
+            hasContraLateralLesion = false,
+            hasOtherVD = true,
             rutherford = RutherfordClassification.CLASS4
-        }
+        )
 
         val want = Want(
             gnri = "101.3",
@@ -102,31 +102,31 @@ class PatientRiskTest {
 
     @Test
     fun mediumRiskCase() {
-        val pd = PatientData().apply {
-            sex = Sex.FEMALE
-            age = 70
-            height = 1.53
-            weight = 55.0
-            alb = 3.5
-            activity = Activity.WHEELCHAIR
-            hasCHF = true
-            hasCVD = true
-            ckd = CKD.G4
-            malignant = MalignantNeoplasm.PAST_HISTORY
-            hasAILesion = false
-            hasFPLesion = true
-            hasBKLesion = true
-            isUrgent = true
-            hasFever = true
-            hasAbnormalWBC = true
-            hasLocalInfection = true
-            hasCAD = false
-            hasDyslipidemia = true
-            isSmoking = false
-            hasContraLateralLesion = true
-            hasOtherVD = false
+        val pd = PatientData(
+            sex = Sex.FEMALE,
+            age = 70,
+            height = 1.53,
+            weight = 55.0,
+            alb = 3.5,
+            activity = Activity.WHEELCHAIR,
+            hasCHF = true,
+            hasCVD = true,
+            ckd = CKD.G4,
+            malignant = MalignantNeoplasm.PAST_HISTORY,
+            hasAILesion = false,
+            hasFPLesion = true,
+            hasBKLesion = true,
+            isUrgent = true,
+            hasFever = true,
+            hasAbnormalWBC = true,
+            hasLocalInfection = true,
+            hasCAD = false,
+            hasDyslipidemia = true,
+            isSmoking = false,
+            hasContraLateralLesion = true,
+            hasOtherVD = false,
             rutherford = RutherfordClassification.CLASS5
-        }
+        )
 
         val want = Want(
             gnri = "93.8",
@@ -143,31 +143,31 @@ class PatientRiskTest {
 
     @Test
     fun highRiskCase() {
-        val pd = PatientData().apply {
-            sex = Sex.MALE
-            age = 85
-            height = 1.75
-            weight = 55.1
-            alb = 3.5
-            activity = Activity.IMMOBILE
-            hasCHF = false
-            hasCVD = false
-            ckd = CKD.G5
-            malignant = MalignantNeoplasm.UNDER_TREATMENT
-            hasAILesion = false
-            hasFPLesion = false
-            hasBKLesion = true
-            isUrgent = true
-            hasFever = false
-            hasAbnormalWBC = true
-            hasLocalInfection = false
-            hasCAD = true
-            hasDyslipidemia = true
-            isSmoking = true
-            hasContraLateralLesion = true
-            hasOtherVD = false
+        val pd = PatientData(
+            sex = Sex.MALE,
+            age = 85,
+            height = 1.75,
+            weight = 55.1,
+            alb = 3.5,
+            activity = Activity.IMMOBILE,
+            hasCHF = false,
+            hasCVD = false,
+            ckd = CKD.G5,
+            malignant = MalignantNeoplasm.UNDER_TREATMENT,
+            hasAILesion = false,
+            hasFPLesion = false,
+            hasBKLesion = true,
+            isUrgent = true,
+            hasFever = false,
+            hasAbnormalWBC = true,
+            hasLocalInfection = false,
+            hasCAD = true,
+            hasDyslipidemia = true,
+            isSmoking = true,
+            hasContraLateralLesion = true,
+            hasOtherVD = false,
             rutherford = RutherfordClassification.CLASS5
-        }
+        )
 
         val want = Want(
             gnri = "86.2",
@@ -184,31 +184,31 @@ class PatientRiskTest {
 
     @Test
     fun highRiskCase2() {
-        val pd = PatientData().apply {
-            sex = Sex.FEMALE
-            age = 90
-            height = 1.55
-            weight = 30.0
-            alb = 3.2
-            activity = Activity.IMMOBILE
-            hasCHF = true
-            hasCVD = true
-            ckd = CKD.G5D
-            malignant = MalignantNeoplasm.UNDER_TREATMENT
-            hasAILesion = false
-            hasFPLesion = false
-            hasBKLesion = true
-            isUrgent = true
-            hasFever = true
-            hasAbnormalWBC = true
-            hasLocalInfection = true
-            hasCAD = true
-            hasDyslipidemia = true
-            isSmoking = true
-            hasContraLateralLesion = false
-            hasOtherVD = true
+        val pd = PatientData(
+            sex = Sex.FEMALE,
+            age = 90,
+            height = 1.55,
+            weight = 30.0,
+            alb = 3.2,
+            activity = Activity.IMMOBILE,
+            hasCHF = true,
+            hasCVD = true,
+            ckd = CKD.G5D,
+            malignant = MalignantNeoplasm.UNDER_TREATMENT,
+            hasAILesion = false,
+            hasFPLesion = false,
+            hasBKLesion = true,
+            isUrgent = true,
+            hasFever = true,
+            hasAbnormalWBC = true,
+            hasLocalInfection = true,
+            hasCAD = true,
+            hasDyslipidemia = true,
+            isSmoking = true,
+            hasContraLateralLesion = false,
+            hasOtherVD = true,
             rutherford = RutherfordClassification.CLASS6
-        }
+        )
 
         val want = Want(
             gnri = "71.3",
@@ -235,7 +235,7 @@ class PatientRiskTest {
 
     private fun assertTestCase(pd: PatientData, want: Want) {
         val pr = PatientRisk(pd)
-        
+
         assertEquals(want.gnri, formatDouble(pr.gnri, 1))
         assertEquals(want.gnriRisk, pr.gnriRisk)
         assertEquals(want.predictedOS, formatDouble(pr.predictedOS, 2))

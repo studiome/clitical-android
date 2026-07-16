@@ -1,18 +1,9 @@
-package org.studiomexx.clitical_android
+package org.studiomexx.clitical_android.model
 
 import kotlin.math.exp
 import kotlin.math.pow
 
-class FormatException(message: String, val source: String) : Exception(message)
-
 class PatientRisk(val patientData: PatientData) {
-    var gnri: Double = Double.NaN
-    var gnriRisk: GNRIRisk? = null
-    var predictedOS: Double = Double.NaN
-    var predictedAFS: Double = Double.NaN
-    var osRisk: OSRisk? = null
-    var predicted30DDeathOrAmputation: Double = Double.NaN
-    var predicted30DMALE: Double = Double.NaN
 
     init {
         if (patientData.weight == null ||
@@ -20,27 +11,28 @@ class PatientRisk(val patientData: PatientData) {
             patientData.age == null ||
             patientData.alb == null
         ) {
-            throw FormatException("form is empty", "NumberForm")
+            throw FormatException("form is empty", ValidationError.EMPTY_FIELDS)
         }
         if (!patientData.hasAILesion &&
             !patientData.hasFPLesion &&
             !patientData.hasBKLesion
         ) {
-            throw FormatException("wrong lesion choice", "LesionChoice")
+            throw FormatException("wrong lesion choice", ValidationError.NO_LESION_SELECTED)
         }
-        gnri = calcGNRI()
-        gnriRisk = classifyGNRIRisk(gnri)
-        predictedOS = calcPredictedOS(patientData)
-        predictedAFS = calcPredictedAFS(patientData)
-        osRisk = classifyOSRisk(predictedOS)
-        predicted30DDeathOrAmputation = calc30DDorA(patientData)
-        predicted30DMALE = calc30DMALE(patientData)
     }
 
-    private fun calcGNRI(): Double {
-        val height = patientData.height ?: return Double.NaN
-        val weight = patientData.weight ?: return Double.NaN
-        val alb = patientData.alb ?: return Double.NaN
+    val gnri: Double = calcGNRI(patientData)
+    val gnriRisk: GNRIRisk? = classifyGNRIRisk(gnri)
+    val predictedOS: Double = calcPredictedOS(patientData)
+    val predictedAFS: Double = calcPredictedAFS(patientData)
+    val osRisk: OSRisk? = classifyOSRisk(predictedOS)
+    val predicted30DDeathOrAmputation: Double = calc30DDorA(patientData)
+    val predicted30DMALE: Double = calc30DMALE(patientData)
+
+    private fun calcGNRI(data: PatientData): Double {
+        val height = data.height ?: return Double.NaN
+        val weight = data.weight ?: return Double.NaN
+        val alb = data.alb ?: return Double.NaN
         if (height == 0.0) return Double.NaN
         var wi = weight / (22.0 * height.pow(2.0))
         if (wi >= 1.0) wi = 1.0
