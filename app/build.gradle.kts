@@ -43,6 +43,12 @@ android {
             enableSplit = false
         }
     }
+    testOptions {
+        unitTests {
+            // Robolectric resolves string resources from the real resource table.
+            isIncludeAndroidResources = true
+        }
+    }
 }
 
 dependencies {
@@ -57,6 +63,10 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     testImplementation(libs.junit)
+    testImplementation(platform(libs.androidx.compose.bom))
+    testImplementation(libs.androidx.compose.ui.test.junit4)
+    testImplementation(libs.androidx.junit)
+    testImplementation(libs.robolectric)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     androidTestImplementation(libs.androidx.espresso.core)
