@@ -50,7 +50,10 @@ private val DarkColorScheme = darkColorScheme(
 @Composable
 fun CLiTICALAndroidTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = true,
+    // Off by default: the brand palette seeded from JsvsColor must match the
+    // Flutter app (clti_risk), which always uses ColorScheme.fromSeed(jsvsColor)
+    // rather than the device wallpaper.
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
