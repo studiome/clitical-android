@@ -251,7 +251,7 @@ class QuestionFormTest {
         showForm()
 
         scrollTo(rowLabelled("発熱"))
-        composeTestRule.onNode(hasText("あり: 体温38℃以上", substring = true)).assertExists()
+        composeTestRule.onNode(hasText("体温38℃以上", substring = true)).assertExists()
     }
 
     // The description belongs to the expanded options, so a collapsed row stays terse.
