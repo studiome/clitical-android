@@ -43,7 +43,7 @@ class SettingsScreensTest {
         composeTestRule.setContent { AboutScreen(locale = Locale.forLanguageTag("ja")) }
 
         composeTestRule.onNode(hasText("CLiTICAL")).assertExists()
-        composeTestRule.onNode(hasText("Version: 1.0")).assertExists()
+        composeTestRule.onNode(hasText("Version: 0.1.0")).assertExists()
     }
 
     @Test
