@@ -256,7 +256,7 @@ fun QuestionForm(viewModel: MainViewModel, modifier: Modifier = Modifier) {
                                 ValidationError.NO_LESION_SELECTED -> R.string.analysisLesionErrorMessage
                                 ValidationError.EMPTY_FIELDS -> R.string.analysisNullErrorMessage
                             }
-                            Toast.makeText(context, context.getString(msgId), Toast.LENGTH_LONG).show()
+                            Toast.makeText(context, context.localizedString(msgId, locale), Toast.LENGTH_LONG).show()
                         }
                     },
                     modifier = Modifier.fillMaxWidth()

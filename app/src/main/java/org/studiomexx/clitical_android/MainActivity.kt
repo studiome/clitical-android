@@ -6,6 +6,7 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -22,7 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -37,12 +38,17 @@ import org.studiomexx.clitical_android.ui.ResultScreen
 import org.studiomexx.clitical_android.ui.localizedString
 import org.studiomexx.clitical_android.ui.theme.CLiTICALAndroidTheme
 
-private val tabs: List<Pair<ImageVector, Int>> = listOf(
-    Icons.Default.Analytics to R.string.riskAssessmentTab,
-    Icons.Default.Language to R.string.language,
-    Icons.AutoMirrored.Filled.MenuBook to R.string.references,
-    Icons.Default.Info to R.string.aboutTab
-)
+/** [labelRes] is kept short so every navigation bar item fits on one line. */
+private enum class Tab(
+    val icon: ImageVector,
+    @StringRes val titleRes: Int,
+    @StringRes val labelRes: Int
+) {
+    RISK(Icons.Default.Analytics, R.string.riskAssessmentTab, R.string.riskAssessmentTab),
+    LANGUAGE(Icons.Default.Language, R.string.language, R.string.language),
+    REFERENCES(Icons.AutoMirrored.Filled.MenuBook, R.string.references, R.string.references),
+    ABOUT(Icons.Default.Info, R.string.about, R.string.aboutTab)
+}
 
 class MainActivity : ComponentActivity() {
     private val viewModel: MainViewModel by viewModels()
@@ -62,7 +68,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 private fun CLiTICALApp(viewModel: MainViewModel) {
     val risk = viewModel.calculatedRisk
-    var selectedTab by rememberSaveable { mutableIntStateOf(0) }
+    var selectedTab by rememberSaveable { mutableStateOf(Tab.RISK) }
     val locale = viewModel.locale
 
     BackHandler(enabled = risk != null) { viewModel.calculatedRisk = null }
@@ -76,23 +82,23 @@ private fun CLiTICALApp(viewModel: MainViewModel) {
     } else {
         Scaffold(
             topBar = {
-                TopAppBar(title = { Text(localizedString(tabs[selectedTab].second, locale)) })
+                TopAppBar(title = { Text(localizedString(selectedTab.titleRes, locale)) })
             },
             bottomBar = {
                 NavigationBar {
-                    tabs.forEachIndexed { index, (icon, labelRes) ->
+                    Tab.entries.forEach { tab ->
                         NavigationBarItem(
-                            icon = { Icon(icon, contentDescription = null) },
+                            icon = { Icon(tab.icon, contentDescription = null) },
                             label = {
                                 Text(
-                                    text = localizedString(labelRes, locale),
+                                    text = localizedString(tab.labelRes, locale),
                                     maxLines = 1,
                                     softWrap = false,
                                     overflow = TextOverflow.Ellipsis
                                 )
                             },
-                            selected = selectedTab == index,
-                            onClick = { selectedTab = index }
+                            selected = selectedTab == tab,
+                            onClick = { selectedTab = tab }
                         )
                     }
                 }
@@ -102,10 +108,10 @@ private fun CLiTICALApp(viewModel: MainViewModel) {
                 .padding(innerPadding)
                 .fillMaxSize()
             when (selectedTab) {
-                0 -> QuestionForm(viewModel = viewModel, modifier = contentModifier)
-                1 -> LanguageScreen(viewModel = viewModel, modifier = contentModifier)
-                2 -> ReferencesScreen(locale = locale, modifier = contentModifier)
-                3 -> AboutScreen(locale = locale, modifier = contentModifier)
+                Tab.RISK -> QuestionForm(viewModel = viewModel, modifier = contentModifier)
+                Tab.LANGUAGE -> LanguageScreen(viewModel = viewModel, modifier = contentModifier)
+                Tab.REFERENCES -> ReferencesScreen(locale = locale, modifier = contentModifier)
+                Tab.ABOUT -> AboutScreen(locale = locale, modifier = contentModifier)
             }
         }
     }

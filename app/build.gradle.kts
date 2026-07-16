@@ -36,6 +36,13 @@ android {
         compose = true
         buildConfig = true
     }
+    bundle {
+        // The in-app language switcher needs every locale present on device,
+        // so Play must not split resources by language.
+        language {
+            enableSplit = false
+        }
+    }
 }
 
 dependencies {
