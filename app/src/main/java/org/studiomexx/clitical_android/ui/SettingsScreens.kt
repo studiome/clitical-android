@@ -20,7 +20,6 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,10 +31,52 @@ import org.studiomexx.clitical_android.BuildConfig
 import org.studiomexx.clitical_android.R
 import java.util.Locale
 
+/**
+ * Groups language, terms, and app-info in a single tab, mirroring the iOS app's
+ * Settings tab (which likewise folds these settings-like items out of the tab bar
+ * rather than giving each its own top-level destination).
+ */
 @Composable
-fun LanguageScreen(viewModel: MainViewModel, modifier: Modifier = Modifier) {
+fun SettingsScreen(viewModel: MainViewModel, modifier: Modifier = Modifier) {
+    val context = LocalContext.current
     val locale = viewModel.locale
-    Column(modifier = modifier.padding(16.dp)) {
+    Column(modifier = modifier.verticalScroll(rememberScrollState())) {
+        SectionHeader(localizedString(R.string.language, locale))
+        LanguagePicker(viewModel = viewModel)
+
+        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+        ListItem(
+            headlineContent = { Text(localizedString(R.string.appTerms, locale)) },
+            trailingContent = {
+                Icon(Icons.AutoMirrored.Filled.OpenInNew, contentDescription = null)
+            },
+            modifier = Modifier.clickable {
+                CustomTabsIntent.Builder().build()
+                    .launchUrl(context, "https://studiome.github.io/clti_risk/".toUri())
+            }
+        )
+
+        SectionHeader(localizedString(R.string.about, locale))
+        Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Text("CLiTICAL", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                Spacer(modifier = Modifier.weight(1f))
+                Text(
+                    "Version: ${BuildConfig.VERSION_NAME}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(localizedString(R.string.appLegalese, locale), style = MaterialTheme.typography.bodySmall)
+        }
+    }
+}
+
+@Composable
+private fun LanguagePicker(viewModel: MainViewModel, modifier: Modifier = Modifier) {
+    val locale = viewModel.locale
+    Column(modifier = modifier.padding(horizontal = 16.dp)) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -116,26 +157,5 @@ fun ReferencesScreen(locale: Locale, modifier: Modifier = Modifier) {
                     .launchUrl(context, "https://doi.org/10.1016/j.ejvs.2022.05.038".toUri())
             }
         )
-    }
-}
-
-@Composable
-fun AboutScreen(locale: Locale, modifier: Modifier = Modifier) {
-    val context = LocalContext.current
-    Column(modifier = modifier.padding(16.dp)) {
-        Text("CLiTICAL", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
-        Spacer(modifier = Modifier.height(8.dp))
-        Text("Version: ${BuildConfig.VERSION_NAME}", style = MaterialTheme.typography.bodyMedium)
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(localizedString(R.string.appLegalese, locale), style = MaterialTheme.typography.bodySmall)
-        Spacer(modifier = Modifier.height(32.dp))
-        TextButton(
-            onClick = {
-                CustomTabsIntent.Builder().build()
-                    .launchUrl(context, "https://studiome.github.io/clti_risk/".toUri())
-            }
-        ) {
-            Text(localizedString(R.string.appTerms, locale))
-        }
     }
 }

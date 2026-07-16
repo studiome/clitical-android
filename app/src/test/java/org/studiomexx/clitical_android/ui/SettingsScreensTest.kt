@@ -25,7 +25,7 @@ class SettingsScreensTest {
     @Test
     fun selectingEnglishSwitchesTheViewModelLocale() {
         val viewModel = MainViewModel().apply { locale = Locale.forLanguageTag("ja") }
-        composeTestRule.setContent { LanguageScreen(viewModel = viewModel) }
+        composeTestRule.setContent { SettingsScreen(viewModel = viewModel) }
 
         composeTestRule.onNode(hasText("English")).performClick()
 
@@ -33,9 +33,9 @@ class SettingsScreensTest {
     }
 
     @Test
-    fun languageScreenRelabelsItselfAfterSwitching() {
+    fun settingsScreenRelabelsItselfAfterSwitchingLanguage() {
         val viewModel = MainViewModel().apply { locale = Locale.forLanguageTag("en") }
-        composeTestRule.setContent { LanguageScreen(viewModel = viewModel) }
+        composeTestRule.setContent { SettingsScreen(viewModel = viewModel) }
 
         // 日本語 is its own endonym, so assert on the entry that actually changes.
         composeTestRule.onNode(hasText("English")).assertExists()
@@ -45,8 +45,9 @@ class SettingsScreensTest {
     }
 
     @Test
-    fun aboutScreenShowsTheBuildVersion() {
-        composeTestRule.setContent { AboutScreen(locale = Locale.forLanguageTag("ja")) }
+    fun settingsScreenShowsTheBuildVersion() {
+        val viewModel = MainViewModel().apply { locale = Locale.forLanguageTag("ja") }
+        composeTestRule.setContent { SettingsScreen(viewModel = viewModel) }
 
         composeTestRule.onNode(hasText("CLiTICAL")).assertExists()
         composeTestRule.onNode(hasText("Version: 0.1.0")).assertExists()
@@ -85,8 +86,9 @@ class SettingsScreensTest {
     }
 
     @Test
-    fun aboutScreenOpensTermsOfServiceInAnInAppBrowser() {
-        composeTestRule.setContent { AboutScreen(locale = Locale.forLanguageTag("ja")) }
+    fun settingsScreenOpensTermsOfServiceInAnInAppBrowser() {
+        val viewModel = MainViewModel().apply { locale = Locale.forLanguageTag("ja") }
+        composeTestRule.setContent { SettingsScreen(viewModel = viewModel) }
 
         composeTestRule.onNode(hasText("利用規約")).performClick()
 

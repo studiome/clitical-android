@@ -16,8 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.Analytics
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Language
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -35,25 +34,27 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.style.TextOverflow
-import org.studiomexx.clitical_android.ui.AboutScreen
-import org.studiomexx.clitical_android.ui.LanguageScreen
 import org.studiomexx.clitical_android.ui.MainViewModel
 import org.studiomexx.clitical_android.ui.QuestionForm
 import org.studiomexx.clitical_android.ui.ReferencesScreen
 import org.studiomexx.clitical_android.ui.ResultScreen
+import org.studiomexx.clitical_android.ui.SettingsScreen
 import org.studiomexx.clitical_android.ui.localizedString
 import org.studiomexx.clitical_android.ui.theme.CLiTICALAndroidTheme
 
-/** [labelRes] is kept short so every navigation bar item fits on one line. */
+/**
+ * Three destinations, matching the iOS app's tab bar: settings-like items
+ * (language, terms, app info) are grouped into a single Settings tab rather
+ * than each holding a tab of their own.
+ */
 private enum class Tab(
     val icon: ImageVector,
     @StringRes val titleRes: Int,
     @StringRes val labelRes: Int
 ) {
     RISK(Icons.Default.Analytics, R.string.riskAssessmentTab, R.string.riskAssessmentTab),
-    LANGUAGE(Icons.Default.Language, R.string.language, R.string.language),
     REFERENCES(Icons.AutoMirrored.Filled.MenuBook, R.string.references, R.string.references),
-    ABOUT(Icons.Default.Info, R.string.about, R.string.aboutTab)
+    SETTINGS(Icons.Default.Settings, R.string.settings, R.string.settings)
 }
 
 class MainActivity : ComponentActivity() {
@@ -125,9 +126,8 @@ private fun CLiTICALApp(viewModel: MainViewModel) {
                     .fillMaxSize()
                 when (selectedTab) {
                     Tab.RISK -> QuestionForm(viewModel = viewModel, modifier = contentModifier)
-                    Tab.LANGUAGE -> LanguageScreen(viewModel = viewModel, modifier = contentModifier)
                     Tab.REFERENCES -> ReferencesScreen(locale = locale, modifier = contentModifier)
-                    Tab.ABOUT -> AboutScreen(locale = locale, modifier = contentModifier)
+                    Tab.SETTINGS -> SettingsScreen(viewModel = viewModel, modifier = contentModifier)
                 }
             }
         }
