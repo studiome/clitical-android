@@ -1,6 +1,6 @@
 package org.studiomexx.clitical_android.ui
 
-import android.content.Intent
+import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -82,8 +82,8 @@ fun ReferencesScreen(locale: Locale, modifier: Modifier = Modifier) {
         HorizontalDivider()
         TextButton(
             onClick = {
-                val intent = Intent(Intent.ACTION_VIEW, "https://doi.org/10.1093/bjs/znab036".toUri())
-                context.startActivity(intent)
+                CustomTabsIntent.Builder().build()
+                    .launchUrl(context, "https://doi.org/10.1093/bjs/znab036".toUri())
             }
         ) {
             Text(
@@ -93,8 +93,8 @@ fun ReferencesScreen(locale: Locale, modifier: Modifier = Modifier) {
         }
         TextButton(
             onClick = {
-                val intent = Intent(Intent.ACTION_VIEW, "https://doi.org/10.1016/j.ejvs.2022.05.038".toUri())
-                context.startActivity(intent)
+                CustomTabsIntent.Builder().build()
+                    .launchUrl(context, "https://doi.org/10.1016/j.ejvs.2022.05.038".toUri())
             }
         ) {
             Text(
@@ -117,8 +117,8 @@ fun AboutScreen(locale: Locale, modifier: Modifier = Modifier) {
         Spacer(modifier = Modifier.height(32.dp))
         TextButton(
             onClick = {
-                val intent = Intent(Intent.ACTION_VIEW, "https://studiome.github.io/clti_risk/".toUri())
-                context.startActivity(intent)
+                CustomTabsIntent.Builder().build()
+                    .launchUrl(context, "https://studiome.github.io/clti_risk/".toUri())
             }
         ) {
             Text(localizedString(R.string.appTerms, locale))
