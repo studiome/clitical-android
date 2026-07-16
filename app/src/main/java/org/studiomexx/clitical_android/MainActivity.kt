@@ -7,6 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.Analytics
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Language
@@ -20,6 +21,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.style.TextOverflow
 import org.studiomexx.clitical_android.ui.AboutScreen
 import org.studiomexx.clitical_android.ui.LanguageScreen
 import org.studiomexx.clitical_android.ui.QuestionForm
@@ -50,30 +53,27 @@ class MainActivity : ComponentActivity() {
                     Scaffold(
                         bottomBar = {
                             NavigationBar {
-                                NavigationBarItem(
-                                    icon = { Icon(Icons.Default.Analytics, contentDescription = null) },
-                                    label = { Text(localizedString(R.string.riskAssessmentTab, locale)) },
-                                    selected = selectedTab == 0,
-                                    onClick = { selectedTab = 0 }
+                                val tabs = listOf(
+                                    Icons.Default.Analytics to R.string.riskAssessmentTab,
+                                    Icons.Default.Language to R.string.language,
+                                    Icons.AutoMirrored.Filled.MenuBook to R.string.references,
+                                    Icons.Default.Info to R.string.aboutTab
                                 )
-                                NavigationBarItem(
-                                    icon = { Icon(Icons.Default.Language, contentDescription = null) },
-                                    label = { Text(localizedString(R.string.language, locale)) },
-                                    selected = selectedTab == 1,
-                                    onClick = { selectedTab = 1 }
-                                )
-                                NavigationBarItem(
-                                    icon = { Icon(Icons.Default.Info, contentDescription = null) },
-                                    label = { Text(localizedString(R.string.references, locale)) },
-                                    selected = selectedTab == 2,
-                                    onClick = { selectedTab = 2 }
-                                )
-                                NavigationBarItem(
-                                    icon = { Icon(Icons.Default.Info, contentDescription = null) },
-                                    label = { Text(localizedString(R.string.about, locale)) },
-                                    selected = selectedTab == 3,
-                                    onClick = { selectedTab = 3 }
-                                )
+                                tabs.forEachIndexed { index, (icon: ImageVector, labelRes: Int) ->
+                                    NavigationBarItem(
+                                        icon = { Icon(icon, contentDescription = null) },
+                                        label = {
+                                            Text(
+                                                text = localizedString(labelRes, locale),
+                                                maxLines = 1,
+                                                softWrap = false,
+                                                overflow = TextOverflow.Ellipsis
+                                            )
+                                        },
+                                        selected = selectedTab == index,
+                                        onClick = { selectedTab = index }
+                                    )
+                                }
                             }
                         }
                     ) { innerPadding ->

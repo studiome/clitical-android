@@ -79,6 +79,7 @@
     <string name="analysisLesionErrorMessage">Error! Check Lesions choice.</string>
     <string name="references">References</string>
     <string name="about">About</string>
+    <string name="aboutTab">About</string>
     <string name="tapToOpenLink">Tap to open link.</string>
     <string name="appLegalese">2022 Kazuhiro Miyahara, JSVS, JCLIMB</string>
     <string name="language">Language</string>

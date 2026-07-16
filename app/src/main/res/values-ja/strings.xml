@@ -79,6 +79,7 @@
     <string name="analysisLesionErrorMessage">動脈病変の領域選択を確認してください。</string>
     <string name="references">参考文献</string>
     <string name="about">このアプリについて</string>
+    <string name="aboutTab">アプリ情報</string>
     <string name="tapToOpenLink">論文サイトを開きます。</string>
     <string name="appLegalese">2022 発行: 特定非営利法人日本血管外科学会、JCLIMB委員会、ソフトウェア制作: 宮原和洋</string>
     <string name="language">言語</string>
