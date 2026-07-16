@@ -1,7 +1,7 @@
 package org.studiomexx.clitical_android.ui
 
 import androidx.browser.customtabs.CustomTabsIntent
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,7 +12,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
@@ -73,35 +77,45 @@ fun LanguageScreen(viewModel: MainViewModel, modifier: Modifier = Modifier) {
 fun ReferencesScreen(locale: Locale, modifier: Modifier = Modifier) {
     val context = LocalContext.current
     Column(
-        modifier = modifier
-            .padding(16.dp)
-            .verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        modifier = modifier.verticalScroll(rememberScrollState())
     ) {
-        Text(localizedString(R.string.tapToOpenLink, locale), style = MaterialTheme.typography.bodyMedium)
+        Text(
+            localizedString(R.string.tapToOpenLink, locale),
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.padding(16.dp)
+        )
         HorizontalDivider()
-        TextButton(
-            onClick = {
+        ListItem(
+            headlineContent = {
+                Text(
+                    "1. Miyata T. et al, Risk prediction model for early outcomes of revascularization for chronic limb-threatening ischaemia. Br J Surg. 2022 Oct 14;109(11):1123.",
+                    style = MaterialTheme.typography.bodySmall
+                )
+            },
+            trailingContent = {
+                Icon(Icons.AutoMirrored.Filled.OpenInNew, contentDescription = null)
+            },
+            modifier = Modifier.clickable {
                 CustomTabsIntent.Builder().build()
                     .launchUrl(context, "https://doi.org/10.1093/bjs/znab036".toUri())
             }
-        ) {
-            Text(
-                "1. Miyata T. et al, Risk prediction model for early outcomes of revascularization for chronic limb-threatening ischaemia. Br J Surg. 2022 Oct 14;109(11):1123.",
-                style = MaterialTheme.typography.bodySmall
-            )
-        }
-        TextButton(
-            onClick = {
+        )
+        HorizontalDivider()
+        ListItem(
+            headlineContent = {
+                Text(
+                    "2. Miyata T. et al, Prediction Models for Two Year Overall Survival and Amputation Free Survival After Revascularisation for Chronic Limb Threatening Ischaemia. Eur J Vasc Endovasc Surg . 2022 Jun 7;S1078-5884(22)00340-9.",
+                    style = MaterialTheme.typography.bodySmall
+                )
+            },
+            trailingContent = {
+                Icon(Icons.AutoMirrored.Filled.OpenInNew, contentDescription = null)
+            },
+            modifier = Modifier.clickable {
                 CustomTabsIntent.Builder().build()
                     .launchUrl(context, "https://doi.org/10.1016/j.ejvs.2022.05.038".toUri())
             }
-        ) {
-            Text(
-                "2. Miyata T. et al, Prediction Models for Two Year Overall Survival and Amputation Free Survival After Revascularisation for Chronic Limb Threatening Ischaemia. Eur J Vasc Endovasc Surg . 2022 Jun 7;S1078-5884(22)00340-9.",
-                style = MaterialTheme.typography.bodySmall
-            )
-        }
+        )
     }
 }
 

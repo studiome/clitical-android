@@ -14,6 +14,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.test.onNodeWithText
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
@@ -21,7 +22,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
-import org.robolectric.shadows.ShadowToast
 import org.studiomexx.clitical_android.model.Sex
 import java.util.Locale
 
@@ -185,7 +185,8 @@ class QuestionFormTest {
         composeTestRule.onNode(rowLabelled("リスク解析実行")).performClick()
 
         assertNotNull(viewModel.calculatedRisk)
-        assertEquals(0, ShadowToast.shownToastCount())
+        composeTestRule.onNodeWithText("数値入力を確認してください。").assertDoesNotExist()
+        composeTestRule.onNodeWithText("動脈病変の領域選択を確認してください。").assertDoesNotExist()
     }
 
     @Test
@@ -196,7 +197,7 @@ class QuestionFormTest {
         composeTestRule.onNode(rowLabelled("リスク解析実行")).performClick()
 
         assertNull(viewModel.calculatedRisk)
-        assertEquals("数値入力を確認してください。", ShadowToast.getTextOfLatestToast())
+        composeTestRule.onNodeWithText("数値入力を確認してください。").assertExists()
     }
 
     @Test
@@ -211,19 +212,19 @@ class QuestionFormTest {
         composeTestRule.onNode(rowLabelled("リスク解析実行")).performClick()
 
         assertNull(viewModel.calculatedRisk)
-        assertEquals("動脈病変の領域選択を確認してください。", ShadowToast.getTextOfLatestToast())
+        composeTestRule.onNodeWithText("動脈病変の領域選択を確認してください。").assertExists()
     }
 
-    /** Regression: the Toast used to resolve via the system locale, ignoring the in-app switcher. */
+    /** Regression: the error message used to resolve via the system locale, ignoring the in-app switcher. */
     @Test
-    fun errorToastFollowsTheInAppLocaleRatherThanTheSystemLocale() {
+    fun errorSnackbarFollowsTheInAppLocaleRatherThanTheSystemLocale() {
         Locale.setDefault(Locale.JAPAN)
         showForm(locale = "en")
 
         scrollTo(rowLabelled("Predict Risks"))
         composeTestRule.onNode(rowLabelled("Predict Risks")).performClick()
 
-        assertEquals("Error! Missing some data at Number Form.", ShadowToast.getTextOfLatestToast())
+        composeTestRule.onNodeWithText("Error! Missing some data at Number Form.").assertExists()
     }
 
     @Test

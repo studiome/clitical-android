@@ -7,6 +7,10 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.annotation.StringRes
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.togetherWith
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -21,6 +25,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -28,6 +33,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.style.TextOverflow
 import org.studiomexx.clitical_android.ui.AboutScreen
 import org.studiomexx.clitical_android.ui.LanguageScreen
@@ -73,45 +79,56 @@ private fun CLiTICALApp(viewModel: MainViewModel) {
 
     BackHandler(enabled = risk != null) { viewModel.calculatedRisk = null }
 
-    if (risk != null) {
-        ResultScreen(
-            risk = risk,
-            onBack = { viewModel.calculatedRisk = null },
-            locale = locale
-        )
-    } else {
-        Scaffold(
-            topBar = {
-                TopAppBar(title = { Text(localizedString(selectedTab.titleRes, locale)) })
-            },
-            bottomBar = {
-                NavigationBar {
-                    Tab.entries.forEach { tab ->
-                        NavigationBarItem(
-                            icon = { Icon(tab.icon, contentDescription = null) },
-                            label = {
-                                Text(
-                                    text = localizedString(tab.labelRes, locale),
-                                    maxLines = 1,
-                                    softWrap = false,
-                                    overflow = TextOverflow.Ellipsis
-                                )
-                            },
-                            selected = selectedTab == tab,
-                            onClick = { selectedTab = tab }
-                        )
+    AnimatedContent(
+        targetState = risk,
+        transitionSpec = { fadeIn() togetherWith fadeOut() },
+        label = "riskResultTransition"
+    ) { targetRisk ->
+        if (targetRisk != null) {
+            ResultScreen(
+                risk = targetRisk,
+                onBack = { viewModel.calculatedRisk = null },
+                locale = locale
+            )
+        } else {
+            val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+            Scaffold(
+                modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+                topBar = {
+                    TopAppBar(
+                        title = { Text(localizedString(selectedTab.titleRes, locale)) },
+                        scrollBehavior = scrollBehavior
+                    )
+                },
+                bottomBar = {
+                    NavigationBar {
+                        Tab.entries.forEach { tab ->
+                            NavigationBarItem(
+                                icon = { Icon(tab.icon, contentDescription = null) },
+                                label = {
+                                    Text(
+                                        text = localizedString(tab.labelRes, locale),
+                                        maxLines = 1,
+                                        softWrap = false,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                },
+                                selected = selectedTab == tab,
+                                onClick = { selectedTab = tab }
+                            )
+                        }
                     }
                 }
-            }
-        ) { innerPadding ->
-            val contentModifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize()
-            when (selectedTab) {
-                Tab.RISK -> QuestionForm(viewModel = viewModel, modifier = contentModifier)
-                Tab.LANGUAGE -> LanguageScreen(viewModel = viewModel, modifier = contentModifier)
-                Tab.REFERENCES -> ReferencesScreen(locale = locale, modifier = contentModifier)
-                Tab.ABOUT -> AboutScreen(locale = locale, modifier = contentModifier)
+            ) { innerPadding ->
+                val contentModifier = Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize()
+                when (selectedTab) {
+                    Tab.RISK -> QuestionForm(viewModel = viewModel, modifier = contentModifier)
+                    Tab.LANGUAGE -> LanguageScreen(viewModel = viewModel, modifier = contentModifier)
+                    Tab.REFERENCES -> ReferencesScreen(locale = locale, modifier = contentModifier)
+                    Tab.ABOUT -> AboutScreen(locale = locale, modifier = contentModifier)
+                }
             }
         }
     }
