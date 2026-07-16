@@ -1,7 +1,6 @@
 package org.studiomexx.clitical_android.ui
 
 import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import org.studiomexx.clitical_android.BuildConfig
 import org.studiomexx.clitical_android.R
 import java.util.Locale
@@ -82,7 +82,7 @@ fun ReferencesScreen(locale: Locale, modifier: Modifier = Modifier) {
         HorizontalDivider()
         TextButton(
             onClick = {
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://doi.org/10.1093/bjs/znab036"))
+                val intent = Intent(Intent.ACTION_VIEW, "https://doi.org/10.1093/bjs/znab036".toUri())
                 context.startActivity(intent)
             }
         ) {
@@ -93,7 +93,7 @@ fun ReferencesScreen(locale: Locale, modifier: Modifier = Modifier) {
         }
         TextButton(
             onClick = {
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://doi.org/10.1016/j.ejvs.2022.05.038"))
+                val intent = Intent(Intent.ACTION_VIEW, "https://doi.org/10.1016/j.ejvs.2022.05.038".toUri())
                 context.startActivity(intent)
             }
         ) {
@@ -117,7 +117,7 @@ fun AboutScreen(locale: Locale, modifier: Modifier = Modifier) {
         Spacer(modifier = Modifier.height(32.dp))
         TextButton(
             onClick = {
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://studiome.github.io/clti_risk/"))
+                val intent = Intent(Intent.ACTION_VIEW, "https://studiome.github.io/clti_risk/".toUri())
                 context.startActivity(intent)
             }
         ) {
