@@ -32,8 +32,8 @@ class MainActivityTest {
         fillField("身長 [cm]", "150")
         fillField("体重 [kg]", "50")
         fillField("アルブミン値 [g/dl]", "4.0")
-        composeTestRule.onNode(hasScrollAction()).performScrollToNode(hasText("リスク解析実行"))
-        composeTestRule.onNodeWithText("リスク解析実行").performClick()
+        composeTestRule.onNode(hasScrollAction()).performScrollToNode(hasText("リスク予測"))
+        composeTestRule.onNodeWithText("リスク予測").performClick()
     }
 
     @Test

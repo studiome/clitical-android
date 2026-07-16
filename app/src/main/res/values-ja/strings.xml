@@ -77,7 +77,7 @@
     <string name="lesionInfo">血行再建対象病変</string>
     <string name="otherLesionInfo">その他血管病変</string>
     <string name="complications">合併症</string>
-    <string name="predictRisks">リスク解析実行</string>
+    <string name="predictRisks">リスク予測</string>
     <string name="reset">リセット</string>
 </resources>
 

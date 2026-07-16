@@ -181,8 +181,8 @@ class QuestionFormTest {
         val viewModel = showForm()
         viewModel.fillRequiredFields()
 
-        scrollTo(rowLabelled("リスク解析実行"))
-        composeTestRule.onNode(rowLabelled("リスク解析実行")).performClick()
+        scrollTo(rowLabelled("リスク予測"))
+        composeTestRule.onNode(rowLabelled("リスク予測")).performClick()
 
         assertNotNull(viewModel.calculatedRisk)
         composeTestRule.onNodeWithText("数値入力を確認してください。").assertDoesNotExist()
@@ -193,8 +193,8 @@ class QuestionFormTest {
     fun predictingWithEmptyFieldsShowsTheNumericInputError() {
         val viewModel = showForm()
 
-        scrollTo(rowLabelled("リスク解析実行"))
-        composeTestRule.onNode(rowLabelled("リスク解析実行")).performClick()
+        scrollTo(rowLabelled("リスク予測"))
+        composeTestRule.onNode(rowLabelled("リスク予測")).performClick()
 
         assertNull(viewModel.calculatedRisk)
         composeTestRule.onNodeWithText("数値入力を確認してください。").assertExists()
@@ -208,8 +208,8 @@ class QuestionFormTest {
         // hasAILesion defaults to true; clearing it leaves no lesion selected.
         scrollTo(rowLabelled("大動脈腸骨動脈領域病変"))
         onSwitchLabelled("大動脈腸骨動脈領域病変").performClick()
-        scrollTo(rowLabelled("リスク解析実行"))
-        composeTestRule.onNode(rowLabelled("リスク解析実行")).performClick()
+        scrollTo(rowLabelled("リスク予測"))
+        composeTestRule.onNode(rowLabelled("リスク予測")).performClick()
 
         assertNull(viewModel.calculatedRisk)
         composeTestRule.onNodeWithText("動脈病変の領域選択を確認してください。").assertExists()
@@ -233,8 +233,8 @@ class QuestionFormTest {
         viewModel.fillRequiredFields()
         scrollTo(rowLabelled("喫煙歴"))
         onSwitchLabelled("喫煙歴").performClick()
-        scrollTo(rowLabelled("リスク解析実行"))
-        composeTestRule.onNode(rowLabelled("リスク解析実行")).performClick()
+        scrollTo(rowLabelled("リスク予測"))
+        composeTestRule.onNode(rowLabelled("リスク予測")).performClick()
         assertNotNull(viewModel.calculatedRisk)
 
         scrollTo(rowLabelled("リセット"))
