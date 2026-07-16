@@ -114,7 +114,8 @@ fun QuestionForm(viewModel: MainViewModel, modifier: Modifier = Modifier) {
             SwitchRow(
                 label = localizedString(R.string.questionSmokingTitle, locale),
                 checked = patientData.isSmoking,
-                onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(isSmoking = checked) } }
+                onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(isSmoking = checked) } },
+                description = localizedString(R.string.questionSmokingDescription, locale)
             )
         }
         item {
@@ -142,35 +143,40 @@ fun QuestionForm(viewModel: MainViewModel, modifier: Modifier = Modifier) {
                 options = CKD.entries,
                 selectedOption = patientData.ckd,
                 onOptionSelected = { ckd -> viewModel.updatePatientData { it.copy(ckd = ckd) } },
-                locale = locale
+                locale = locale,
+                description = localizedString(R.string.questionCKDDescription, locale)
             )
         }
         item {
             SwitchRow(
                 label = localizedString(R.string.questionUrgentTitle, locale),
                 checked = patientData.isUrgent,
-                onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(isUrgent = checked) } }
+                onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(isUrgent = checked) } },
+                description = localizedString(R.string.questionUrgentDescription, locale)
             )
         }
         item {
             SwitchRow(
                 label = localizedString(R.string.questionFeverTitle, locale),
                 checked = patientData.hasFever,
-                onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(hasFever = checked) } }
+                onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(hasFever = checked) } },
+                description = localizedString(R.string.questionFeverDescription, locale)
             )
         }
         item {
             SwitchRow(
                 label = localizedString(R.string.questionAbnormalWBCTitle, locale),
                 checked = patientData.hasAbnormalWBC,
-                onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(hasAbnormalWBC = checked) } }
+                onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(hasAbnormalWBC = checked) } },
+                description = localizedString(R.string.questionAbnormalWBCDescription, locale)
             )
         }
         item {
             SwitchRow(
                 label = localizedString(R.string.questionLocalInfectionTitle, locale),
                 checked = patientData.hasLocalInfection,
-                onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(hasLocalInfection = checked) } }
+                onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(hasLocalInfection = checked) } },
+                description = localizedString(R.string.questionLocalInfectionDescription, locale)
             )
         }
         item {
@@ -211,14 +217,16 @@ fun QuestionForm(viewModel: MainViewModel, modifier: Modifier = Modifier) {
             SwitchRow(
                 label = localizedString(R.string.questionContraTitle, locale),
                 checked = patientData.hasContraLateralLesion,
-                onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(hasContraLateralLesion = checked) } }
+                onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(hasContraLateralLesion = checked) } },
+                description = localizedString(R.string.questionContraDescription, locale)
             )
         }
         item {
             SwitchRow(
                 label = localizedString(R.string.questionOtherLesionTitle, locale),
                 checked = patientData.hasOtherVD,
-                onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(hasOtherVD = checked) } }
+                onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(hasOtherVD = checked) } },
+                description = localizedString(R.string.questionOtherLesionDescription, locale)
             )
         }
 
@@ -227,28 +235,32 @@ fun QuestionForm(viewModel: MainViewModel, modifier: Modifier = Modifier) {
             SwitchRow(
                 label = localizedString(R.string.questionCHFTitle, locale),
                 checked = patientData.hasCHF,
-                onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(hasCHF = checked) } }
+                onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(hasCHF = checked) } },
+                description = localizedString(R.string.questionCHFDescription, locale)
             )
         }
         item {
             SwitchRow(
                 label = localizedString(R.string.questionCADTitle, locale),
                 checked = patientData.hasCAD,
-                onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(hasCAD = checked) } }
+                onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(hasCAD = checked) } },
+                description = localizedString(R.string.questionCADDescription, locale)
             )
         }
         item {
             SwitchRow(
                 label = localizedString(R.string.questionCVDTitle, locale),
                 checked = patientData.hasCVD,
-                onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(hasCVD = checked) } }
+                onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(hasCVD = checked) } },
+                description = localizedString(R.string.questionCVDDescription, locale)
             )
         }
         item {
             SwitchRow(
                 label = localizedString(R.string.questionDLTitle, locale),
                 checked = patientData.hasDyslipidemia,
-                onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(hasDyslipidemia = checked) } }
+                onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(hasDyslipidemia = checked) } },
+                description = localizedString(R.string.questionDLDescription, locale)
             )
         }
         item {
@@ -364,12 +376,17 @@ fun TextEditRow(
 fun SwitchRow(
     label: String,
     checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit
+    onCheckedChange: (Boolean) -> Unit,
+    description: String? = null
 ) {
     // Toggling on the row rather than the Switch merges the two into one node, so the
     // switch is announced with its label and the whole row becomes a tap target.
     ListItem(
         headlineContent = { Text(label) },
+        // The clinical definition of "yes/no" lives here as supporting text.
+        supportingContent = description?.let {
+            { Text(it, style = MaterialTheme.typography.bodySmall) }
+        },
         trailingContent = {
             Switch(
                 checked = checked,
@@ -390,7 +407,8 @@ fun <T> EnumChoiceRow(
     options: List<T>,
     selectedOption: T,
     onOptionSelected: (T) -> Unit,
-    locale: Locale
+    locale: Locale,
+    description: String? = null
 ) where T : Enum<T>, T : Labeled {
     var expanded by remember { mutableStateOf(false) }
     val chevronRotation by animateFloatAsState(if (expanded) 180f else 0f, label = "chevronRotation")
@@ -411,6 +429,14 @@ fun <T> EnumChoiceRow(
         )
         AnimatedVisibility(visible = expanded) {
             Column(modifier = Modifier.padding(start = 32.dp)) {
+                if (description != null) {
+                    Text(
+                        text = description,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                    )
+                }
                 options.forEach { option ->
                     // The row owns the click so the option is one target, not two.
                     Row(

@@ -157,6 +157,7 @@ class QuestionFormTest {
         // hasAILesion defaults to true, hasFPLesion to false.
         scrollTo(rowLabelled("大動脈腸骨動脈領域病変"))
         onSwitchLabelled("大動脈腸骨動脈領域病変").assertIsOn()
+        scrollTo(rowLabelled("大腿膝窩領域病変"))
         onSwitchLabelled("大腿膝窩領域病変").assertIsOff()
     }
 
@@ -243,5 +244,25 @@ class QuestionFormTest {
         assertEquals("", viewModel.ageText)
         assertEquals(false, viewModel.patientData.isSmoking)
         assertNull(viewModel.calculatedRisk)
+    }
+
+    @Test
+    fun switchRowShowsItsClinicalDescription() {
+        showForm()
+
+        scrollTo(rowLabelled("発熱"))
+        composeTestRule.onNode(hasText("あり: 体温38℃以上", substring = true)).assertExists()
+    }
+
+    // The description belongs to the expanded options, so a collapsed row stays terse.
+    @Test
+    fun enumRowShowsItsDescriptionOnlyWhenExpanded() {
+        showForm()
+
+        scrollTo(hasText("慢性腎臓病", substring = true))
+        composeTestRule.onNode(hasText("正常: 60以上", substring = true)).assertDoesNotExist()
+
+        composeTestRule.onNode(hasText("慢性腎臓病", substring = true)).performClick()
+        composeTestRule.onNode(hasText("正常: 60以上", substring = true)).assertExists()
     }
 }
