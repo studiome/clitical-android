@@ -91,4 +91,5 @@
     <string name="complications">Complications</string>
     <string name="predictRisks">Predict Risks</string>
     <string name="reset">Reset</string>
+    <string name="questionFormTitle">Patient Data</string>
 </resources>

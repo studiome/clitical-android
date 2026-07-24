@@ -14,15 +14,16 @@ import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -41,22 +42,39 @@ fun SettingsScreen(viewModel: MainViewModel, modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val locale = viewModel.locale
     Column(modifier = modifier.verticalScroll(rememberScrollState())) {
-        SectionHeader(localizedString(R.string.language, locale))
-        LanguagePicker(viewModel = viewModel)
-
-        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-        ListItem(
-            headlineContent = { Text(localizedString(R.string.appTerms, locale)) },
-            trailingContent = {
-                Icon(Icons.AutoMirrored.Filled.OpenInNew, contentDescription = null)
-            },
-            modifier = Modifier.clickable {
-                CustomTabsIntent.Builder().build()
-                    .launchUrl(context, "https://studiome.github.io/clti_risk/".toUri())
-            }
+        Text(
+            text = localizedString(R.string.settings, locale),
+            style = MaterialTheme.typography.headlineMedium,
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
         )
 
-        SectionHeader(localizedString(R.string.about, locale))
+        SectionTitle(localizedString(R.string.language, locale))
+        SectionCard(
+            rows = listOf(
+                { LanguagePicker(viewModel = viewModel) }
+            )
+        )
+
+        SectionCard(
+            modifier = Modifier.padding(top = 8.dp),
+            rows = listOf(
+                {
+                    ListItem(
+                        headlineContent = { Text(localizedString(R.string.appTerms, locale)) },
+                        trailingContent = {
+                            Icon(Icons.AutoMirrored.Filled.OpenInNew, contentDescription = null)
+                        },
+                        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                        modifier = Modifier.clickable {
+                            CustomTabsIntent.Builder().build()
+                                .launchUrl(context, "https://studiome.github.io/clti_risk/".toUri())
+                        }
+                    )
+                }
+            )
+        )
+
+        SectionTitle(localizedString(R.string.about, locale))
         Column(modifier = Modifier.padding(horizontal = 16.dp)) {
             Row(modifier = Modifier.fillMaxWidth()) {
                 Text("CLiTICAL", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
@@ -76,7 +94,7 @@ fun SettingsScreen(viewModel: MainViewModel, modifier: Modifier = Modifier) {
 @Composable
 private fun LanguagePicker(viewModel: MainViewModel, modifier: Modifier = Modifier) {
     val locale = viewModel.locale
-    Column(modifier = modifier.padding(horizontal = 16.dp)) {
+    Column(modifier = modifier.padding(horizontal = 8.dp, vertical = 8.dp)) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -121,41 +139,55 @@ fun ReferencesScreen(locale: Locale, modifier: Modifier = Modifier) {
         modifier = modifier.verticalScroll(rememberScrollState())
     ) {
         Text(
+            text = localizedString(R.string.references, locale),
+            style = MaterialTheme.typography.headlineMedium,
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+        )
+        Text(
             localizedString(R.string.tapToOpenLink, locale),
             style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(16.dp)
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
         )
-        HorizontalDivider()
-        ListItem(
-            headlineContent = {
-                Text(
-                    "1. Miyata T. et al, Risk prediction model for early outcomes of revascularization for chronic limb-threatening ischaemia. Br J Surg. 2022 Oct 14;109(11):1123.",
-                    style = MaterialTheme.typography.bodySmall
-                )
-            },
-            trailingContent = {
-                Icon(Icons.AutoMirrored.Filled.OpenInNew, contentDescription = null)
-            },
-            modifier = Modifier.clickable {
-                CustomTabsIntent.Builder().build()
-                    .launchUrl(context, "https://doi.org/10.1093/bjs/znab036".toUri())
-            }
-        )
-        HorizontalDivider()
-        ListItem(
-            headlineContent = {
-                Text(
-                    "2. Miyata T. et al, Prediction Models for Two Year Overall Survival and Amputation Free Survival After Revascularisation for Chronic Limb Threatening Ischaemia. Eur J Vasc Endovasc Surg . 2022 Jun 7;S1078-5884(22)00340-9.",
-                    style = MaterialTheme.typography.bodySmall
-                )
-            },
-            trailingContent = {
-                Icon(Icons.AutoMirrored.Filled.OpenInNew, contentDescription = null)
-            },
-            modifier = Modifier.clickable {
-                CustomTabsIntent.Builder().build()
-                    .launchUrl(context, "https://doi.org/10.1016/j.ejvs.2022.05.038".toUri())
-            }
+        SectionCard(
+            rows = listOf(
+                {
+                    ListItem(
+                        headlineContent = {
+                            Text(
+                                "1. Miyata T. et al, Risk prediction model for early outcomes of revascularization for chronic limb-threatening ischaemia. Br J Surg. 2022 Oct 14;109(11):1123.",
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        },
+                        trailingContent = {
+                            Icon(Icons.AutoMirrored.Filled.OpenInNew, contentDescription = null)
+                        },
+                        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                        modifier = Modifier.clickable {
+                            CustomTabsIntent.Builder().build()
+                                .launchUrl(context, "https://doi.org/10.1093/bjs/znab036".toUri())
+                        }
+                    )
+                },
+                {
+                    ListItem(
+                        headlineContent = {
+                            Text(
+                                "2. Miyata T. et al, Prediction Models for Two Year Overall Survival and Amputation Free Survival After Revascularisation for Chronic Limb Threatening Ischaemia. Eur J Vasc Endovasc Surg . 2022 Jun 7;S1078-5884(22)00340-9.",
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        },
+                        trailingContent = {
+                            Icon(Icons.AutoMirrored.Filled.OpenInNew, contentDescription = null)
+                        },
+                        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                        modifier = Modifier.clickable {
+                            CustomTabsIntent.Builder().build()
+                                .launchUrl(context, "https://doi.org/10.1016/j.ejvs.2022.05.038".toUri())
+                        }
+                    )
+                }
+            )
         )
     }
 }

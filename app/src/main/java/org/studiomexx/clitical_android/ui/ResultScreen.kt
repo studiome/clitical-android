@@ -11,11 +11,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -65,6 +65,11 @@ fun ResultScreen(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            Text(
+                text = localizedString(R.string.result, locale),
+                style = MaterialTheme.typography.headlineMedium
+            )
+
             val notAvailable = localizedString(R.string.notAvailable, locale)
 
             // 30-day Amputation/Death
@@ -129,7 +134,7 @@ fun InfoCard(
     value: String,
     extraLabel: String? = null
 ) {
-    ElevatedCard(
+    OutlinedCard(
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(
@@ -155,7 +160,6 @@ fun InfoCard(
             Text(
                 text = value,
                 style = MaterialTheme.typography.displayMedium,
-                color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.SemiBold
             )
             if (extraLabel != null) {
@@ -163,7 +167,6 @@ fun InfoCard(
                 Text(
                     text = extraLabel,
                     style = MaterialTheme.typography.headlineSmall,
-                    color = MaterialTheme.colorScheme.secondary,
                     fontWeight = FontWeight.Medium
                 )
             }

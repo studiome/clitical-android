@@ -91,5 +91,6 @@
     <string name="complications">合併症</string>
     <string name="predictRisks">リスク予測</string>
     <string name="reset">リセット</string>
+    <string name="questionFormTitle">患者データ</string>
 </resources>
 
