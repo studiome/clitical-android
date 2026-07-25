@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
@@ -71,11 +72,19 @@ fun SettingsScreen(viewModel: MainViewModel, modifier: Modifier = Modifier) {
 
         SectionTitle(localizedString(R.string.about, locale))
         Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-            Row(modifier = Modifier.fillMaxWidth()) {
+            // The bare version number, as clitical-ios shows it: a "Version:"
+            // label would be one more string to translate for no added meaning.
+            // Merging the row keeps the number tied to the app name for a
+            // screen reader, which is what the iOS list row does by default.
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .semantics(mergeDescendants = true) { }
+            ) {
                 Text("CLiTICAL", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.weight(1f))
                 Text(
-                    "Version: ${BuildConfig.VERSION_NAME}",
+                    BuildConfig.VERSION_NAME,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

@@ -49,8 +49,11 @@ class SettingsScreensTest {
         val viewModel = MainViewModel().apply { locale = Locale.forLanguageTag("ja") }
         composeTestRule.setContent { SettingsScreen(viewModel = viewModel) }
 
-        composeTestRule.onNode(hasText("CLiTICAL")).assertExists()
-        composeTestRule.onNode(hasText("Version: 0.1.0")).assertExists()
+        // Matching clitical-ios, the row shows the bare version number with no
+        // "Version:" label, so the About row has nothing left to translate. The
+        // row is one node so the number is announced with the app it belongs to.
+        composeTestRule.onNode(hasText("CLiTICAL") and hasText("0.1.0")).assertExists()
+        composeTestRule.onNode(hasText("Version: 0.1.0")).assertDoesNotExist()
     }
 
     @Test
