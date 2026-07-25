@@ -14,6 +14,7 @@ import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Analytics
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
@@ -42,7 +43,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -76,7 +80,9 @@ fun QuestionForm(viewModel: MainViewModel, modifier: Modifier = Modifier) {
             Text(
                 text = localizedString(R.string.questionFormTitle, locale),
                 style = MaterialTheme.typography.headlineMedium,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                modifier = Modifier
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .semantics { heading() }
             )
         }
 
@@ -437,13 +443,22 @@ fun <T> EnumChoiceRow(
 ) where T : Enum<T>, T : Labeled {
     var expanded by remember { mutableStateOf(false) }
 
+    // The label/description Text nodes are purely visual: the OutlinedTextField below
+    // carries an equivalent contentDescription, so a screen reader should focus that
+    // single node rather than announcing the label twice.
+    val fieldDescription = description?.let { "$label, $it" } ?: label
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Column(modifier = Modifier.weight(1f)) {
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .clearAndSetSemantics { }
+        ) {
             Text(text = label, style = MaterialTheme.typography.bodyLarge)
             if (description != null) {
                 Text(
@@ -468,19 +483,24 @@ fun <T> EnumChoiceRow(
                 modifier = Modifier
                     .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
                     .fillMaxWidth()
-                    .semantics { contentDescription = label }
+                    .semantics { contentDescription = fieldDescription }
             )
             ExposedDropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = false }
             ) {
                 options.forEach { option ->
+                    val isSelected = option == selectedOption
                     DropdownMenuItem(
                         text = { Text(localizedString(option.stringResId, locale)) },
+                        trailingIcon = if (isSelected) {
+                            { Icon(Icons.Default.Check, contentDescription = null) }
+                        } else null,
                         onClick = {
                             onOptionSelected(option)
                             expanded = false
-                        }
+                        },
+                        modifier = Modifier.semantics { selected = isSelected }
                     )
                 }
             }

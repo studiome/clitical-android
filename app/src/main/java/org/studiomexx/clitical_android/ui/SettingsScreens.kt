@@ -25,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
@@ -42,12 +43,6 @@ fun SettingsScreen(viewModel: MainViewModel, modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val locale = viewModel.locale
     Column(modifier = modifier.verticalScroll(rememberScrollState())) {
-        Text(
-            text = localizedString(R.string.settings, locale),
-            style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-        )
-
         SectionTitle(localizedString(R.string.language, locale))
         SectionCard(
             rows = listOf(
@@ -100,6 +95,7 @@ private fun LanguagePicker(viewModel: MainViewModel, modifier: Modifier = Modifi
                 .fillMaxWidth()
                 .selectable(
                     selected = (locale.language == "ja"),
+                    role = Role.RadioButton,
                     onClick = { viewModel.locale = Locale.forLanguageTag("ja") }
                 )
                 .padding(8.dp),
@@ -107,7 +103,7 @@ private fun LanguagePicker(viewModel: MainViewModel, modifier: Modifier = Modifi
         ) {
             RadioButton(
                 selected = (locale.language == "ja"),
-                onClick = { viewModel.locale = Locale.forLanguageTag("ja") }
+                onClick = null
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(localizedString(R.string.ja, locale))
@@ -117,6 +113,7 @@ private fun LanguagePicker(viewModel: MainViewModel, modifier: Modifier = Modifi
                 .fillMaxWidth()
                 .selectable(
                     selected = (locale.language == "en"),
+                    role = Role.RadioButton,
                     onClick = { viewModel.locale = Locale.forLanguageTag("en") }
                 )
                 .padding(8.dp),
@@ -124,7 +121,7 @@ private fun LanguagePicker(viewModel: MainViewModel, modifier: Modifier = Modifi
         ) {
             RadioButton(
                 selected = (locale.language == "en"),
-                onClick = { viewModel.locale = Locale.forLanguageTag("en") }
+                onClick = null
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(localizedString(R.string.en, locale))
@@ -138,11 +135,6 @@ fun ReferencesScreen(locale: Locale, modifier: Modifier = Modifier) {
     Column(
         modifier = modifier.verticalScroll(rememberScrollState())
     ) {
-        Text(
-            text = localizedString(R.string.references, locale),
-            style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-        )
         Text(
             localizedString(R.string.tapToOpenLink, locale),
             style = MaterialTheme.typography.bodyMedium,

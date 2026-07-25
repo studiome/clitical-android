@@ -65,11 +65,6 @@ fun ResultScreen(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text(
-                text = localizedString(R.string.result, locale),
-                style = MaterialTheme.typography.headlineMedium
-            )
-
             val notAvailable = localizedString(R.string.notAvailable, locale)
 
             // 30-day Amputation/Death

@@ -4,6 +4,8 @@ import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsOn
+import androidx.compose.ui.test.assertIsSelected
+import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.hasScrollAction
 import androidx.compose.ui.test.hasSetTextAction
@@ -79,13 +81,17 @@ class QuestionFormTest {
     }
 
     @Test
-    fun enumOptionIsASingleTargetAnnouncedAsARadioButton() {
-        showForm()
+    fun enumOptionExposesItsSelectedState() {
+        val viewModel = showForm()
+        assertEquals(Sex.FEMALE, viewModel.patientData.sex)
 
-        composeTestRule.onNode(rowLabelled("性別")).performClick()
+        // Open the dropdown via its anchor field, the same way TalkBack reaches it.
+        composeTestRule.onNode(hasContentDescription("性別") and hasClickAction()).performClick()
 
         // One selectable node per option, not a nested row-plus-radio pair.
         composeTestRule.onAllNodes(isSelectable() and hasText("男性")).assertCountEquals(1)
+        // The current selection is exposed as selection state, not just as displayed text.
+        composeTestRule.onNode(isSelectable() and hasText("女性")).assertIsSelected()
     }
 
     @Test
@@ -166,15 +172,15 @@ class QuestionFormTest {
         val viewModel = showForm()
         assertEquals(Sex.FEMALE, viewModel.patientData.sex)
 
-        // Collapsed, the row only shows the current selection, so the other option is absent.
-        composeTestRule.onNode(rowLabelled("男性")).assertDoesNotExist()
+        // Collapsed, the dropdown menu isn't showing its options yet.
+        composeTestRule.onNode(isSelectable() and hasText("男性")).assertDoesNotExist()
 
-        composeTestRule.onNode(rowLabelled("性別")).performClick()
-        composeTestRule.onNode(rowLabelled("男性")).performClick()
+        composeTestRule.onNode(hasContentDescription("性別") and hasClickAction()).performClick()
+        composeTestRule.onNode(isSelectable() and hasText("男性")).performClick()
 
         assertEquals(Sex.MALE, viewModel.patientData.sex)
-        // Collapsed again: 男性 now shows as the selection, and 女性 is gone with the options.
-        composeTestRule.onNode(rowLabelled("女性")).assertDoesNotExist()
+        // Selecting an option collapses the menu again.
+        composeTestRule.onNode(isSelectable() and hasText("男性")).assertDoesNotExist()
     }
 
     @Test
@@ -254,15 +260,14 @@ class QuestionFormTest {
         composeTestRule.onNode(hasText("体温38℃以上", substring = true)).assertExists()
     }
 
-    // The description belongs to the expanded options, so a collapsed row stays terse.
+    // Matches web's select-row.ts, which renders the description unconditionally.
+    // The label/description pair is hidden from the semantics tree in favour of a single
+    // merged contentDescription on the field (see fieldDescription), so we assert through that.
     @Test
-    fun enumRowShowsItsDescriptionOnlyWhenExpanded() {
+    fun enumRowAlwaysShowsItsDescription() {
         showForm()
 
-        scrollTo(hasText("慢性腎臓病", substring = true))
-        composeTestRule.onNode(hasText("正常: 60以上", substring = true)).assertDoesNotExist()
-
-        composeTestRule.onNode(hasText("慢性腎臓病", substring = true)).performClick()
-        composeTestRule.onNode(hasText("正常: 60以上", substring = true)).assertExists()
+        scrollTo(hasContentDescription("慢性腎臓病", substring = true))
+        composeTestRule.onNode(hasContentDescription("正常: 60以上", substring = true)).assertExists()
     }
 }
