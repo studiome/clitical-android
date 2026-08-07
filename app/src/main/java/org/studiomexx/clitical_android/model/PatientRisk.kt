@@ -3,7 +3,7 @@ package org.studiomexx.clitical_android.model
 import kotlin.math.exp
 import kotlin.math.pow
 
-class PatientRisk(val patientData: PatientData) {
+class PatientRisk(patientData: PatientData) {
 
     init {
         if (patientData.weight == null ||
@@ -52,13 +52,13 @@ class PatientRisk(val patientData: PatientData) {
     private fun calcPredictedOS(data: PatientData): Double {
         val sigma = calcSigma(data, osCoeff)
         if (sigma.isNaN()) return Double.NaN
-        return osH0Coeff.pow(exp(sigma))
+        return OS_H0_COEFF.pow(exp(sigma))
     }
 
     private fun calcPredictedAFS(data: PatientData): Double {
         val sigma = calcSigma(data, afsCoeff)
         if (sigma.isNaN()) return Double.NaN
-        return afsH0Coeff.pow(exp(sigma))
+        return AFS_H0_COEFF.pow(exp(sigma))
     }
 
     private fun classifyOSRisk(overallSurvival: Double): OSRisk? {
@@ -142,34 +142,34 @@ class PatientRisk(val patientData: PatientData) {
         if (data.hasCVD) sigma += coeff[Covariants.HAS_CVD] ?: 0.0
 
         // CKD
-        when (data.ckd) {
-            CKD.G3 -> sigma += coeff[Covariants.HAS_CKD_G3] ?: 0.0
-            CKD.G4 -> sigma += coeff[Covariants.HAS_CKD_G4] ?: 0.0
-            CKD.G5 -> sigma += coeff[Covariants.HAS_CKD_G5] ?: 0.0
-            CKD.G5D -> sigma += coeff[Covariants.HAS_CKD_G5D] ?: 0.0
-            else -> {}
+        sigma += when (data.ckd) {
+            CKD.G3 -> coeff[Covariants.HAS_CKD_G3] ?: 0.0
+            CKD.G4 -> coeff[Covariants.HAS_CKD_G4] ?: 0.0
+            CKD.G5 -> coeff[Covariants.HAS_CKD_G5] ?: 0.0
+            CKD.G5D -> coeff[Covariants.HAS_CKD_G5D] ?: 0.0
+            else -> 0.0
         }
 
         // GNRI Risk
         val risk = gnriRisk ?: return Double.NaN
-        when (risk) {
-            GNRIRisk.NO_RISK, GNRIRisk.LOW -> sigma += coeff[Covariants.GNRI_NO_OR_LOW] ?: 0.0
-            GNRIRisk.MODERATE -> sigma += coeff[Covariants.GNRI_MODERATE] ?: 0.0
-            GNRIRisk.MAJOR -> sigma += coeff[Covariants.GNRI_MAJOR] ?: 0.0
+        sigma += when (risk) {
+            GNRIRisk.NO_RISK, GNRIRisk.LOW -> coeff[Covariants.GNRI_NO_OR_LOW] ?: 0.0
+            GNRIRisk.MODERATE -> coeff[Covariants.GNRI_MODERATE] ?: 0.0
+            GNRIRisk.MAJOR -> coeff[Covariants.GNRI_MAJOR] ?: 0.0
         }
 
         // Activity
-        when (data.activity) {
-            Activity.AMBULATORY -> sigma += coeff[Covariants.ACTIVITY_AMBULATORY] ?: 0.0
-            Activity.WHEELCHAIR -> sigma += coeff[Covariants.ACTIVITY_WHEELCHAIR] ?: 0.0
-            Activity.IMMOBILE -> sigma += coeff[Covariants.ACTIVITY_IMMOBILE] ?: 0.0
+        sigma += when (data.activity) {
+            Activity.AMBULATORY -> coeff[Covariants.ACTIVITY_AMBULATORY] ?: 0.0
+            Activity.WHEELCHAIR -> coeff[Covariants.ACTIVITY_WHEELCHAIR] ?: 0.0
+            Activity.IMMOBILE -> coeff[Covariants.ACTIVITY_IMMOBILE] ?: 0.0
         }
 
         // Malignancy
-        when (data.malignant) {
-            MalignantNeoplasm.PAST_HISTORY -> sigma += coeff[Covariants.PAST_MALIGNANCY] ?: 0.0
-            MalignantNeoplasm.UNDER_TREATMENT -> sigma += coeff[Covariants.TREATING_MALIGNANCY] ?: 0.0
-            else -> {}
+        sigma += when (data.malignant) {
+            MalignantNeoplasm.PAST_HISTORY -> coeff[Covariants.PAST_MALIGNANCY] ?: 0.0
+            MalignantNeoplasm.UNDER_TREATMENT -> coeff[Covariants.TREATING_MALIGNANCY] ?: 0.0
+            else -> 0.0
         }
 
         // Occlusive lesion
@@ -212,10 +212,10 @@ class PatientRisk(val patientData: PatientData) {
         if (data.hasOtherVD) sigma += coeff[Covariants.HAS_OTHER] ?: 0.0
 
         // Rutherford
-        when (data.rutherford) {
-            RutherfordClassification.CLASS4 -> sigma += coeff[Covariants.RUTHERFORD_4] ?: 0.0
-            RutherfordClassification.CLASS5 -> sigma += coeff[Covariants.RUTHERFORD_5] ?: 0.0
-            RutherfordClassification.CLASS6 -> sigma += coeff[Covariants.RUTHERFORD_6] ?: 0.0
+        sigma += when (data.rutherford) {
+            RutherfordClassification.CLASS4 -> coeff[Covariants.RUTHERFORD_4] ?: 0.0
+            RutherfordClassification.CLASS5 -> coeff[Covariants.RUTHERFORD_5] ?: 0.0
+            RutherfordClassification.CLASS6 -> coeff[Covariants.RUTHERFORD_6] ?: 0.0
         }
 
         sigma += coeff[Covariants.INTERCEPT] ?: 0.0
@@ -224,7 +224,7 @@ class PatientRisk(val patientData: PatientData) {
     }
 
     companion object {
-        const val osH0Coeff = 0.922
+        const val OS_H0_COEFF = 0.922
         val osCoeff = mapOf(
             Covariants.IS_FEMALE to -0.25,
             Covariants.AGE_65_TO_74 to 0.31,
@@ -246,7 +246,7 @@ class PatientRisk(val patientData: PatientData) {
             Covariants.LESION_BELOW_IP to 0.16
         )
 
-        const val afsH0Coeff = 0.876
+        const val AFS_H0_COEFF = 0.876
         val afsCoeff = mapOf(
             Covariants.IS_FEMALE to -0.21,
             Covariants.AGE_65_TO_74 to 0.19,

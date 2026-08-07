@@ -26,5 +26,5 @@ data class PatientData(
     val hasCAD: Boolean = false,
     val hasContraLateralLesion: Boolean = false,
     val hasOtherVD: Boolean = false,
-    val rutherford: RutherfordClassification = RutherfordClassification.CLASS4
+    val rutherford: RutherfordClassification = RutherfordClassification.CLASS4,
 )
