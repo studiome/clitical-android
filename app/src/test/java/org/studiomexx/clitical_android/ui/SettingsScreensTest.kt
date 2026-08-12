@@ -14,6 +14,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.Shadows.shadowOf
+import org.studiomexx.clitical_android.BuildConfig
 import java.util.Locale
 
 @RunWith(RobolectricTestRunner::class)
@@ -52,8 +53,41 @@ class SettingsScreensTest {
         // Matching clitical-ios, the row shows the bare version number with no
         // "Version:" label, so the About row has nothing left to translate. The
         // row is one node so the number is announced with the app it belongs to.
-        composeTestRule.onNode(hasText("CLiTICAL") and hasText("0.1.0")).assertExists()
-        composeTestRule.onNode(hasText("Version: 0.1.0")).assertDoesNotExist()
+        composeTestRule.onNode(hasText("CLiTICAL") and hasText(BuildConfig.VERSION_NAME)).assertExists()
+        composeTestRule.onNode(hasText("Version: " + BuildConfig.VERSION_NAME)).assertDoesNotExist()
+    }
+
+    @Test
+    fun settingsScreenShowsWhatTheAppPredicts() {
+        val viewModel = MainViewModel().apply { locale = Locale.forLanguageTag("ja") }
+        composeTestRule.setContent { SettingsScreen(viewModel = viewModel) }
+
+        composeTestRule.onNode(hasText("包括的慢性下肢虚血", substring = true)).assertExists()
+    }
+
+    @Test
+    fun settingsScreenShowsTheClinicalDisclaimer() {
+        val viewModel = MainViewModel().apply { locale = Locale.forLanguageTag("ja") }
+        composeTestRule.setContent { SettingsScreen(viewModel = viewModel) }
+
+        composeTestRule.onNode(hasText("最終的な判断は担当医の責任", substring = true)).assertExists()
+    }
+
+    @Test
+    fun settingsScreenSaysPatientDataStaysOnTheDevice() {
+        val viewModel = MainViewModel().apply { locale = Locale.forLanguageTag("ja") }
+        composeTestRule.setContent { SettingsScreen(viewModel = viewModel) }
+
+        composeTestRule.onNode(hasText("外部への送信", substring = true)).assertExists()
+    }
+
+    @Test
+    fun settingsScreenTranslatesTheAboutTextToEnglish() {
+        val viewModel = MainViewModel().apply { locale = Locale.forLanguageTag("en") }
+        composeTestRule.setContent { SettingsScreen(viewModel = viewModel) }
+
+        composeTestRule.onNode(hasText("chronic limb-threatening ischaemia", substring = true)).assertExists()
+        composeTestRule.onNode(hasText("包括的慢性下肢虚血", substring = true)).assertDoesNotExist()
     }
 
     @Test

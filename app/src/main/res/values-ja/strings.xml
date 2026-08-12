@@ -60,6 +60,10 @@
     <string name="notAvailable">該当なし</string>
     <string name="tapToOpenLink">論文サイトを開きます。</string>
     <string name="appLegalese">2022 発行: 特定非営利法人日本血管外科学会、JCLIMB委員会、ソフトウェア制作: 宮原和洋</string>
+    <string name="aboutDescription">CLiTICAL は、血行再建術を受ける包括的慢性下肢虚血 (CLTI) 患者の周術期および中期予後を予測するアプリです。</string>
+    <string name="aboutDataSource">予測モデルは日本血管外科学会 JCLIMB レジストリの解析に基づいています。出典は「参考文献」タブに掲載しています。</string>
+    <string name="aboutPrivacy">入力された患者データは端末内でのみ扱われ、外部への送信や保存は行いません。</string>
+    <string name="aboutDisclaimer">予測値は臨床判断を補助する参考情報であり、診断や治療方針の決定に代わるものではありません。最終的な判断は担当医の責任において行ってください。</string>
     <string name="language">言語</string>
     <string name="en">English</string>
     <string name="ja">日本語</string>

@@ -2,6 +2,7 @@ package org.studiomexx.clitical_android.ui
 
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -71,7 +72,10 @@ fun SettingsScreen(viewModel: MainViewModel, modifier: Modifier = Modifier) {
         )
 
         SectionTitle(localizedString(R.string.about, locale))
-        Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+        Column(
+            modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
             // The bare version number, as clitical-ios shows it: a "Version:"
             // label would be one more string to translate for no added meaning.
             // Merging the row keeps the number tied to the app name for a
@@ -89,7 +93,22 @@ fun SettingsScreen(viewModel: MainViewModel, modifier: Modifier = Modifier) {
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-            Spacer(modifier = Modifier.height(8.dp))
+            Text(localizedString(R.string.aboutDescription, locale), style = MaterialTheme.typography.bodyMedium)
+            Text(
+                localizedString(R.string.aboutDataSource, locale),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Text(
+                localizedString(R.string.aboutPrivacy, locale),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Text(
+                localizedString(R.string.aboutDisclaimer, locale),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
             Text(localizedString(R.string.appLegalese, locale), style = MaterialTheme.typography.bodySmall)
         }
     }

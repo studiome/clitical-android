@@ -60,6 +60,10 @@
     <string name="notAvailable">N/A</string>
     <string name="tapToOpenLink">Tap to open link.</string>
     <string name="appLegalese">2022 Kazuhiro Miyahara, JSVS, JCLIMB</string>
+    <string name="aboutDescription">CLiTICAL predicts peri-procedural and mid-term outcomes for patients with chronic limb-threatening ischaemia (CLTI) undergoing revascularisation.</string>
+    <string name="aboutDataSource">The prediction models are derived from the JCLIMB registry of the Japanese Society for Vascular Surgery. The source papers are listed in the References tab.</string>
+    <string name="aboutPrivacy">Entered patient data stays on this device. Nothing is uploaded or stored outside the app.</string>
+    <string name="aboutDisclaimer">The predicted values are reference information to support clinical judgement. They do not replace diagnosis or treatment decisions, which remain the responsibility of the attending clinician.</string>
     <string name="language">Language</string>
     <string name="en">English</string>
     <string name="ja">日本語</string>
