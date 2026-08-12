@@ -162,7 +162,11 @@ there. `versionCode` must increase for every build uploaded to Play.
 
 ## License
 
+Released under the [MIT License](LICENSE).
+
 © 2022 Kazuhiro Miyahara, Japanese Society for Vascular Surgery (JSVS), JCLIMB Committee.
 
-Use of the app is governed by its [terms of service](https://studiome.github.io/clti_risk/). No
-open-source license has been declared for this repository.
+The MIT License covers this source code. It does not extend to the published prediction models and
+the papers they come from — see [References](#references) — nor does it waive the clinical
+disclaimer above. Use of the distributed app is additionally governed by its
+[terms of service](https://studiome.github.io/clti_risk/).
