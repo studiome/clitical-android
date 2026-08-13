@@ -58,36 +58,14 @@ class SettingsScreensTest {
     }
 
     @Test
-    fun settingsScreenShowsWhatTheAppPredicts() {
+    fun settingsScreenOnlyShowsTheVersionAndLegaleseInAbout() {
         val viewModel = MainViewModel().apply { locale = Locale.forLanguageTag("ja") }
         composeTestRule.setContent { SettingsScreen(viewModel = viewModel) }
 
-        composeTestRule.onNode(hasText("包括的慢性下肢虚血", substring = true)).assertExists()
-    }
-
-    @Test
-    fun settingsScreenShowsTheClinicalDisclaimer() {
-        val viewModel = MainViewModel().apply { locale = Locale.forLanguageTag("ja") }
-        composeTestRule.setContent { SettingsScreen(viewModel = viewModel) }
-
-        composeTestRule.onNode(hasText("最終的な判断は担当医の責任", substring = true)).assertExists()
-    }
-
-    @Test
-    fun settingsScreenSaysPatientDataStaysOnTheDevice() {
-        val viewModel = MainViewModel().apply { locale = Locale.forLanguageTag("ja") }
-        composeTestRule.setContent { SettingsScreen(viewModel = viewModel) }
-
-        composeTestRule.onNode(hasText("外部への送信", substring = true)).assertExists()
-    }
-
-    @Test
-    fun settingsScreenTranslatesTheAboutTextToEnglish() {
-        val viewModel = MainViewModel().apply { locale = Locale.forLanguageTag("en") }
-        composeTestRule.setContent { SettingsScreen(viewModel = viewModel) }
-
-        composeTestRule.onNode(hasText("chronic limb-threatening ischaemia", substring = true)).assertExists()
+        composeTestRule.onNode(hasText("2022 発行", substring = true)).assertExists()
         composeTestRule.onNode(hasText("包括的慢性下肢虚血", substring = true)).assertDoesNotExist()
+        composeTestRule.onNode(hasText("外部への送信", substring = true)).assertDoesNotExist()
+        composeTestRule.onNode(hasText("最終的な判断は担当医の責任", substring = true)).assertDoesNotExist()
     }
 
     @Test
