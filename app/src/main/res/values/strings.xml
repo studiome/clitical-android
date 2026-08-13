@@ -86,6 +86,8 @@
     <string name="osMediumRisk">Medium Risk</string>
     <string name="osHighRisk">High Risk</string>
     <string name="appTerms">Terms of service</string>
+    <string name="appPrivacyPolicy">Privacy Policy</string>
+    <string name="appSupport">Support</string>
     <string name="riskAssessmentTab">Risk Assessment</string>
     <string name="basicInfo">Basic Info</string>
     <string name="socialHistory">Social History</string>

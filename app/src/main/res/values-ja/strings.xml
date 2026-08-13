@@ -86,6 +86,8 @@
     <string name="osMediumRisk">中等度リスク</string>
     <string name="osHighRisk">高リスク</string>
     <string name="appTerms">利用規約</string>
+    <string name="appPrivacyPolicy">プライバシーポリシー</string>
+    <string name="appSupport">サポート</string>
     <string name="riskAssessmentTab">リスク評価</string>
     <string name="basicInfo">基本情報</string>
     <string name="socialHistory">生活歴</string>
@@ -97,4 +99,3 @@
     <string name="reset">リセット</string>
     <string name="questionFormTitle">患者データ</string>
 </resources>
-

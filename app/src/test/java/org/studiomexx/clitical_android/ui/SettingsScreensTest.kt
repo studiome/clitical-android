@@ -123,7 +123,7 @@ class SettingsScreensTest {
     }
 
     @Test
-    fun settingsScreenOpensTermsOfServiceInAnInAppBrowser() {
+    fun settingsScreenOpensJapaneseTermsOfServiceInAnInAppBrowser() {
         val viewModel = MainViewModel().apply { locale = Locale.forLanguageTag("ja") }
         composeTestRule.setContent { SettingsScreen(viewModel = viewModel) }
 
@@ -131,7 +131,46 @@ class SettingsScreensTest {
 
         val intent = shadowOf(composeTestRule.activity).nextStartedActivity
         assertEquals(Intent.ACTION_VIEW, intent.action)
-        assertEquals("https://studiome.github.io/clti_risk/".toUri(), intent.data)
+        assertEquals("https://studiome.github.io/clitical-legal/terms/ja/".toUri(), intent.data)
+        assertTrue(intent.hasExtra(CustomTabsIntent.EXTRA_SESSION))
+    }
+
+    @Test
+    fun settingsScreenOpensEnglishTermsOfServiceForAnyNonJapaneseLocale() {
+        val viewModel = MainViewModel().apply { locale = Locale.forLanguageTag("fr") }
+        composeTestRule.setContent { SettingsScreen(viewModel = viewModel) }
+
+        composeTestRule.onNode(hasText("Terms of service")).performClick()
+
+        val intent = shadowOf(composeTestRule.activity).nextStartedActivity
+        assertEquals(Intent.ACTION_VIEW, intent.action)
+        assertEquals("https://studiome.github.io/clitical-legal/terms/en/".toUri(), intent.data)
+        assertTrue(intent.hasExtra(CustomTabsIntent.EXTRA_SESSION))
+    }
+
+    @Test
+    fun settingsScreenOpensEnglishPrivacyPolicyInAnInAppBrowser() {
+        val viewModel = MainViewModel().apply { locale = Locale.forLanguageTag("en") }
+        composeTestRule.setContent { SettingsScreen(viewModel = viewModel) }
+
+        composeTestRule.onNode(hasText("Privacy Policy")).performClick()
+
+        val intent = shadowOf(composeTestRule.activity).nextStartedActivity
+        assertEquals(Intent.ACTION_VIEW, intent.action)
+        assertEquals("https://studiome.github.io/clitical-legal/privacy/en/".toUri(), intent.data)
+        assertTrue(intent.hasExtra(CustomTabsIntent.EXTRA_SESSION))
+    }
+
+    @Test
+    fun settingsScreenOpensJapaneseSupportInAnInAppBrowser() {
+        val viewModel = MainViewModel().apply { locale = Locale.forLanguageTag("ja") }
+        composeTestRule.setContent { SettingsScreen(viewModel = viewModel) }
+
+        composeTestRule.onNode(hasText("サポート")).performClick()
+
+        val intent = shadowOf(composeTestRule.activity).nextStartedActivity
+        assertEquals(Intent.ACTION_VIEW, intent.action)
+        assertEquals("https://studiome.github.io/clitical-legal/support/ja/".toUri(), intent.data)
         assertTrue(intent.hasExtra(CustomTabsIntent.EXTRA_SESSION))
     }
 }

@@ -35,9 +35,9 @@ import org.studiomexx.clitical_android.R
 import java.util.Locale
 
 /**
- * Groups language, terms, and app-info in a single tab, mirroring the iOS app's
- * Settings tab (which likewise folds these settings-like items out of the tab bar
- * rather than giving each its own top-level destination).
+ * Groups language, legal information, and app info in a single tab, mirroring the
+ * iOS app's Settings tab (which likewise folds these settings-like items out of
+ * the tab bar rather than giving each its own top-level destination).
  */
 @Composable
 fun SettingsScreen(viewModel: MainViewModel, modifier: Modifier = Modifier) {
@@ -54,19 +54,9 @@ fun SettingsScreen(viewModel: MainViewModel, modifier: Modifier = Modifier) {
         SectionCard(
             modifier = Modifier.padding(top = 8.dp),
             rows = listOf(
-                {
-                    ListItem(
-                        headlineContent = { Text(localizedString(R.string.appTerms, locale)) },
-                        trailingContent = {
-                            Icon(Icons.AutoMirrored.Filled.OpenInNew, contentDescription = null)
-                        },
-                        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-                        modifier = Modifier.clickable {
-                            CustomTabsIntent.Builder().build()
-                                .launchUrl(context, "https://studiome.github.io/clti_risk/".toUri())
-                        }
-                    )
-                }
+                { LegalLinkRow(R.string.appTerms, "terms", locale) },
+                { LegalLinkRow(R.string.appPrivacyPolicy, "privacy", locale) },
+                { LegalLinkRow(R.string.appSupport, "support", locale) }
             )
         )
 
@@ -111,6 +101,27 @@ fun SettingsScreen(viewModel: MainViewModel, modifier: Modifier = Modifier) {
             Text(localizedString(R.string.appLegalese, locale), style = MaterialTheme.typography.bodySmall)
         }
     }
+}
+
+@Composable
+private fun LegalLinkRow(labelRes: Int, page: String, locale: Locale) {
+    val context = LocalContext.current
+    ListItem(
+        headlineContent = { Text(localizedString(labelRes, locale)) },
+        trailingContent = {
+            Icon(Icons.AutoMirrored.Filled.OpenInNew, contentDescription = null)
+        },
+        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+        modifier = Modifier.clickable {
+            CustomTabsIntent.Builder().build()
+                .launchUrl(context, legalPageUrl(page, locale).toUri())
+        }
+    )
+}
+
+private fun legalPageUrl(page: String, locale: Locale): String {
+    val language = if (locale.language == "ja") "ja" else "en"
+    return "https://studiome.github.io/clitical-legal/$page/$language/"
 }
 
 @Composable
