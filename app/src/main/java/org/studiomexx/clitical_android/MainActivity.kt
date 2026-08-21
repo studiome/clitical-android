@@ -33,6 +33,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import org.studiomexx.clitical_android.ui.MainViewModel
 import org.studiomexx.clitical_android.ui.QuestionForm
@@ -50,11 +52,12 @@ import org.studiomexx.clitical_android.ui.theme.CLiTICALAndroidTheme
 private enum class Tab(
     val icon: ImageVector,
     @StringRes val titleRes: Int,
-    @StringRes val labelRes: Int
+    @StringRes val labelRes: Int,
+    @StringRes val a11yLabelRes: Int
 ) {
-    RISK(Icons.Default.Analytics, R.string.riskAssessmentTab, R.string.riskAssessmentTab),
-    REFERENCES(Icons.AutoMirrored.Filled.MenuBook, R.string.references, R.string.references),
-    SETTINGS(Icons.Default.Settings, R.string.settings, R.string.settings)
+    RISK(Icons.Default.Analytics, R.string.riskAssessmentTab, R.string.riskAssessmentTabShort, R.string.riskAssessmentTabA11y),
+    REFERENCES(Icons.AutoMirrored.Filled.MenuBook, R.string.references, R.string.referencesTabShort, R.string.referencesTabA11y),
+    SETTINGS(Icons.Default.Settings, R.string.settings, R.string.settingsTabShort, R.string.settingsTabA11y)
 }
 
 class MainActivity : ComponentActivity() {
@@ -104,6 +107,7 @@ private fun CLiTICALApp(viewModel: MainViewModel) {
                 bottomBar = {
                     NavigationBar {
                         Tab.entries.forEach { tab ->
+                            val accessibleLabel = localizedString(tab.a11yLabelRes, locale)
                             NavigationBarItem(
                                 icon = { Icon(tab.icon, contentDescription = null) },
                                 label = {
@@ -113,6 +117,9 @@ private fun CLiTICALApp(viewModel: MainViewModel) {
                                         softWrap = false,
                                         overflow = TextOverflow.Ellipsis
                                     )
+                                },
+                                modifier = Modifier.semantics {
+                                    contentDescription = accessibleLabel
                                 },
                                 selected = selectedTab == tab,
                                 onClick = { selectedTab = tab }

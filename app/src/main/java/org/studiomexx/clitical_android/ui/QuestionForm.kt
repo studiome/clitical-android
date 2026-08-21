@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -33,6 +34,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,16 +43,20 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.error
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.runtime.withFrameNanos
 import kotlinx.coroutines.launch
 import org.studiomexx.clitical_android.R
 import org.studiomexx.clitical_android.model.Activity
@@ -73,9 +79,52 @@ fun QuestionForm(viewModel: MainViewModel, modifier: Modifier = Modifier) {
     val patientData = viewModel.patientData
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
+    val listState = rememberLazyListState()
+    val ageFocusRequester = remember { FocusRequester() }
+    val heightFocusRequester = remember { FocusRequester() }
+    val weightFocusRequester = remember { FocusRequester() }
+    val albFocusRequester = remember { FocusRequester() }
+    val lesionFocusRequester = remember { FocusRequester() }
+
+    val ageError = if (viewModel.hasSubmitted && viewModel.ageText.toIntOrNull() == null) {
+        localizedString(R.string.questionAgeError, locale)
+    } else null
+    val heightError = if (viewModel.hasSubmitted && viewModel.heightText.toDoubleOrNull() == null) {
+        localizedString(R.string.questionHeightError, locale)
+    } else null
+    val weightError = if (viewModel.hasSubmitted && viewModel.weightText.toDoubleOrNull() == null) {
+        localizedString(R.string.questionWeightError, locale)
+    } else null
+    val albError = if (viewModel.hasSubmitted && viewModel.albText.toDoubleOrNull() == null) {
+        localizedString(R.string.questionAlbError, locale)
+    } else null
+    val lesionError = if (
+        viewModel.hasSubmitted &&
+        !patientData.hasAILesion && !patientData.hasFPLesion && !patientData.hasBKLesion
+    ) localizedString(R.string.lesionSelectionError, locale) else null
+
+    fun focusFirstInvalid() {
+        val target = when {
+            ageError != null -> Pair(2, ageFocusRequester)
+            heightError != null -> Pair(2, heightFocusRequester)
+            weightError != null -> Pair(2, weightFocusRequester)
+            albError != null -> Pair(6, albFocusRequester)
+            lesionError != null -> Pair(8, lesionFocusRequester)
+            else -> null
+        } ?: return
+        coroutineScope.launch {
+            listState.animateScrollToItem(target.first)
+            withFrameNanos { }
+            target.second.requestFocus()
+        }
+    }
+
+    LaunchedEffect(viewModel.validationAttempt) {
+        if (viewModel.hasSubmitted) focusFirstInvalid()
+    }
 
     Box(modifier = modifier) {
-    LazyColumn(modifier = Modifier.fillMaxSize()) {
+    LazyColumn(state = listState, modifier = Modifier.fillMaxSize()) {
         item {
             Text(
                 text = localizedString(R.string.questionFormTitle, locale),
@@ -95,7 +144,9 @@ fun QuestionForm(viewModel: MainViewModel, modifier: Modifier = Modifier) {
                             label = localizedString(R.string.questionAgeTitle, locale),
                             value = viewModel.ageText,
                             onValueChange = { if (it.isEmpty() || it.all { c -> c.isDigit() }) viewModel.ageText = it },
-                            isDecimal = false
+                            isDecimal = false,
+                            errorMessage = ageError,
+                            focusRequester = ageFocusRequester
                         )
                     },
                     {
@@ -112,7 +163,9 @@ fun QuestionForm(viewModel: MainViewModel, modifier: Modifier = Modifier) {
                             label = localizedString(R.string.questionHeightTitle, locale),
                             value = viewModel.heightText,
                             onValueChange = { if (it.isEmpty() || it.matches(heightWeightPattern)) viewModel.heightText = it },
-                            isDecimal = true
+                            isDecimal = true,
+                            errorMessage = heightError,
+                            focusRequester = heightFocusRequester
                         )
                     },
                     {
@@ -120,7 +173,9 @@ fun QuestionForm(viewModel: MainViewModel, modifier: Modifier = Modifier) {
                             label = localizedString(R.string.questionWeightTitle, locale),
                             value = viewModel.weightText,
                             onValueChange = { if (it.isEmpty() || it.matches(heightWeightPattern)) viewModel.weightText = it },
-                            isDecimal = true
+                            isDecimal = true,
+                            errorMessage = weightError,
+                            focusRequester = weightFocusRequester
                         )
                     }
                 )
@@ -161,7 +216,9 @@ fun QuestionForm(viewModel: MainViewModel, modifier: Modifier = Modifier) {
                             label = localizedString(R.string.questionAlbTitle, locale),
                             value = viewModel.albText,
                             onValueChange = { if (it.isEmpty() || it.matches(albuminPattern)) viewModel.albText = it },
-                            isDecimal = true
+                            isDecimal = true,
+                            errorMessage = albError,
+                            focusRequester = albFocusRequester
                         )
                     },
                     {
@@ -227,7 +284,8 @@ fun QuestionForm(viewModel: MainViewModel, modifier: Modifier = Modifier) {
                         SwitchRow(
                             label = localizedString(R.string.questionAILesionTitle, locale),
                             checked = patientData.hasAILesion,
-                            onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(hasAILesion = checked) } }
+                            onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(hasAILesion = checked) } },
+                            focusRequester = lesionFocusRequester
                         )
                     },
                     {
@@ -243,6 +301,19 @@ fun QuestionForm(viewModel: MainViewModel, modifier: Modifier = Modifier) {
                             checked = patientData.hasBKLesion,
                             onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(hasBKLesion = checked) } }
                         )
+                    },
+                    {
+                        if (lesionError != null) {
+                            Text(
+                                text = lesionError,
+                                color = MaterialTheme.colorScheme.error,
+                                style = MaterialTheme.typography.bodySmall,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp)
+                                    .semantics { error(lesionError) }
+                            )
+                        }
                     }
                 )
             )
@@ -379,7 +450,9 @@ fun TextEditRow(
     label: String,
     value: String,
     onValueChange: (String) -> Unit,
-    isDecimal: Boolean
+    isDecimal: Boolean,
+    errorMessage: String? = null,
+    focusRequester: FocusRequester? = null
 ) {
     ListItem(
         headlineContent = { Text(label) },
@@ -387,10 +460,18 @@ fun TextEditRow(
             OutlinedTextField(
                 value = value,
                 onValueChange = onValueChange,
+                isError = errorMessage != null,
+                supportingText = errorMessage?.let { message ->
+                    { Text(message, color = MaterialTheme.colorScheme.error) }
+                },
                 // The headline is a separate node, so the field needs its own label.
                 modifier = Modifier
                     .width(110.dp)
-                    .semantics { contentDescription = label },
+                    .then(focusRequester?.let { Modifier.focusRequester(it) } ?: Modifier)
+                    .semantics {
+                        contentDescription = label
+                        if (errorMessage != null) error(errorMessage)
+                    },
                 keyboardOptions = KeyboardOptions(
                     keyboardType = if (isDecimal) KeyboardType.Decimal else KeyboardType.Number
                 ),
@@ -406,7 +487,8 @@ fun SwitchRow(
     label: String,
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
-    description: String? = null
+    description: String? = null,
+    focusRequester: FocusRequester? = null
 ) {
     // Toggling on the row rather than the Switch merges the two into one node, so the
     // switch is announced with its label and the whole row becomes a tap target.
@@ -422,11 +504,13 @@ fun SwitchRow(
                 onCheckedChange = null
             )
         },
-        modifier = Modifier.toggleable(
-            value = checked,
-            onValueChange = onCheckedChange,
-            role = Role.Switch
-        ),
+        modifier = Modifier
+            .then(focusRequester?.let { Modifier.focusRequester(it) } ?: Modifier)
+            .toggleable(
+                value = checked,
+                onValueChange = onCheckedChange,
+                role = Role.Switch
+            ),
         colors = transparentListItemColors
     )
 }

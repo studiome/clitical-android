@@ -52,9 +52,9 @@ fun SettingsScreen(viewModel: MainViewModel, modifier: Modifier = Modifier) {
         SectionCard(
             modifier = Modifier.padding(top = 8.dp),
             rows = listOf(
-                { LegalLinkRow(R.string.appTerms, "terms", locale) },
-                { LegalLinkRow(R.string.appPrivacyPolicy, "privacy", locale) },
-                { LegalLinkRow(R.string.appSupport, "support", locale) }
+                { LegalLinkRow(R.string.appTerms, R.string.openTermsInBrowser, "terms", locale) },
+                { LegalLinkRow(R.string.appPrivacyPolicy, R.string.openPrivacyInBrowser, "privacy", locale) },
+                { LegalLinkRow(R.string.appSupport, R.string.openSupportInBrowser, "support", locale) }
             )
         )
 
@@ -85,7 +85,7 @@ fun SettingsScreen(viewModel: MainViewModel, modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun LegalLinkRow(labelRes: Int, page: String, locale: Locale) {
+private fun LegalLinkRow(labelRes: Int, actionLabelRes: Int, page: String, locale: Locale) {
     val context = LocalContext.current
     ListItem(
         headlineContent = { Text(localizedString(labelRes, locale)) },
@@ -93,7 +93,9 @@ private fun LegalLinkRow(labelRes: Int, page: String, locale: Locale) {
             Icon(Icons.AutoMirrored.Filled.OpenInNew, contentDescription = null)
         },
         colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-        modifier = Modifier.clickable {
+        modifier = Modifier.clickable(
+            onClickLabel = localizedString(actionLabelRes, locale)
+        ) {
             CustomTabsIntent.Builder().build()
                 .launchUrl(context, legalPageUrl(page, locale).toUri())
         }
@@ -174,7 +176,9 @@ fun ReferencesScreen(locale: Locale, modifier: Modifier = Modifier) {
                             Icon(Icons.AutoMirrored.Filled.OpenInNew, contentDescription = null)
                         },
                         colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-                        modifier = Modifier.clickable {
+                        modifier = Modifier.clickable(
+                            onClickLabel = localizedString(R.string.openReferenceInBrowser, locale)
+                        ) {
                             CustomTabsIntent.Builder().build()
                                 .launchUrl(context, "https://doi.org/10.1093/bjs/znab036".toUri())
                         }
@@ -192,7 +196,9 @@ fun ReferencesScreen(locale: Locale, modifier: Modifier = Modifier) {
                             Icon(Icons.AutoMirrored.Filled.OpenInNew, contentDescription = null)
                         },
                         colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-                        modifier = Modifier.clickable {
+                        modifier = Modifier.clickable(
+                            onClickLabel = localizedString(R.string.openReferenceInBrowser, locale)
+                        ) {
                             CustomTabsIntent.Builder().build()
                                 .launchUrl(context, "https://doi.org/10.1016/j.ejvs.2022.05.038".toUri())
                         }

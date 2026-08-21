@@ -24,6 +24,10 @@ class MainViewModel : ViewModel() {
 
     var calculatedRisk by mutableStateOf<PatientRisk?>(null)
 
+    /** True after the user attempts analysis; keeps field validation visible until fixed. */
+    var hasSubmitted by mutableStateOf(false)
+    var validationAttempt by mutableStateOf(0)
+
     fun updatePatientData(transform: (PatientData) -> PatientData) {
         patientData = transform(patientData)
     }
@@ -35,9 +39,13 @@ class MainViewModel : ViewModel() {
         albText = ""
         patientData = PatientData()
         calculatedRisk = null
+        hasSubmitted = false
+        validationAttempt = 0
     }
 
     fun calculateRisk(): ValidationError? {
+        hasSubmitted = true
+        validationAttempt++
         val data = patientData.copy(
             age = ageText.toIntOrNull(),
             height = heightText.toDoubleOrNull()?.div(100.0),

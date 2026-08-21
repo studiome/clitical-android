@@ -53,4 +53,14 @@ class MainActivityTest {
         // The result screen has no age field, so its reappearance confirms we're back on the form.
         composeTestRule.onNode(hasSetTextAction() and hasContentDescription("年齢 [歳]")).assertExists()
     }
+
+    @Test
+    fun navigationTabsHaveShortLabelsAndCompleteAccessibleNames() {
+        composeTestRule.onNodeWithText("リスク").assertExists()
+        composeTestRule.onNodeWithText("文献").assertExists()
+        composeTestRule.onNodeWithText("設定").assertExists()
+        composeTestRule.onNode(hasContentDescription("リスク評価タブ")).assertExists()
+        composeTestRule.onNode(hasContentDescription("参考文献タブ")).assertExists()
+        composeTestRule.onNode(hasContentDescription("設定タブ")).assertExists()
+    }
 }

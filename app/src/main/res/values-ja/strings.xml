@@ -89,6 +89,12 @@
     <string name="appPrivacyPolicy">プライバシーポリシー</string>
     <string name="appSupport">サポート</string>
     <string name="riskAssessmentTab">リスク評価</string>
+    <string name="riskAssessmentTabShort">リスク</string>
+    <string name="riskAssessmentTabA11y">リスク評価タブ</string>
+    <string name="referencesTabShort">文献</string>
+    <string name="referencesTabA11y">参考文献タブ</string>
+    <string name="settingsTabShort">設定</string>
+    <string name="settingsTabA11y">設定タブ</string>
     <string name="basicInfo">基本情報</string>
     <string name="socialHistory">生活歴</string>
     <string name="clinicalInfo">臨床情報</string>
@@ -98,4 +104,13 @@
     <string name="predictRisks">リスク予測</string>
     <string name="reset">リセット</string>
     <string name="questionFormTitle">患者データ</string>
+    <string name="questionAgeError">年齢を入力してください。</string>
+    <string name="questionHeightError">身長を入力してください。</string>
+    <string name="questionWeightError">体重を入力してください。</string>
+    <string name="questionAlbError">アルブミン値を入力してください。</string>
+    <string name="lesionSelectionError">動脈病変を1つ以上選択してください。</string>
+    <string name="openTermsInBrowser">ブラウザで利用規約を開く</string>
+    <string name="openPrivacyInBrowser">ブラウザでプライバシーポリシーを開く</string>
+    <string name="openSupportInBrowser">ブラウザでサポートを開く</string>
+    <string name="openReferenceInBrowser">ブラウザで参考文献を開く</string>
 </resources>

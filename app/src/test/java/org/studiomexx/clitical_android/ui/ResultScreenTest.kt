@@ -2,6 +2,8 @@ package org.studiomexx.clitical_android.ui
 
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.hasText
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.performClick
@@ -16,6 +18,8 @@ import java.util.Locale
 
 @RunWith(RobolectricTestRunner::class)
 class ResultScreenTest {
+
+    private fun isHeading() = SemanticsMatcher.keyIsDefined(SemanticsProperties.Heading)
 
     @get:Rule
     val composeTestRule = createComposeRule()
@@ -88,5 +92,13 @@ class ResultScreenTest {
         composeTestRule.onNodeWithContentDescription("戻る").performClick()
 
         assertEquals(1, backCount)
+    }
+
+    @Test
+    fun resultTitleAndCardTitlesAreHeadings() {
+        showResult()
+
+        composeTestRule.onNode(hasText("予測リスク") and isHeading()).assertExists()
+        composeTestRule.onNode(hasText("GNRI (Geriatric Nutritional Risk Index)") and isHeading()).assertExists()
     }
 }

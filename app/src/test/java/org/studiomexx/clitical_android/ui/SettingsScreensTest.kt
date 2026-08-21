@@ -6,6 +6,7 @@ import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.semantics.SemanticsActions
 import androidx.core.net.toUri
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -150,5 +151,20 @@ class SettingsScreensTest {
         assertEquals(Intent.ACTION_VIEW, intent.action)
         assertEquals("https://studiome.github.io/clitical-legal/support/ja/".toUri(), intent.data)
         assertTrue(intent.hasExtra(CustomTabsIntent.EXTRA_SESSION))
+    }
+
+    @Test
+    fun legalLinksExposeLocalizedOpenActionLabels() {
+        val viewModel = MainViewModel().apply { locale = Locale.forLanguageTag("ja") }
+        composeTestRule.setContent { SettingsScreen(viewModel = viewModel) }
+
+        val japaneseAction = composeTestRule.onNode(hasText("利用規約"))
+            .fetchSemanticsNode().config[SemanticsActions.OnClick]
+        assertEquals("ブラウザで利用規約を開く", japaneseAction?.label)
+
+        viewModel.locale = Locale.forLanguageTag("en")
+        val englishAction = composeTestRule.onNode(hasText("Terms of service"))
+            .fetchSemanticsNode().config[SemanticsActions.OnClick]
+        assertEquals("Open terms of service in browser", englishAction?.label)
     }
 }

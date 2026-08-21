@@ -89,6 +89,12 @@
     <string name="appPrivacyPolicy">Privacy Policy</string>
     <string name="appSupport">Support</string>
     <string name="riskAssessmentTab">Risk Assessment</string>
+    <string name="riskAssessmentTabShort">Risk</string>
+    <string name="riskAssessmentTabA11y">Risk assessment tab</string>
+    <string name="referencesTabShort">Refs</string>
+    <string name="referencesTabA11y">References tab</string>
+    <string name="settingsTabShort">Settings</string>
+    <string name="settingsTabA11y">Settings tab</string>
     <string name="basicInfo">Basic Info</string>
     <string name="socialHistory">Social History</string>
     <string name="clinicalInfo">Clinical Info</string>
@@ -98,4 +104,13 @@
     <string name="predictRisks">Predict Risks</string>
     <string name="reset">Reset</string>
     <string name="questionFormTitle">Patient Data</string>
+    <string name="questionAgeError">Enter age.</string>
+    <string name="questionHeightError">Enter body height.</string>
+    <string name="questionWeightError">Enter body weight.</string>
+    <string name="questionAlbError">Enter serum albumin.</string>
+    <string name="lesionSelectionError">Select at least one artery lesion site.</string>
+    <string name="openTermsInBrowser">Open terms of service in browser</string>
+    <string name="openPrivacyInBrowser">Open privacy policy in browser</string>
+    <string name="openSupportInBrowser">Open support in browser</string>
+    <string name="openReferenceInBrowser">Open reference in browser</string>
 </resources>

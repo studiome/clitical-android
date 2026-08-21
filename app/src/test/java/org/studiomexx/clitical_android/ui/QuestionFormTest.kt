@@ -3,6 +3,7 @@ package org.studiomexx.clitical_android.ui
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsOff
+import androidx.compose.ui.test.assertIsFocused
 import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.hasClickAction
@@ -220,6 +221,30 @@ class QuestionFormTest {
 
         assertNull(viewModel.calculatedRisk)
         composeTestRule.onNodeWithText("動脈病変の領域選択を確認してください。").assertExists()
+    }
+
+    @Test
+    fun predictingWithEmptyFieldsShowsPersistentFieldErrorAndFocusesFirstField() {
+        showForm()
+
+        scrollTo(rowLabelled("リスク予測"))
+        composeTestRule.onNode(rowLabelled("リスク予測")).performClick()
+
+        composeTestRule.onNodeWithText("年齢を入力してください。").assertExists()
+        onFieldLabelled("年齢 [歳]").assertIsFocused()
+    }
+
+    @Test
+    fun lesionValidationErrorRemainsVisibleAfterSubmit() {
+        val viewModel = showForm()
+        viewModel.fillRequiredFields()
+
+        scrollTo(rowLabelled("大動脈腸骨動脈領域病変"))
+        onSwitchLabelled("大動脈腸骨動脈領域病変").performClick()
+        scrollTo(rowLabelled("リスク予測"))
+        composeTestRule.onNode(rowLabelled("リスク予測")).performClick()
+
+        composeTestRule.onNodeWithText("動脈病変を1つ以上選択してください。").assertExists()
     }
 
     /** Regression: the error message used to resolve via the system locale, ignoring the in-app switcher. */
