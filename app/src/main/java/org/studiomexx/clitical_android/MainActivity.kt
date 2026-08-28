@@ -37,6 +37,8 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import org.studiomexx.clitical_android.ui.MainViewModel
+import org.studiomexx.clitical_android.ui.AboutScreen
+import org.studiomexx.clitical_android.ui.IntendedUseGate
 import org.studiomexx.clitical_android.ui.QuestionForm
 import org.studiomexx.clitical_android.ui.ReferencesScreen
 import org.studiomexx.clitical_android.ui.ResultScreen
@@ -68,7 +70,14 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             CLiTICALAndroidTheme {
-                CLiTICALApp(viewModel)
+                IntendedUseGate(
+                    store = IntendedUseDisclaimerStore(
+                        getSharedPreferences("clitical_preferences", MODE_PRIVATE)
+                    ),
+                    locale = viewModel.locale
+                ) {
+                    CLiTICALApp(viewModel)
+                }
             }
         }
     }
@@ -79,9 +88,12 @@ class MainActivity : ComponentActivity() {
 private fun CLiTICALApp(viewModel: MainViewModel) {
     val risk = viewModel.calculatedRisk
     var selectedTab by rememberSaveable { mutableStateOf(Tab.RISK) }
+    var showAbout by rememberSaveable { mutableStateOf(false) }
     val locale = viewModel.locale
 
-    BackHandler(enabled = risk != null) { viewModel.calculatedRisk = null }
+    BackHandler(enabled = risk != null || showAbout) {
+        if (risk != null) viewModel.calculatedRisk = null else showAbout = false
+    }
 
     AnimatedContent(
         targetState = risk,
@@ -94,6 +106,8 @@ private fun CLiTICALApp(viewModel: MainViewModel) {
                 onBack = { viewModel.calculatedRisk = null },
                 locale = locale
             )
+        } else if (showAbout) {
+            AboutScreen(locale = locale, onBack = { showAbout = false }, modifier = Modifier.fillMaxSize())
         } else {
             val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
             Scaffold(
@@ -134,7 +148,11 @@ private fun CLiTICALApp(viewModel: MainViewModel) {
                 when (selectedTab) {
                     Tab.RISK -> QuestionForm(viewModel = viewModel, modifier = contentModifier)
                     Tab.REFERENCES -> ReferencesScreen(locale = locale, modifier = contentModifier)
-                    Tab.SETTINGS -> SettingsScreen(viewModel = viewModel, modifier = contentModifier)
+                    Tab.SETTINGS -> SettingsScreen(
+                        viewModel = viewModel,
+                        modifier = contentModifier,
+                        onAboutClick = { showAbout = true }
+                    )
                 }
             }
         }

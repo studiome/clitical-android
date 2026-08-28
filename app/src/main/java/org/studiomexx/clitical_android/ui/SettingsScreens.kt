@@ -39,7 +39,11 @@ import java.util.Locale
  * the tab bar rather than giving each its own top-level destination).
  */
 @Composable
-fun SettingsScreen(viewModel: MainViewModel, modifier: Modifier = Modifier) {
+fun SettingsScreen(
+    viewModel: MainViewModel,
+    modifier: Modifier = Modifier,
+    onAboutClick: () -> Unit = {}
+) {
     val locale = viewModel.locale
     Column(modifier = modifier.verticalScroll(rememberScrollState())) {
         SectionTitle(localizedString(R.string.language, locale))
@@ -69,6 +73,7 @@ fun SettingsScreen(viewModel: MainViewModel, modifier: Modifier = Modifier) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .clickable(onClickLabel = localizedString(R.string.openAbout, locale), onClick = onAboutClick)
                     .semantics(mergeDescendants = true) { }
             ) {
                 Text("CLiTICAL", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)

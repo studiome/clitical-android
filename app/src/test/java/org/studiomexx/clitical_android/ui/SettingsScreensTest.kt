@@ -7,6 +7,9 @@ import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.core.net.toUri
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -67,6 +70,24 @@ class SettingsScreensTest {
         composeTestRule.onNode(hasText("包括的慢性下肢虚血", substring = true)).assertDoesNotExist()
         composeTestRule.onNode(hasText("外部への送信", substring = true)).assertDoesNotExist()
         composeTestRule.onNode(hasText("最終的な判断は担当医の責任", substring = true)).assertDoesNotExist()
+    }
+
+    @Test
+    fun tappingAboutVersionRowShowsDetailedAboutInformation() {
+        val viewModel = MainViewModel().apply { locale = Locale.forLanguageTag("ja") }
+        var aboutVisible by mutableStateOf(false)
+        composeTestRule.setContent {
+            SettingsScreen(viewModel = viewModel, onAboutClick = { aboutVisible = true })
+            if (aboutVisible) AboutScreen(locale = viewModel.locale)
+        }
+
+        composeTestRule.onNode(hasText("CLiTICAL") and hasText(BuildConfig.VERSION_NAME)).performClick()
+        composeTestRule.onNode(hasText("概要")).assertExists()
+        composeTestRule.onNode(hasText("使用目的")).assertExists()
+        composeTestRule.onNode(hasText("予測できる指標")).assertExists()
+        composeTestRule.onNode(hasText("算出方法")).assertExists()
+        composeTestRule.onNode(hasText("プライバシー")).assertExists()
+        composeTestRule.onNode(hasText("確認済みの利用目的説明版", substring = true)).assertExists()
     }
 
     @Test

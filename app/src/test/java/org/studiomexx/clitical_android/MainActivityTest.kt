@@ -6,10 +6,12 @@ import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextInput
 import org.junit.Rule
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -20,6 +22,14 @@ class MainActivityTest {
 
     @get:Rule
     val composeTestRule = createAndroidComposeRule<MainActivity>()
+
+    @Before
+    fun acknowledgeFirstRunNoticeWhenPresent() {
+        val notice = composeTestRule.onAllNodesWithText("内容を理解しました")
+        if (notice.fetchSemanticsNodes().isNotEmpty()) {
+            notice[0].performClick()
+        }
+    }
 
     private fun fillField(label: String, text: String) {
         val matcher = hasSetTextAction() and hasContentDescription(label)
