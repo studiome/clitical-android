@@ -15,3 +15,9 @@
 .cxx
 local.properties
 /app/release
+
+# IDE and task artifacts
+/.idea/deploymentTargetSelector.xml
+/.idea/planningMode.xml
+/artifacts/
+/.artifacts/
