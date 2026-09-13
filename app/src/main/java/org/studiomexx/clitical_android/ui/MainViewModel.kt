@@ -1,6 +1,7 @@
 package org.studiomexx.clitical_android.ui
 
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
@@ -11,7 +12,7 @@ import org.studiomexx.clitical_android.model.ValidationError
 import java.util.Locale
 
 class MainViewModel : ViewModel() {
-    var locale by mutableStateOf(Locale.forLanguageTag("ja"))
+    var locale: Locale by mutableStateOf(Locale.forLanguageTag("ja"))
 
     // Text buffers for numeric inputs, kept separate so partially-typed values can be edited freely
     var ageText by mutableStateOf("")
@@ -26,7 +27,7 @@ class MainViewModel : ViewModel() {
 
     /** True after the user attempts analysis; keeps field validation visible until fixed. */
     var hasSubmitted by mutableStateOf(false)
-    var validationAttempt by mutableStateOf(0)
+    var validationAttempt by mutableIntStateOf(0)
 
     fun updatePatientData(transform: (PatientData) -> PatientData) {
         patientData = transform(patientData)
