@@ -25,8 +25,11 @@ android {
 
     buildTypes {
         release {
+            // R8 shrinking, optimization and obfuscation plus resource shrinking. Play flags
+            // a release whose DEX isn't optimized; the app uses no reflection that needs
+            // keep rules of its own (see src/main/keepRules).
             optimization {
-                enable = false
+                enable = true
             }
         }
     }
