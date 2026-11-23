@@ -6,9 +6,11 @@ plugins {
 android {
     namespace = "org.studiomexx.clitical_android"
     compileSdk {
-        // AndroidX 2026.06 requires 37 to compile. targetSdk stays at 36:
+        // AndroidX 2026.11 requires 37.1 to compile. targetSdk stays at 36:
         // raising that opts into new runtime behaviour and needs device testing.
-        version = release(37)
+        version = release(37) {
+            minorApiLevel = 1
+        }
     }
 
     defaultConfig {
