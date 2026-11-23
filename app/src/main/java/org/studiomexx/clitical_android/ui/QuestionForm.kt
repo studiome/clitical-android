@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -15,11 +14,11 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Analytics
+import androidx.compose.material.icons.filled.Calculate
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenu
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
@@ -58,7 +57,6 @@ import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.withFrameNanos
 import kotlinx.coroutines.launch
@@ -76,16 +74,11 @@ import java.util.Locale
 private val heightWeightPattern = Regex("^\\d{0,3}(\\.\\d{0,1})?$")
 private val albuminPattern = Regex("^\\d{0,2}(\\.\\d{0,1})?$")
 
-/**
- * @param bottomInset room kept clear at the bottom for the Predict FAB that floats over the
- *   form on a phone, so the last rows and the snackbar aren't hidden beneath it.
- */
 @Composable
 fun QuestionForm(
     viewModel: MainViewModel,
     modifier: Modifier = Modifier,
-    listState: LazyListState = rememberLazyListState(),
-    bottomInset: Dp = 0.dp
+    listState: LazyListState = rememberLazyListState()
 ) {
     val context = LocalContext.current
     val locale = viewModel.locale
@@ -151,7 +144,7 @@ fun QuestionForm(
     LazyColumn(
         state = listState,
         modifier = Modifier.fillMaxSize(),
-        contentPadding = readableContentPadding(maxWidth, bottom = bottomInset)
+        contentPadding = readableContentPadding(maxWidth, bottom = PredictFabClearance)
     ) {
         item { ScreenTitle(localizedString(R.string.questionFormTitle, locale)) }
 
@@ -412,17 +405,10 @@ fun QuestionForm(
             )
         }
 
+        // Predict is the floating action below, not a second button here. Reset stays in the
+        // flow at the end: a destructive action shouldn't float within reach.
         item {
             Column(modifier = Modifier.padding(16.dp)) {
-                Button(
-                    onClick = { viewModel.calculateRisk() },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Icon(Icons.Default.Analytics, contentDescription = null)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(localizedString(R.string.predictRisks, locale))
-                }
-                Spacer(modifier = Modifier.height(8.dp))
                 OutlinedButton(
                     onClick = { viewModel.reset() },
                     modifier = Modifier.fillMaxWidth(),
@@ -433,14 +419,32 @@ fun QuestionForm(
             }
         }
     }
+        // The screen's one primary action. It floats over the form so it can be reached
+        // from anywhere in the long list, and keeps its label except while scrolling down.
+        val predictLabel = localizedString(R.string.predictRisks, locale)
+        ExtendedFloatingActionButton(
+            text = { Text(predictLabel) },
+            icon = { Icon(Icons.Default.Calculate, contentDescription = null) },
+            expanded = !listState.lastScrolledForward,
+            onClick = { viewModel.calculateRisk() },
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(16.dp)
+                // Collapsed to its icon, the FAB still needs its name.
+                .semantics { contentDescription = predictLabel }
+        )
+        // Above the FAB, as Material places snackbars.
         SnackbarHost(
             hostState = snackbarHostState,
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .padding(bottom = bottomInset)
+                .padding(bottom = PredictFabClearance)
         )
     }
 }
+
+/** The FAB's 56dp plus its 16dp margin and a little air, kept clear below the last row. */
+private val PredictFabClearance = 88.dp
 
 @Preview(showBackground = true)
 @Composable

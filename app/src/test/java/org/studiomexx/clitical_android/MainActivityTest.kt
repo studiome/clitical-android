@@ -1,6 +1,7 @@
 package org.studiomexx.clitical_android
 
 import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.hasAnyAncestor
 import androidx.compose.ui.test.hasClickAction
@@ -52,12 +53,8 @@ class MainActivityTest {
     }
 
     private fun fillRequiredFieldsAndSubmit() {
-        fillField("年齢 [歳]", "65")
-        fillField("身長 [cm]", "150")
-        fillField("体重 [kg]", "50")
-        fillField("アルブミン値 [g/dl]", "4.0")
-        onForm().performScrollToNode(hasText("リスク予測"))
-        composeTestRule.onNodeWithText("リスク予測").performClick()
+        fillRequiredFields()
+        composeTestRule.onNode(predictFab).performClick()
     }
 
     @Test
@@ -131,10 +128,10 @@ class MainActivityTest {
     @Test
     @Config(qualifiers = "w1000dp-h800dp")
     fun wideWindowKeepsTheFormAtAReadableWidth() {
-        val predict = hasText("リスク予測") and hasClickAction()
-        onForm().performScrollToNode(predict)
+        val reset = hasText("リセット") and hasClickAction()
+        onForm().performScrollToNode(reset)
 
-        val button = composeTestRule.onNode(predict).getUnclippedBoundsInRoot()
+        val button = composeTestRule.onNode(reset).getUnclippedBoundsInRoot()
 
         assertTrue("button width ${button.width}", button.width <= 640.dp)
     }
@@ -182,9 +179,32 @@ class MainActivityTest {
         composeTestRule.onNode(predictFab).assertDoesNotExist()
     }
 
+    // One way to predict, not a FAB plus a same-named button at the end of the form.
+    @Test
+    fun predictIsOfferedOnceEvenAtTheEndOfTheForm() {
+        onForm().performScrollToNode(hasText("リセット"))
+
+        composeTestRule.onAllNodes(predictFab).assertCountEquals(1)
+        composeTestRule.onAllNodes(
+            hasClickAction() and hasText("リスク予測") and hasAnyAncestor(hasScrollToIndexAction())
+        ).assertCountEquals(0)
+    }
+
+    // Over the form with its label, rather than an unlabelled icon up in the rail.
     @Test
     @Config(qualifiers = "w1000dp-h800dp")
-    fun unfoldedPredictFabInTheRailShowsTheResultBesideTheForm() {
+    fun unfoldedPredictFabIsLabelledAndFloatsOverTheForm() {
+        val fab = composeTestRule.onNode(predictFab).getUnclippedBoundsInRoot()
+
+        // M3 hides the label from semantics (the FAB is named by its content description),
+        // so "labelled" shows as extended: wider than the 56dp icon-only FAB.
+        assertTrue("fab $fab", fab.width > 56.dp)
+        assertTrue("fab $fab", fab.left > 96.dp)
+    }
+
+    @Test
+    @Config(qualifiers = "w1000dp-h800dp")
+    fun unfoldedPredictFabShowsTheResultBesideTheForm() {
         fillRequiredFields()
 
         composeTestRule.onNode(predictFab).performClick()

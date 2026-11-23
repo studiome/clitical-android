@@ -58,6 +58,10 @@ class QuestionFormTest {
 
     private fun rowLabelled(label: String) = hasText(label)
 
+    // Predict is the form's floating action, reachable from anywhere in the list.
+    private fun predict(label: String = "リスク予測") =
+        composeTestRule.onNode(hasClickAction() and hasContentDescription(label)).performClick()
+
     // Both controls carry their own label, so they are reachable the same way a
     // screen reader reaches them: on the merged tree, by that label.
     private fun onSwitchLabelled(label: String) =
@@ -193,8 +197,7 @@ class QuestionFormTest {
         val viewModel = showForm()
         viewModel.fillRequiredFields()
 
-        scrollTo(rowLabelled("リスク予測"))
-        composeTestRule.onNode(rowLabelled("リスク予測")).performClick()
+        predict()
 
         assertNotNull(viewModel.calculatedRisk)
         composeTestRule.onNodeWithText("数値入力を確認してください。").assertDoesNotExist()
@@ -205,8 +208,7 @@ class QuestionFormTest {
     fun predictingWithEmptyFieldsShowsTheNumericInputError() {
         val viewModel = showForm()
 
-        scrollTo(rowLabelled("リスク予測"))
-        composeTestRule.onNode(rowLabelled("リスク予測")).performClick()
+        predict()
 
         assertNull(viewModel.calculatedRisk)
         composeTestRule.onNodeWithText("数値入力を確認してください。").assertExists()
@@ -220,8 +222,7 @@ class QuestionFormTest {
         // hasAILesion defaults to true; clearing it leaves no lesion selected.
         scrollTo(rowLabelled("大動脈腸骨動脈領域病変"))
         onSwitchLabelled("大動脈腸骨動脈領域病変").performClick()
-        scrollTo(rowLabelled("リスク予測"))
-        composeTestRule.onNode(rowLabelled("リスク予測")).performClick()
+        predict()
 
         assertNull(viewModel.calculatedRisk)
         composeTestRule.onNodeWithText("動脈病変の領域選択を確認してください。").assertExists()
@@ -231,8 +232,7 @@ class QuestionFormTest {
     fun predictingWithEmptyFieldsShowsPersistentFieldErrorAndFocusesFirstField() {
         showForm()
 
-        scrollTo(rowLabelled("リスク予測"))
-        composeTestRule.onNode(rowLabelled("リスク予測")).performClick()
+        predict()
 
         composeTestRule.onNodeWithText("年齢を入力してください。").assertExists()
         onFieldLabelled("年齢 [歳]").assertIsFocused()
@@ -246,8 +246,7 @@ class QuestionFormTest {
     fun fieldErrorUsesTheRowWidthRatherThanTheFieldWidth() {
         showForm()
 
-        scrollTo(rowLabelled("リスク予測"))
-        composeTestRule.onNode(rowLabelled("リスク予測")).performClick()
+        predict()
         scrollTo(hasContentDescription("身長 [cm]"))
 
         val field = onFieldLabelled("身長 [cm]").getUnclippedBoundsInRoot()
@@ -267,8 +266,7 @@ class QuestionFormTest {
         val viewModel = MainViewModel().apply { locale = Locale.forLanguageTag("ja") }
         val restorationTester = StateRestorationTester(composeTestRule)
         restorationTester.setContent { QuestionForm(viewModel = viewModel) }
-        scrollTo(rowLabelled("リスク予測"))
-        composeTestRule.onNode(rowLabelled("リスク予測")).performClick()
+        predict()
         onFieldLabelled("年齢 [歳]").assertIsFocused()
 
         restorationTester.emulateSavedInstanceStateRestore()
@@ -285,8 +283,7 @@ class QuestionFormTest {
 
         scrollTo(rowLabelled("大動脈腸骨動脈領域病変"))
         onSwitchLabelled("大動脈腸骨動脈領域病変").performClick()
-        scrollTo(rowLabelled("リスク予測"))
-        composeTestRule.onNode(rowLabelled("リスク予測")).performClick()
+        predict()
 
         composeTestRule.onNodeWithText("動脈病変を1つ以上選択してください。").assertExists()
     }
@@ -297,8 +294,7 @@ class QuestionFormTest {
         Locale.setDefault(Locale.JAPAN)
         showForm(locale = "en")
 
-        scrollTo(rowLabelled("Predict Risks"))
-        composeTestRule.onNode(rowLabelled("Predict Risks")).performClick()
+        predict("Predict Risks")
 
         composeTestRule.onNodeWithText("Error! Missing some data at Number Form.").assertExists()
     }
@@ -309,8 +305,7 @@ class QuestionFormTest {
         viewModel.fillRequiredFields()
         scrollTo(rowLabelled("喫煙歴"))
         onSwitchLabelled("喫煙歴").performClick()
-        scrollTo(rowLabelled("リスク予測"))
-        composeTestRule.onNode(rowLabelled("リスク予測")).performClick()
+        predict()
         assertNotNull(viewModel.calculatedRisk)
 
         scrollTo(rowLabelled("リセット"))
