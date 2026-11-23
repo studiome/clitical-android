@@ -53,6 +53,7 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.error
 import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.hideFromAccessibility
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.KeyboardType
@@ -465,32 +466,44 @@ fun TextEditRow(
     errorMessage: String? = null,
     focusRequester: FocusRequester? = null
 ) {
-    ListItem(
-        headlineContent = { Text(label) },
-        trailingContent = {
-            OutlinedTextField(
-                value = value,
-                onValueChange = onValueChange,
-                isError = errorMessage != null,
-                supportingText = errorMessage?.let { message ->
-                    { Text(message, color = MaterialTheme.colorScheme.error) }
-                },
-                // The headline is a separate node, so the field needs its own label.
+    Column {
+        ListItem(
+            headlineContent = { Text(label) },
+            trailingContent = {
+                OutlinedTextField(
+                    value = value,
+                    onValueChange = onValueChange,
+                    isError = errorMessage != null,
+                    // The headline is a separate node, so the field needs its own label.
+                    modifier = Modifier
+                        .width(110.dp)
+                        .then(focusRequester?.let { Modifier.focusRequester(it) } ?: Modifier)
+                        .semantics {
+                            contentDescription = label
+                            if (errorMessage != null) error(errorMessage)
+                        },
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = if (isDecimal) KeyboardType.Decimal else KeyboardType.Number
+                    ),
+                    singleLine = true
+                )
+            },
+            colors = transparentListItemColors
+        )
+        // Under the whole row rather than as the field's supporting text, where the 110dp
+        // field broke the message mid-phrase. The field already announces it as its error.
+        if (errorMessage != null) {
+            Text(
+                text = errorMessage,
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier
-                    .width(110.dp)
-                    .then(focusRequester?.let { Modifier.focusRequester(it) } ?: Modifier)
-                    .semantics {
-                        contentDescription = label
-                        if (errorMessage != null) error(errorMessage)
-                    },
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = if (isDecimal) KeyboardType.Decimal else KeyboardType.Number
-                ),
-                singleLine = true
+                    .fillMaxWidth()
+                    .padding(start = 16.dp, end = 16.dp, bottom = 12.dp)
+                    .semantics { hideFromAccessibility() }
             )
-        },
-        colors = transparentListItemColors
-    )
+        }
+    }
 }
 
 @Composable

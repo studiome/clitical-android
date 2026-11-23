@@ -1,6 +1,7 @@
 package org.studiomexx.clitical_android.ui
 
 import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsFocused
@@ -23,6 +24,7 @@ import androidx.compose.ui.test.onNodeWithText
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -234,6 +236,26 @@ class QuestionFormTest {
 
         composeTestRule.onNodeWithText("年齢を入力してください。").assertExists()
         onFieldLabelled("年齢 [歳]").assertIsFocused()
+    }
+
+    /**
+     * Regression: the message sat under the 110dp numeric field and broke mid-phrase
+     * ("身長を入力し / てください。"). It now runs under the row from the label's edge.
+     */
+    @Test
+    fun fieldErrorUsesTheRowWidthRatherThanTheFieldWidth() {
+        showForm()
+
+        scrollTo(rowLabelled("リスク予測"))
+        composeTestRule.onNode(rowLabelled("リスク予測")).performClick()
+        scrollTo(hasContentDescription("身長 [cm]"))
+
+        val field = onFieldLabelled("身長 [cm]").getUnclippedBoundsInRoot()
+        val message = composeTestRule
+            .onNodeWithText("身長を入力してください。", useUnmergedTree = true)
+            .getUnclippedBoundsInRoot()
+        assertTrue("message $message vs field $field", message.left < field.left)
+        assertTrue("message $message vs field $field", message.top >= field.bottom)
     }
 
     /**
