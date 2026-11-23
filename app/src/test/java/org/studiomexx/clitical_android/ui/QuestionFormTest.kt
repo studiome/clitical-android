@@ -4,7 +4,9 @@ import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsOff
+import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsFocused
+import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertIsNotFocused
 import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.assertIsOn
@@ -308,12 +310,42 @@ class QuestionFormTest {
         predict()
         assertNotNull(viewModel.calculatedRisk)
 
-        scrollTo(rowLabelled("リセット"))
-        composeTestRule.onNode(rowLabelled("リセット")).performClick()
+        clearInput()
 
         assertEquals("", viewModel.ageText)
         assertEquals(false, viewModel.patientData.isSmoking)
         assertNull(viewModel.calculatedRisk)
+    }
+
+    // Named for what it does, undoable from a snackbar, and unavailable with nothing to clear.
+
+    private fun clearInput() {
+        scrollTo(rowLabelled("入力をクリア"))
+        composeTestRule.onNode(rowLabelled("入力をクリア")).performClick()
+    }
+
+    @Test
+    fun clearingOffersUndoThatRestoresTheInput() {
+        val viewModel = showForm()
+        viewModel.fillRequiredFields()
+
+        clearInput()
+        composeTestRule.onNodeWithText("入力をクリアしました").assertExists()
+        composeTestRule.onNodeWithText("元に戻す").performClick()
+
+        assertEquals("65", viewModel.ageText)
+        assertEquals("4.0", viewModel.albText)
+    }
+
+    @Test
+    fun clearIsDisabledOnAnUntouchedForm() {
+        val viewModel = showForm()
+        scrollTo(rowLabelled("入力をクリア"))
+        composeTestRule.onNode(rowLabelled("入力をクリア")).assertIsNotEnabled()
+
+        viewModel.ageText = "6"
+
+        composeTestRule.onNode(rowLabelled("入力をクリア")).assertIsEnabled()
     }
 
     @Test

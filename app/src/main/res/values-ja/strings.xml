@@ -102,7 +102,9 @@
     <string name="otherLesionInfo">その他血管病変</string>
     <string name="complications">合併症</string>
     <string name="predictRisks">リスク予測</string>
-    <string name="reset">リセット</string>
+    <string name="reset">入力をクリア</string>
+    <string name="resetDone">入力をクリアしました</string>
+    <string name="undo">元に戻す</string>
     <string name="questionFormTitle">患者データ</string>
     <string name="questionAgeError">年齢を入力してください。</string>
     <string name="questionHeightError">身長を入力してください。</string>

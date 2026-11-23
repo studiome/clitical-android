@@ -102,7 +102,9 @@
     <string name="otherLesionInfo">Other Vascular Lesions</string>
     <string name="complications">Complications</string>
     <string name="predictRisks">Predict Risks</string>
-    <string name="reset">Reset</string>
+    <string name="reset">Clear all</string>
+    <string name="resetDone">Patient data cleared</string>
+    <string name="undo">Undo</string>
     <string name="questionFormTitle">Patient Data</string>
     <string name="questionAgeError">Enter age.</string>
     <string name="questionHeightError">Enter body height.</string>

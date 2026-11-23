@@ -128,7 +128,7 @@ class MainActivityTest {
     @Test
     @Config(qualifiers = "w1000dp-h800dp")
     fun wideWindowKeepsTheFormAtAReadableWidth() {
-        val reset = hasText("リセット") and hasClickAction()
+        val reset = hasText("入力をクリア") and hasClickAction()
         onForm().performScrollToNode(reset)
 
         val button = composeTestRule.onNode(reset).getUnclippedBoundsInRoot()
@@ -182,7 +182,7 @@ class MainActivityTest {
     // One way to predict, not a FAB plus a same-named button at the end of the form.
     @Test
     fun predictIsOfferedOnceEvenAtTheEndOfTheForm() {
-        onForm().performScrollToNode(hasText("リセット"))
+        onForm().performScrollToNode(hasText("入力をクリア"))
 
         composeTestRule.onAllNodes(predictFab).assertCountEquals(1)
         composeTestRule.onAllNodes(

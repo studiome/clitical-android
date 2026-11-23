@@ -52,7 +52,24 @@ class MainViewModel : ViewModel() {
         patientData = transform(patientData)
     }
 
+    /** Whether there is anything to clear: some answer differs from a fresh form. */
+    val canReset: Boolean
+        get() = ageText.isNotEmpty() || heightText.isNotEmpty() || weightText.isNotEmpty() ||
+            albText.isNotEmpty() || patientData != PatientData()
+
+    private class Answers(
+        val ageText: String,
+        val heightText: String,
+        val weightText: String,
+        val albText: String,
+        val patientData: PatientData
+    )
+
+    /** What the last [reset] cleared, so its snackbar can offer Undo. */
+    private var clearedAnswers: Answers? = null
+
     fun reset() {
+        clearedAnswers = Answers(ageText, heightText, weightText, albText, patientData)
         ageText = ""
         heightText = ""
         weightText = ""
@@ -62,6 +79,17 @@ class MainViewModel : ViewModel() {
         hasSubmitted = false
         validationAttempt = 0
         validationError = null
+    }
+
+    /** Puts back the answers the last [reset] cleared. The risk isn't restored: predict again. */
+    fun undoReset() {
+        val answers = clearedAnswers ?: return
+        clearedAnswers = null
+        ageText = answers.ageText
+        heightText = answers.heightText
+        weightText = answers.weightText
+        albText = answers.albText
+        patientData = answers.patientData
     }
 
     fun calculateRisk(): ValidationError? {

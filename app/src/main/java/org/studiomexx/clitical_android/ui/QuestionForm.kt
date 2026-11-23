@@ -30,8 +30,10 @@ import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -405,12 +407,26 @@ fun QuestionForm(
             )
         }
 
-        // Predict is the floating action below, not a second button here. Reset stays in the
-        // flow at the end: a destructive action shouldn't float within reach.
+        // Predict is the floating action below, not a second button here. Clearing stays in
+        // the flow at the end: a destructive action shouldn't float within reach. It wipes
+        // every answer at once, so it's offered only when there is something to clear and
+        // can be undone from the snackbar rather than confirmed up front.
         item {
             Column(modifier = Modifier.padding(16.dp)) {
                 OutlinedButton(
-                    onClick = { viewModel.reset() },
+                    onClick = {
+                        viewModel.reset()
+                        coroutineScope.launch {
+                            snackbarHostState.currentSnackbarData?.dismiss()
+                            val result = snackbarHostState.showSnackbar(
+                                message = context.localizedString(R.string.resetDone, locale),
+                                actionLabel = context.localizedString(R.string.undo, locale),
+                                duration = SnackbarDuration.Long
+                            )
+                            if (result == SnackbarResult.ActionPerformed) viewModel.undoReset()
+                        }
+                    },
+                    enabled = viewModel.canReset,
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error)
                 ) {
