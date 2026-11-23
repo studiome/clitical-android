@@ -4,6 +4,8 @@ import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsFocused
+import androidx.compose.ui.test.assertIsNotFocused
+import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.hasClickAction
@@ -232,6 +234,26 @@ class QuestionFormTest {
 
         composeTestRule.onNodeWithText("年齢を入力してください。").assertExists()
         onFieldLabelled("年齢 [歳]").assertIsFocused()
+    }
+
+    /**
+     * Regression: folding/unfolding or rotating recreates the form, which replayed the last
+     * failed submit — jumping to the first invalid field and popping the keyboard again.
+     */
+    @Test
+    fun recreatingTheFormDoesNotRefocusTheFirstInvalidField() {
+        val viewModel = MainViewModel().apply { locale = Locale.forLanguageTag("ja") }
+        val restorationTester = StateRestorationTester(composeTestRule)
+        restorationTester.setContent { QuestionForm(viewModel = viewModel) }
+        scrollTo(rowLabelled("リスク予測"))
+        composeTestRule.onNode(rowLabelled("リスク予測")).performClick()
+        onFieldLabelled("年齢 [歳]").assertIsFocused()
+
+        restorationTester.emulateSavedInstanceStateRestore()
+
+        // The field error stays visible, but focus is not stolen again.
+        composeTestRule.onNodeWithText("年齢を入力してください。").assertExists()
+        onFieldLabelled("年齢 [歳]").assertIsNotFocused()
     }
 
     @Test

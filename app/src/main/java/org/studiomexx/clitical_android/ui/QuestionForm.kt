@@ -37,6 +37,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -120,7 +121,12 @@ fun QuestionForm(viewModel: MainViewModel, modifier: Modifier = Modifier) {
         }
     }
 
+    // React only to submits made while this form is shown. Without this, recreating the form
+    // (fold/unfold, rotation, switching tabs) replays the last failed submit and steals focus.
+    var handledAttempt by remember { mutableIntStateOf(viewModel.validationAttempt) }
     LaunchedEffect(viewModel.validationAttempt) {
+        if (viewModel.validationAttempt == handledAttempt) return@LaunchedEffect
+        handledAttempt = viewModel.validationAttempt
         if (viewModel.hasSubmitted) focusFirstInvalid()
     }
 
