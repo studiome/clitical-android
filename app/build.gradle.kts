@@ -17,8 +17,8 @@ android {
         applicationId = "org.studiomexx.clitical_android"
         minSdk = 34
         targetSdk = 37
-        versionCode = 6
-        versionName = "2.1.1"
+        versionCode = 7
+        versionName = "2.2.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
