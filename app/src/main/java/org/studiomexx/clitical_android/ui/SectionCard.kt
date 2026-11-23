@@ -20,6 +20,22 @@ import androidx.compose.ui.unit.dp
 import org.studiomexx.clitical_android.ui.theme.CLiTICALAndroidTheme
 
 /**
+ * The heading a tab's screen opens with. The tabs have no top app bar, so this is what tells
+ * the user (and a screen reader) where they are.
+ */
+@Composable
+fun ScreenTitle(title: String, modifier: Modifier = Modifier) {
+    Text(
+        text = title,
+        style = MaterialTheme.typography.headlineMedium,
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 8.dp)
+            .semantics { heading() }
+    )
+}
+
+/**
  * Section title matching web's `.section-title` (question-form.scss / settings.scss):
  * title-small, bold, primary color, sitting above the card rather than inside it.
  */

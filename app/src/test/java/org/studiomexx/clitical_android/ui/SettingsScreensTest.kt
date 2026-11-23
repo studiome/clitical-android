@@ -6,6 +6,7 @@ import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -81,7 +82,10 @@ class SettingsScreensTest {
             if (aboutVisible) AboutScreen(locale = viewModel.locale)
         }
 
-        composeTestRule.onNode(hasText("CLiTICAL") and hasText(BuildConfig.VERSION_NAME)).performClick()
+        // Below the screen's heading, the row starts out of view on a small window.
+        composeTestRule.onNode(hasText("CLiTICAL") and hasText(BuildConfig.VERSION_NAME))
+            .performScrollTo()
+            .performClick()
         composeTestRule.onNode(hasText("概要")).assertExists()
         composeTestRule.onNode(hasText("使用目的")).assertExists()
         composeTestRule.onNode(hasText("予測できる指標")).assertExists()

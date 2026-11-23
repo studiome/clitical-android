@@ -46,6 +46,7 @@ fun SettingsScreen(
 ) {
     val locale = viewModel.locale
     Column(modifier = modifier.verticalScroll(rememberScrollState()).readableWidth()) {
+        ScreenTitle(localizedString(R.string.settings, locale))
         SectionTitle(localizedString(R.string.language, locale))
         SectionCard(
             rows = listOf(
@@ -161,6 +162,7 @@ fun ReferencesScreen(locale: Locale, modifier: Modifier = Modifier) {
     Column(
         modifier = modifier.verticalScroll(rememberScrollState()).readableWidth()
     ) {
+        ScreenTitle(localizedString(R.string.references, locale))
         Text(
             localizedString(R.string.tapToOpenLink, locale),
             style = MaterialTheme.typography.bodyMedium,

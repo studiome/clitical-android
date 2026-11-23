@@ -8,6 +8,7 @@ import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.hasScrollToIndexAction
 import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.isHeading
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onAllNodesWithText
@@ -85,6 +86,20 @@ class MainActivityTest {
         composeTestRule.onNode(hasContentDescription("リスク評価タブ")).assertExists()
         composeTestRule.onNode(hasContentDescription("参考文献タブ")).assertExists()
         composeTestRule.onNode(hasContentDescription("設定タブ")).assertExists()
+    }
+
+    // No top app bar on the tabs: it only repeated the tab's name. Each screen opens with its
+    // own heading instead, so it still announces where the user is.
+    @Test
+    fun tabsHaveNoTopAppBarButEachScreenOpensWithAHeading() {
+        composeTestRule.onNodeWithText("リスク評価").assertDoesNotExist()
+        composeTestRule.onNode(isHeading() and hasText("患者データ")).assertExists()
+
+        composeTestRule.onNode(hasContentDescription("参考文献タブ")).performClick()
+        composeTestRule.onNode(isHeading() and hasText("参考文献")).assertExists()
+
+        composeTestRule.onNode(hasContentDescription("設定タブ")).performClick()
+        composeTestRule.onNode(isHeading() and hasText("設定")).assertExists()
     }
 
     // Adaptive layout: a phone keeps the bottom bar; an unfolded foldable or a tablet gets a

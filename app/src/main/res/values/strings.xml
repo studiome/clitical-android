@@ -89,7 +89,6 @@
     <string name="appTerms">Terms of service</string>
     <string name="appPrivacyPolicy">Privacy Policy</string>
     <string name="appSupport">Support</string>
-    <string name="riskAssessmentTab">Risk Assessment</string>
     <string name="riskAssessmentTabShort">Risk</string>
     <string name="riskAssessmentTabA11y">Risk assessment tab</string>
     <string name="referencesTabShort">Refs</string>

@@ -24,7 +24,6 @@ import androidx.compose.material.icons.filled.Calculate
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -34,8 +33,6 @@ import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffo
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldDefaults
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -44,7 +41,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
@@ -69,13 +65,12 @@ import org.studiomexx.clitical_android.ui.theme.CLiTICALAndroidTheme
  */
 private enum class Tab(
     val icon: ImageVector,
-    @StringRes val titleRes: Int,
     @StringRes val labelRes: Int,
     @StringRes val a11yLabelRes: Int
 ) {
-    RISK(Icons.Default.Analytics, R.string.riskAssessmentTab, R.string.riskAssessmentTabShort, R.string.riskAssessmentTabA11y),
-    REFERENCES(Icons.AutoMirrored.Filled.MenuBook, R.string.references, R.string.referencesTabShort, R.string.referencesTabA11y),
-    SETTINGS(Icons.Default.Settings, R.string.settings, R.string.settingsTabShort, R.string.settingsTabA11y)
+    RISK(Icons.Default.Analytics, R.string.riskAssessmentTabShort, R.string.riskAssessmentTabA11y),
+    REFERENCES(Icons.AutoMirrored.Filled.MenuBook, R.string.referencesTabShort, R.string.referencesTabA11y),
+    SETTINGS(Icons.Default.Settings, R.string.settingsTabShort, R.string.settingsTabA11y)
 }
 
 class MainActivity : ComponentActivity() {
@@ -99,7 +94,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CLiTICALApp(viewModel: MainViewModel) {
     val risk = viewModel.calculatedRisk
@@ -174,16 +168,10 @@ private fun CLiTICALApp(viewModel: MainViewModel) {
                     }
                 }
             ) {
-                val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-                Scaffold(
-                    modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-                    topBar = {
-                        TopAppBar(
-                            title = { Text(localizedString(selectedTab.titleRes, locale)) },
-                            scrollBehavior = scrollBehavior
-                        )
-                    }
-                ) { innerPadding ->
+                // No top app bar: it only repeated the selected tab's name. Each screen opens
+                // with its own heading, and the Scaffold still keeps content clear of the
+                // status bar.
+                Scaffold { innerPadding ->
                     val contentModifier = Modifier
                         .padding(innerPadding)
                         .fillMaxSize()

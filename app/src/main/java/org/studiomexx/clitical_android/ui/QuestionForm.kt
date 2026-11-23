@@ -53,7 +53,6 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.error
-import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.hideFromAccessibility
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
@@ -154,15 +153,7 @@ fun QuestionForm(
         modifier = Modifier.fillMaxSize(),
         contentPadding = readableContentPadding(maxWidth, bottom = bottomInset)
     ) {
-        item {
-            Text(
-                text = localizedString(R.string.questionFormTitle, locale),
-                style = MaterialTheme.typography.headlineMedium,
-                modifier = Modifier
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
-                    .semantics { heading() }
-            )
-        }
+        item { ScreenTitle(localizedString(R.string.questionFormTitle, locale)) }
 
         item { SectionTitle(localizedString(R.string.basicInfo, locale)) }
         item {
