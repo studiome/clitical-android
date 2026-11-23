@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.text.KeyboardOptions
@@ -58,6 +59,7 @@ import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.withFrameNanos
 import kotlinx.coroutines.launch
@@ -75,14 +77,22 @@ import java.util.Locale
 private val heightWeightPattern = Regex("^\\d{0,3}(\\.\\d{0,1})?$")
 private val albuminPattern = Regex("^\\d{0,2}(\\.\\d{0,1})?$")
 
+/**
+ * @param bottomInset room kept clear at the bottom for the Predict FAB that floats over the
+ *   form on a phone, so the last rows and the snackbar aren't hidden beneath it.
+ */
 @Composable
-fun QuestionForm(viewModel: MainViewModel, modifier: Modifier = Modifier) {
+fun QuestionForm(
+    viewModel: MainViewModel,
+    modifier: Modifier = Modifier,
+    listState: LazyListState = rememberLazyListState(),
+    bottomInset: Dp = 0.dp
+) {
     val context = LocalContext.current
     val locale = viewModel.locale
     val patientData = viewModel.patientData
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
-    val listState = rememberLazyListState()
     val ageFocusRequester = remember { FocusRequester() }
     val heightFocusRequester = remember { FocusRequester() }
     val weightFocusRequester = remember { FocusRequester() }
@@ -129,13 +139,20 @@ fun QuestionForm(viewModel: MainViewModel, modifier: Modifier = Modifier) {
         if (viewModel.validationAttempt == handledAttempt) return@LaunchedEffect
         handledAttempt = viewModel.validationAttempt
         if (viewModel.hasSubmitted) focusFirstInvalid()
+        // Reported here rather than at the button, so the FAB's submits report the same way.
+        val msgId = when (viewModel.validationError) {
+            ValidationError.NO_LESION_SELECTED -> R.string.analysisLesionErrorMessage
+            ValidationError.EMPTY_FIELDS -> R.string.analysisNullErrorMessage
+            null -> return@LaunchedEffect
+        }
+        snackbarHostState.showSnackbar(context.localizedString(msgId, locale))
     }
 
     BoxWithConstraints(modifier = modifier) {
     LazyColumn(
         state = listState,
         modifier = Modifier.fillMaxSize(),
-        contentPadding = readableContentPadding(maxWidth)
+        contentPadding = readableContentPadding(maxWidth, bottom = bottomInset)
     ) {
         item {
             Text(
@@ -407,17 +424,7 @@ fun QuestionForm(viewModel: MainViewModel, modifier: Modifier = Modifier) {
         item {
             Column(modifier = Modifier.padding(16.dp)) {
                 Button(
-                    onClick = {
-                        val error = viewModel.calculateRisk()
-                        if (error != null) {
-                            val msgId = when (error) {
-                                ValidationError.NO_LESION_SELECTED -> R.string.analysisLesionErrorMessage
-                                ValidationError.EMPTY_FIELDS -> R.string.analysisNullErrorMessage
-                            }
-                            val message = context.localizedString(msgId, locale)
-                            coroutineScope.launch { snackbarHostState.showSnackbar(message) }
-                        }
-                    },
+                    onClick = { viewModel.calculateRisk() },
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Icon(Icons.Default.Analytics, contentDescription = null)
@@ -437,7 +444,9 @@ fun QuestionForm(viewModel: MainViewModel, modifier: Modifier = Modifier) {
     }
         SnackbarHost(
             hostState = snackbarHostState,
-            modifier = Modifier.align(Alignment.BottomCenter)
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = bottomInset)
         )
     }
 }

@@ -1,6 +1,8 @@
 package org.studiomexx.clitical_android
 
+import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
+import androidx.compose.ui.test.hasAnyAncestor
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.hasScrollToIndexAction
@@ -120,6 +122,59 @@ class MainActivityTest {
         val button = composeTestRule.onNode(predict).getUnclippedBoundsInRoot()
 
         assertTrue("button width ${button.width}", button.width <= 640.dp)
+    }
+
+    // Predict as the screen's primary action (M3 FAB): reachable without scrolling the long
+    // form, above the bottom bar on a phone and in the rail's header when unfolded.
+
+    // NavigationSuiteScaffold composes the primary action for both the bar and the rail
+    // slots but only places the one in use, so match the placed one.
+    private val isPlaced = SemanticsMatcher("is placed") { it.layoutInfo.isPlaced }
+
+    private val predictFab = hasClickAction() and
+        (hasText("リスク予測") or hasContentDescription("リスク予測")) and
+        !hasAnyAncestor(hasScrollToIndexAction()) and isPlaced
+
+    private fun fillRequiredFields() {
+        fillField("年齢 [歳]", "65")
+        fillField("身長 [cm]", "150")
+        fillField("体重 [kg]", "50")
+        fillField("アルブミン値 [g/dl]", "4.0")
+    }
+
+    @Test
+    fun predictFabShowsTheResultWithoutScrollingToTheEndOfTheForm() {
+        fillRequiredFields()
+
+        composeTestRule.onNode(predictFab).performClick()
+
+        composeTestRule.onNodeWithText("予測リスク").assertExists()
+    }
+
+    @Test
+    fun predictFabWithMissingInputShowsTheError() {
+        composeTestRule.onNode(predictFab).performClick()
+
+        composeTestRule.onNodeWithText("数値入力を確認してください。").assertExists()
+    }
+
+    @Test
+    fun predictFabIsOnlyOnTheRiskTab() {
+        composeTestRule.onNode(predictFab).assertExists()
+
+        composeTestRule.onNode(hasContentDescription("参考文献タブ")).performClick()
+
+        composeTestRule.onNode(predictFab).assertDoesNotExist()
+    }
+
+    @Test
+    @Config(qualifiers = "w1000dp-h800dp")
+    fun unfoldedPredictFabInTheRailShowsTheResultBesideTheForm() {
+        fillRequiredFields()
+
+        composeTestRule.onNode(predictFab).performClick()
+
+        composeTestRule.onNodeWithText("予測30日死亡・大切断率").assertExists()
     }
 
     // Like the iOS app in regular width: form and predicted risks side by side.

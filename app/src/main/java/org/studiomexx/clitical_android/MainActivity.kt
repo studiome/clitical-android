@@ -20,14 +20,19 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.Analytics
+import androidx.compose.material.icons.filled.Calculate
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteItem
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldDefaults
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -43,6 +48,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.window.core.layout.WindowSizeClass
 import org.studiomexx.clitical_android.ui.MainViewModel
@@ -127,8 +133,24 @@ private fun CLiTICALApp(viewModel: MainViewModel) {
         } else if (showAbout) {
             AboutScreen(locale = locale, onBack = { showAbout = false }, modifier = Modifier.fillMaxSize())
         } else {
+            val formListState = rememberLazyListState()
+            val isBar = navigationSuiteType in BarNavigationSuiteTypes
             NavigationSuiteScaffold(
                 navigationSuiteType = navigationSuiteType,
+                // Predict is the screen's primary action: an extended FAB above the bottom bar
+                // on a phone, or a FAB in the rail's header once unfolded.
+                primaryActionContent = {
+                    if (selectedTab == Tab.RISK) {
+                        PredictFab(
+                            label = localizedString(R.string.predictRisks, locale),
+                            // Shrinks to its icon while the form scrolls down, so it covers less.
+                            expanded = isBar && !formListState.lastScrolledForward,
+                            onClick = { viewModel.calculateRisk() },
+                            // The rail's header doesn't center it in the 96dp rail by itself.
+                            modifier = if (isBar) Modifier else Modifier.padding(horizontal = 20.dp)
+                        )
+                    }
+                },
                 navigationItems = {
                     Tab.entries.forEach { tab ->
                         val accessibleLabel = localizedString(tab.a11yLabelRes, locale)
@@ -169,6 +191,8 @@ private fun CLiTICALApp(viewModel: MainViewModel) {
                         Tab.RISK -> RiskAssessment(
                             viewModel = viewModel,
                             isTwoPane = isTwoPane,
+                            listState = formListState,
+                            bottomInset = if (isBar) PredictFabClearance else 0.dp,
                             modifier = contentModifier
                         )
                         Tab.REFERENCES -> ReferencesScreen(locale = locale, modifier = contentModifier)
@@ -184,18 +208,53 @@ private fun CLiTICALApp(viewModel: MainViewModel) {
     }
 }
 
+private val BarNavigationSuiteTypes = setOf(
+    NavigationSuiteType.ShortNavigationBarCompact,
+    NavigationSuiteType.ShortNavigationBarMedium,
+    NavigationSuiteType.NavigationBar
+)
+
+/** A FAB's 56dp plus the 16dp the scaffold keeps around it, and a little air. */
+private val PredictFabClearance = 88.dp
+
+@Composable
+private fun PredictFab(
+    label: String,
+    expanded: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    ExtendedFloatingActionButton(
+        text = { Text(label) },
+        // Not the Risk tab's Analytics icon, which sits right below it in the rail.
+        icon = { Icon(Icons.Default.Calculate, contentDescription = null) },
+        expanded = expanded,
+        onClick = onClick,
+        // Collapsed to its icon, the FAB still needs its name.
+        modifier = modifier.semantics { contentDescription = label }
+    )
+}
+
 /**
  * The form alone, or the form with the predicted risks beside it. The form keeps a single
  * call site either way so its scroll position survives folding and unfolding.
  */
 @Composable
-private fun RiskAssessment(viewModel: MainViewModel, isTwoPane: Boolean, modifier: Modifier) {
+private fun RiskAssessment(
+    viewModel: MainViewModel,
+    isTwoPane: Boolean,
+    listState: LazyListState,
+    bottomInset: Dp,
+    modifier: Modifier
+) {
     BoxWithConstraints(modifier) {
         val formWidth = (maxWidth * 0.45f).coerceIn(360.dp, 520.dp)
         Row(Modifier.fillMaxSize()) {
             QuestionForm(
                 viewModel = viewModel,
-                modifier = if (isTwoPane) Modifier.width(formWidth).fillMaxHeight() else Modifier.fillMaxSize()
+                modifier = if (isTwoPane) Modifier.width(formWidth).fillMaxHeight() else Modifier.fillMaxSize(),
+                listState = listState,
+                bottomInset = bottomInset
             )
             if (isTwoPane) {
                 VerticalDivider()

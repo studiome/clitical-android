@@ -55,5 +55,7 @@ fun Modifier.readableWidth(): Modifier = layout { measurable, constraints ->
 }
 
 /** The [readableWidth] equivalent for lazy lists, which take their gutter as content padding. */
-fun readableContentPadding(availableWidth: Dp): PaddingValues =
-    PaddingValues(horizontal = ((availableWidth - ReadableContentMaxWidth) / 2).coerceAtLeast(0.dp))
+fun readableContentPadding(availableWidth: Dp, bottom: Dp = 0.dp): PaddingValues {
+    val gutter = ((availableWidth - ReadableContentMaxWidth) / 2).coerceAtLeast(0.dp)
+    return PaddingValues(start = gutter, end = gutter, bottom = bottom)
+}

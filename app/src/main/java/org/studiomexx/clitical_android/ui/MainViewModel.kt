@@ -44,6 +44,10 @@ class MainViewModel : ViewModel() {
     var hasSubmitted by mutableStateOf(false)
     var validationAttempt by mutableIntStateOf(0)
 
+    /** Why the latest attempt failed, so every Predict entry point reports it the same way. */
+    var validationError by mutableStateOf<ValidationError?>(null)
+        private set
+
     fun updatePatientData(transform: (PatientData) -> PatientData) {
         patientData = transform(patientData)
     }
@@ -57,6 +61,7 @@ class MainViewModel : ViewModel() {
         calculatedRisk = null
         hasSubmitted = false
         validationAttempt = 0
+        validationError = null
     }
 
     fun calculateRisk(): ValidationError? {
@@ -69,12 +74,13 @@ class MainViewModel : ViewModel() {
             alb = albText.toDoubleOrNull()
         )
 
-        return try {
+        validationError = try {
             calculatedRisk = PatientRisk(data)
             null
         } catch (e: FormatException) {
             calculatedRisk = null
             e.source
         }
+        return validationError
     }
 }
