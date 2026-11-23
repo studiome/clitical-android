@@ -1,5 +1,7 @@
 package org.studiomexx.clitical_android
 
+import androidx.compose.ui.test.getUnclippedBoundsInRoot
+import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.hasScrollAction
 import androidx.compose.ui.test.hasSetTextAction
@@ -10,11 +12,17 @@ import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.width
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
 /** Covers the AnimatedContent switch between the question form and the result screen. */
 @RunWith(RobolectricTestRunner::class)
@@ -72,5 +80,42 @@ class MainActivityTest {
         composeTestRule.onNode(hasContentDescription("リスク評価タブ")).assertExists()
         composeTestRule.onNode(hasContentDescription("参考文献タブ")).assertExists()
         composeTestRule.onNode(hasContentDescription("設定タブ")).assertExists()
+    }
+
+    // Adaptive layout: a phone keeps the bottom bar; an unfolded foldable or a tablet gets a
+    // navigation rail along the edge and a form that doesn't stretch across the whole window.
+
+    private fun tabBounds(a11yLabel: String) =
+        composeTestRule.onNode(hasContentDescription(a11yLabel)).getUnclippedBoundsInRoot()
+
+    @Test
+    fun compactWindowShowsTheTabsInABottomBar() {
+        val risk = tabBounds("リスク評価タブ")
+        val settings = tabBounds("設定タブ")
+
+        assertEquals(risk.top, settings.top)
+        assertNotEquals(risk.left, settings.left)
+    }
+
+    // Pixel Fold-class inner display.
+    @Test
+    @Config(qualifiers = "w673dp-h841dp")
+    fun unfoldedWindowShowsTheTabsInANavigationRail() {
+        val risk = tabBounds("リスク評価タブ")
+        val settings = tabBounds("設定タブ")
+
+        assertEquals(risk.left, settings.left)
+        assertTrue(settings.top > risk.top)
+    }
+
+    @Test
+    @Config(qualifiers = "w1000dp-h800dp")
+    fun wideWindowKeepsTheFormAtAReadableWidth() {
+        val predict = hasText("リスク予測") and hasClickAction()
+        composeTestRule.onNode(hasScrollAction()).performScrollToNode(predict)
+
+        val button = composeTestRule.onNode(predict).getUnclippedBoundsInRoot()
+
+        assertTrue("button width ${button.width}", button.width <= 640.dp)
     }
 }

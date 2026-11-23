@@ -65,6 +65,7 @@ fun AboutScreen(
             modifier = Modifier
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
+                .readableWidth()
                 .padding(horizontal = 16.dp, vertical = 12.dp)
         ) {
             Column(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {

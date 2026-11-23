@@ -19,9 +19,11 @@ import androidx.compose.material.icons.filled.Analytics
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteItem
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -90,6 +92,9 @@ private fun CLiTICALApp(viewModel: MainViewModel) {
     var selectedTab by rememberSaveable { mutableStateOf(Tab.RISK) }
     var showAbout by rememberSaveable { mutableStateOf(false) }
     val locale = viewModel.locale
+    // Bottom bar on phones and folded devices; a rail along the edge once unfolded or on a tablet.
+    val navigationSuiteType =
+        NavigationSuiteScaffoldDefaults.navigationSuiteType(currentWindowAdaptiveInfoV2())
 
     BackHandler(enabled = risk != null || showAbout) {
         if (risk != null) viewModel.calculatedRisk = null else showAbout = false
@@ -109,50 +114,53 @@ private fun CLiTICALApp(viewModel: MainViewModel) {
         } else if (showAbout) {
             AboutScreen(locale = locale, onBack = { showAbout = false }, modifier = Modifier.fillMaxSize())
         } else {
-            val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-            Scaffold(
-                modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-                topBar = {
-                    TopAppBar(
-                        title = { Text(localizedString(selectedTab.titleRes, locale)) },
-                        scrollBehavior = scrollBehavior
-                    )
-                },
-                bottomBar = {
-                    NavigationBar {
-                        Tab.entries.forEach { tab ->
-                            val accessibleLabel = localizedString(tab.a11yLabelRes, locale)
-                            NavigationBarItem(
-                                icon = { Icon(tab.icon, contentDescription = null) },
-                                label = {
-                                    Text(
-                                        text = localizedString(tab.labelRes, locale),
-                                        maxLines = 1,
-                                        softWrap = false,
-                                        overflow = TextOverflow.Ellipsis
-                                    )
-                                },
-                                modifier = Modifier.semantics {
-                                    contentDescription = accessibleLabel
-                                },
-                                selected = selectedTab == tab,
-                                onClick = { selectedTab = tab }
-                            )
-                        }
+            NavigationSuiteScaffold(
+                navigationSuiteType = navigationSuiteType,
+                navigationItems = {
+                    Tab.entries.forEach { tab ->
+                        val accessibleLabel = localizedString(tab.a11yLabelRes, locale)
+                        NavigationSuiteItem(
+                            icon = { Icon(tab.icon, contentDescription = null) },
+                            label = {
+                                Text(
+                                    text = localizedString(tab.labelRes, locale),
+                                    maxLines = 1,
+                                    softWrap = false,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            },
+                            modifier = Modifier.semantics {
+                                contentDescription = accessibleLabel
+                            },
+                            selected = selectedTab == tab,
+                            onClick = { selectedTab = tab },
+                            navigationSuiteType = navigationSuiteType
+                        )
                     }
                 }
-            ) { innerPadding ->
-                val contentModifier = Modifier
-                    .padding(innerPadding)
-                    .fillMaxSize()
-                when (selectedTab) {
-                    Tab.RISK -> QuestionForm(viewModel = viewModel, modifier = contentModifier)
-                    Tab.REFERENCES -> ReferencesScreen(locale = locale, modifier = contentModifier)
-                    Tab.SETTINGS -> SettingsScreen(
-                        viewModel = viewModel,
-                        modifier = contentModifier,
-                        onAboutClick = { showAbout = true }
-                    )
+            ) {
+                val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+                Scaffold(
+                    modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+                    topBar = {
+                        TopAppBar(
+                            title = { Text(localizedString(selectedTab.titleRes, locale)) },
+                            scrollBehavior = scrollBehavior
+                        )
+                    }
+                ) { innerPadding ->
+                    val contentModifier = Modifier
+                        .padding(innerPadding)
+                        .fillMaxSize()
+                    when (selectedTab) {
+                        Tab.RISK -> QuestionForm(viewModel = viewModel, modifier = contentModifier)
+                        Tab.REFERENCES -> ReferencesScreen(locale = locale, modifier = contentModifier)
+                        Tab.SETTINGS -> SettingsScreen(
+                            viewModel = viewModel,
+                            modifier = contentModifier,
+                            onAboutClick = { showAbout = true }
+                        )
+                    }
                 }
             }
         }

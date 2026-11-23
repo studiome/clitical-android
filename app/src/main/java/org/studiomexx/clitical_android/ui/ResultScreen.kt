@@ -69,7 +69,8 @@ fun ResultScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
                 .padding(16.dp)
-                .verticalScroll(rememberScrollState()),
+                .verticalScroll(rememberScrollState())
+                .readableWidth(),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             val notAvailable = localizedString(R.string.notAvailable, locale)

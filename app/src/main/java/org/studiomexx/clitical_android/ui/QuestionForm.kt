@@ -1,6 +1,6 @@
 package org.studiomexx.clitical_android.ui
 
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -130,8 +130,12 @@ fun QuestionForm(viewModel: MainViewModel, modifier: Modifier = Modifier) {
         if (viewModel.hasSubmitted) focusFirstInvalid()
     }
 
-    Box(modifier = modifier) {
-    LazyColumn(state = listState, modifier = Modifier.fillMaxSize()) {
+    BoxWithConstraints(modifier = modifier) {
+    LazyColumn(
+        state = listState,
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = readableContentPadding(maxWidth)
+    ) {
         item {
             Text(
                 text = localizedString(R.string.questionFormTitle, locale),

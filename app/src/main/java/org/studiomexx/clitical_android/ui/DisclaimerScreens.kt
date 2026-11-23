@@ -96,6 +96,7 @@ fun IntendedUseDisclaimerScreen(locale: Locale, onAcknowledge: () -> Unit) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .navigationBarsPadding()
+                    .readableWidth()
                     .padding(horizontal = 16.dp, vertical = 10.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -121,6 +122,7 @@ fun IntendedUseDisclaimerScreen(locale: Locale, onAcknowledge: () -> Unit) {
                 .fillMaxSize()
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
+                .readableWidth()
                 .padding(horizontal = 16.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
