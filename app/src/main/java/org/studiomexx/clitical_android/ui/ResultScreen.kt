@@ -7,10 +7,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Analytics
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -27,6 +29,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.studiomexx.clitical_android.R
@@ -64,61 +67,107 @@ fun ResultScreen(
             )
         }
     ) { innerPadding ->
-        Column(
+        RiskResultContent(
+            risk = risk,
+            locale = locale,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(16.dp)
-                .verticalScroll(rememberScrollState())
-                .readableWidth(),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+        )
+    }
+}
+
+/**
+ * The results pane beside the form on a wide window, mirroring the iOS app in regular
+ * width: the predicted risks once calculated, otherwise a hint on how to get them.
+ */
+@Composable
+fun RiskResultPane(risk: PatientRisk?, locale: Locale, modifier: Modifier = Modifier) {
+    if (risk != null) {
+        RiskResultContent(risk = risk, locale = locale, modifier = modifier)
+    } else {
+        Column(
+            modifier = modifier.padding(32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            val notAvailable = localizedString(R.string.notAvailable, locale)
-
-            // 30-day Amputation/Death
-            val adVal = if (risk.predicted30DDeathOrAmputation.isNaN()) notAvailable else String.format(Locale.US, "%.1f%%", risk.predicted30DDeathOrAmputation * 100.0)
-            InfoCard(
-                title = localizedString(R.string.predicted30DAD, locale),
-                subtitle = localizedString(R.string.predicted30DADDescription, locale),
-                value = adVal
+            Icon(
+                Icons.Default.Analytics,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(48.dp)
             )
-
-            // 30-day MALE
-            val maleVal = if (risk.predicted30DMALE.isNaN()) notAvailable else String.format(Locale.US, "%.1f%%", risk.predicted30DMALE * 100.0)
-            InfoCard(
-                title = localizedString(R.string.predicted30DMALE, locale),
-                subtitle = localizedString(R.string.predicted30DMALEDescription, locale),
-                value = maleVal
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                localizedString(R.string.result, locale),
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.semantics { heading() }
             )
-
-            // 2-year OS
-            val osVal = if (risk.predictedOS.isNaN()) notAvailable else String.format(Locale.US, "%.0f%%", risk.predictedOS * 100.0)
-            val osRiskLabel = risk.osRisk?.let { localizedString(it.stringResId, locale) } ?: notAvailable
-            InfoCard(
-                title = localizedString(R.string.predicted2yrOS, locale),
-                subtitle = localizedString(R.string.predicted2yrOSDescription, locale),
-                value = osVal,
-                extraLabel = osRiskLabel
-            )
-
-            // 2-year AFS
-            val afsVal = if (risk.predictedAFS.isNaN()) notAvailable else String.format(Locale.US, "%.0f%%", risk.predictedAFS * 100.0)
-            InfoCard(
-                title = localizedString(R.string.predicted2yrAFS, locale),
-                subtitle = localizedString(R.string.predicted2yrAFSDescription, locale),
-                value = afsVal
-            )
-
-            // GNRI
-            val gnriVal = if (risk.gnri.isNaN()) notAvailable else String.format(Locale.US, "%.1f", risk.gnri)
-            val gnriRiskLabel = risk.gnriRisk?.let { localizedString(it.stringResId, locale) } ?: notAvailable
-            InfoCard(
-                title = localizedString(R.string.gnri, locale),
-                subtitle = localizedString(R.string.gnriDesctiption, locale),
-                value = gnriVal,
-                extraLabel = gnriRiskLabel
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                localizedString(R.string.resultEmptyMessage, locale),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center
             )
         }
+    }
+}
+
+@Composable
+private fun RiskResultContent(risk: PatientRisk, locale: Locale, modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier
+            .padding(16.dp)
+            .verticalScroll(rememberScrollState())
+            .readableWidth(),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        val notAvailable = localizedString(R.string.notAvailable, locale)
+
+        // 30-day Amputation/Death
+        val adVal = if (risk.predicted30DDeathOrAmputation.isNaN()) notAvailable else String.format(Locale.US, "%.1f%%", risk.predicted30DDeathOrAmputation * 100.0)
+        InfoCard(
+            title = localizedString(R.string.predicted30DAD, locale),
+            subtitle = localizedString(R.string.predicted30DADDescription, locale),
+            value = adVal
+        )
+
+        // 30-day MALE
+        val maleVal = if (risk.predicted30DMALE.isNaN()) notAvailable else String.format(Locale.US, "%.1f%%", risk.predicted30DMALE * 100.0)
+        InfoCard(
+            title = localizedString(R.string.predicted30DMALE, locale),
+            subtitle = localizedString(R.string.predicted30DMALEDescription, locale),
+            value = maleVal
+        )
+
+        // 2-year OS
+        val osVal = if (risk.predictedOS.isNaN()) notAvailable else String.format(Locale.US, "%.0f%%", risk.predictedOS * 100.0)
+        val osRiskLabel = risk.osRisk?.let { localizedString(it.stringResId, locale) } ?: notAvailable
+        InfoCard(
+            title = localizedString(R.string.predicted2yrOS, locale),
+            subtitle = localizedString(R.string.predicted2yrOSDescription, locale),
+            value = osVal,
+            extraLabel = osRiskLabel
+        )
+
+        // 2-year AFS
+        val afsVal = if (risk.predictedAFS.isNaN()) notAvailable else String.format(Locale.US, "%.0f%%", risk.predictedAFS * 100.0)
+        InfoCard(
+            title = localizedString(R.string.predicted2yrAFS, locale),
+            subtitle = localizedString(R.string.predicted2yrAFSDescription, locale),
+            value = afsVal
+        )
+
+        // GNRI
+        val gnriVal = if (risk.gnri.isNaN()) notAvailable else String.format(Locale.US, "%.1f", risk.gnri)
+        val gnriRiskLabel = risk.gnriRisk?.let { localizedString(it.stringResId, locale) } ?: notAvailable
+        InfoCard(
+            title = localizedString(R.string.gnri, locale),
+            subtitle = localizedString(R.string.gnriDesctiption, locale),
+            value = gnriVal,
+            extraLabel = gnriRiskLabel
+        )
     }
 }
 

@@ -3,7 +3,7 @@ package org.studiomexx.clitical_android
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.hasContentDescription
-import androidx.compose.ui.test.hasScrollAction
+import androidx.compose.ui.test.hasScrollToIndexAction
 import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -39,9 +39,12 @@ class MainActivityTest {
         }
     }
 
+    // The form's lazy list; on a wide window the results pane scrolls too.
+    private fun onForm() = composeTestRule.onNode(hasScrollToIndexAction())
+
     private fun fillField(label: String, text: String) {
         val matcher = hasSetTextAction() and hasContentDescription(label)
-        composeTestRule.onNode(hasScrollAction()).performScrollToNode(matcher)
+        onForm().performScrollToNode(matcher)
         composeTestRule.onNode(matcher).performTextInput(text)
     }
 
@@ -50,7 +53,7 @@ class MainActivityTest {
         fillField("身長 [cm]", "150")
         fillField("体重 [kg]", "50")
         fillField("アルブミン値 [g/dl]", "4.0")
-        composeTestRule.onNode(hasScrollAction()).performScrollToNode(hasText("リスク予測"))
+        onForm().performScrollToNode(hasText("リスク予測"))
         composeTestRule.onNodeWithText("リスク予測").performClick()
     }
 
@@ -112,10 +115,45 @@ class MainActivityTest {
     @Config(qualifiers = "w1000dp-h800dp")
     fun wideWindowKeepsTheFormAtAReadableWidth() {
         val predict = hasText("リスク予測") and hasClickAction()
-        composeTestRule.onNode(hasScrollAction()).performScrollToNode(predict)
+        onForm().performScrollToNode(predict)
 
         val button = composeTestRule.onNode(predict).getUnclippedBoundsInRoot()
 
         assertTrue("button width ${button.width}", button.width <= 640.dp)
+    }
+
+    // Like the iOS app in regular width: form and predicted risks side by side.
+
+    private val ageField = hasSetTextAction() and hasContentDescription("年齢 [歳]")
+
+    @Test
+    @Config(qualifiers = "w1000dp-h800dp")
+    fun wideWindowShowsAnEmptyResultsPaneBesideTheForm() {
+        composeTestRule.onNode(ageField).assertExists()
+        composeTestRule.onNodeWithText("患者データを入力すると、ここに予測リスクが表示されます。").assertExists()
+    }
+
+    @Test
+    @Config(qualifiers = "w1000dp-h800dp")
+    fun wideWindowShowsTheResultBesideTheFormInsteadOfReplacingIt() {
+        fillRequiredFieldsAndSubmit()
+
+        composeTestRule.onNodeWithText("予測30日死亡・大切断率").assertExists()
+        // The form is still there to edit, scrolled down to the Predict button.
+        onForm().performScrollToNode(ageField)
+        composeTestRule.onNode(ageField).assertExists()
+        // No full-screen result, so there's nothing to go back from.
+        composeTestRule.onNode(hasContentDescription("戻る")).assertDoesNotExist()
+    }
+
+    @Test
+    @Config(qualifiers = "w1000dp-h800dp")
+    fun wideWindowClearsTheResultWhenTheInputChanges() {
+        fillRequiredFieldsAndSubmit()
+
+        fillField("年齢 [歳]", "1")
+
+        composeTestRule.onNodeWithText("予測30日死亡・大切断率").assertDoesNotExist()
+        composeTestRule.onNodeWithText("患者データを入力すると、ここに予測リスクが表示されます。").assertExists()
     }
 }

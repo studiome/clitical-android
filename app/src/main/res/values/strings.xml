@@ -68,6 +68,7 @@
     <string name="en">English</string>
     <string name="ja">日本語</string>
     <string name="result">Predicted Risks</string>
+    <string name="resultEmptyMessage">Enter the patient data to show the predicted risks here.</string>
     <string name="gnri">GNRI</string>
     <string name="gnriDesctiption">Geriatric Nutritional Risk Index</string>
     <string name="predicted30DAD">Predicted 30-day Amputation/Death</string>

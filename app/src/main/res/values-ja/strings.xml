@@ -68,6 +68,7 @@
     <string name="en">English</string>
     <string name="ja">日本語</string>
     <string name="result">予測リスク</string>
+    <string name="resultEmptyMessage">患者データを入力すると、ここに予測リスクが表示されます。</string>
     <string name="gnri">GNRI (Geriatric Nutritional Risk Index)</string>
     <string name="gnriDesctiption">栄養リスク指標</string>
     <string name="predicted30DAD">予測30日死亡・大切断率</string>
