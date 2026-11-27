@@ -28,8 +28,8 @@ class PatientRiskTest {
             predictedOS = "0.92",
             predictedAFS = "0.88",
             osRisk = OSRisk.LOW,
-            predicted30DDorA = "0.013",
-            predicted30DMALE = "0.032",
+            predicted30DayDeathOrAmputation = "0.013",
+            predicted30DayMALE = "0.032",
         )
 
         assertTestCase(pd, want)
@@ -85,8 +85,8 @@ class PatientRiskTest {
             predictedOS = "0.91",
             predictedAFS = "0.64",
             osRisk = OSRisk.LOW,
-            predicted30DDorA = "0.088",
-            predicted30DMALE = "0.152",
+            predicted30DayDeathOrAmputation = "0.088",
+            predicted30DayMALE = "0.152",
         )
 
         assertTestCase(pd, want)
@@ -126,8 +126,8 @@ class PatientRiskTest {
             predictedOS = "0.67",
             predictedAFS = "0.25",
             osRisk = OSRisk.MEDIUM,
-            predicted30DDorA = "0.170",
-            predicted30DMALE = "0.175",
+            predicted30DayDeathOrAmputation = "0.170",
+            predicted30DayMALE = "0.175",
         )
 
         assertTestCase(pd, want)
@@ -167,8 +167,8 @@ class PatientRiskTest {
             predictedOS = "0.08",
             predictedAFS = "0.03",
             osRisk = OSRisk.HIGH,
-            predicted30DDorA = "0.100",
-            predicted30DMALE = "0.043",
+            predicted30DayDeathOrAmputation = "0.100",
+            predicted30DayMALE = "0.043",
         )
 
         assertTestCase(pd, want)
@@ -208,8 +208,8 @@ class PatientRiskTest {
             predictedOS = "0.00",
             predictedAFS = "0.00",
             osRisk = OSRisk.HIGH,
-            predicted30DDorA = "0.370",
-            predicted30DMALE = "0.122",
+            predicted30DayDeathOrAmputation = "0.370",
+            predicted30DayMALE = "0.122",
         )
 
         assertTestCase(pd, want)
@@ -221,8 +221,8 @@ class PatientRiskTest {
         val predictedOS: String,
         val predictedAFS: String,
         val osRisk: OSRisk?,
-        val predicted30DDorA: String,
-        val predicted30DMALE: String,
+        val predicted30DayDeathOrAmputation: String,
+        val predicted30DayMALE: String,
     )
 
     private fun assertTestCase(pd: PatientData, want: Want) {
@@ -233,8 +233,8 @@ class PatientRiskTest {
         assertEquals(want.predictedOS, formatDouble(pr.predictedOS, 2))
         assertEquals(want.predictedAFS, formatDouble(pr.predictedAFS, 2))
         assertEquals(want.osRisk, pr.osRisk)
-        assertEquals(want.predicted30DDorA, formatDouble(pr.predicted30DDeathOrAmputation, 3))
-        assertEquals(want.predicted30DMALE, formatDouble(pr.predicted30DayMALE, 3))
+        assertEquals(want.predicted30DayDeathOrAmputation, formatDouble(pr.predicted30DayDeathOrAmputation, 3))
+        assertEquals(want.predicted30DayMALE, formatDouble(pr.predicted30DayMALE, 3))
     }
 
     private fun formatDouble(v: Double, fractionDigits: Int): String {

@@ -124,7 +124,7 @@ private fun RiskResultContent(risk: PatientRisk, locale: Locale, modifier: Modif
         val notAvailable = localizedString(R.string.notAvailable, locale)
 
         // 30-day Amputation/Death
-        val adVal = if (risk.predicted30DDeathOrAmputation.isNaN()) notAvailable else String.format(Locale.US, "%.1f%%", risk.predicted30DDeathOrAmputation * 100.0)
+        val adVal = if (risk.predicted30DayDeathOrAmputation.isNaN()) notAvailable else String.format(Locale.US, "%.1f%%", risk.predicted30DayDeathOrAmputation * 100.0)
         InfoCard(
             title = localizedString(R.string.predicted30DAD, locale),
             subtitle = localizedString(R.string.predicted30DADDescription, locale),

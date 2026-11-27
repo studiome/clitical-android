@@ -11,7 +11,7 @@ class PatientRisk(patientData: PatientData) {
     val predictedOS: Double
     val predictedAFS: Double
     val osRisk: OSRisk?
-    val predicted30DDeathOrAmputation: Double
+    val predicted30DayDeathOrAmputation: Double
     val predicted30DayMALE: Double
 
     init {
@@ -25,7 +25,7 @@ class PatientRisk(patientData: PatientData) {
             predictedOS = Double.NaN
             predictedAFS = Double.NaN
             osRisk = null
-            predicted30DDeathOrAmputation = Double.NaN
+            predicted30DayDeathOrAmputation = Double.NaN
             predicted30DayMALE = Double.NaN
         } else {
             val covariates = extractCovariates(patientData, gnriRisk)
@@ -38,7 +38,7 @@ class PatientRisk(patientData: PatientData) {
             predictedAFS = AFS_H0_COEFFICIENT.pow(exp(afsSigma))
 
             val dorASigma = calculateSigma(shortDeadOrAmputationCoefficients, covariates)
-            predicted30DDeathOrAmputation = sigmoid(dorASigma)
+            predicted30DayDeathOrAmputation = sigmoid(dorASigma)
 
             val maleSigma = calculateSigma(shortMALECoefficients, covariates)
             predicted30DayMALE = sigmoid(maleSigma)
