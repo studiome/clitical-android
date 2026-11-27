@@ -8,12 +8,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
 import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.DirectionsWalk
+import androidx.compose.material.icons.filled.Healing
 import androidx.compose.material.icons.filled.MonitorHeart
 import androidx.compose.material.icons.filled.Restaurant
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -33,18 +33,18 @@ private data class Prediction(val title: Int, val icon: ImageVector)
 
 private val predictions = listOf(
     Prediction(R.string.predicted30DAD, Icons.Default.MonitorHeart),
-    Prediction(R.string.predicted30DMALE, Icons.Default.FavoriteBorder),
+    // A limb event, not a survival measure, so it must not share the heart used for OS.
+    Prediction(R.string.predicted30DMALE, Icons.Default.Healing),
     Prediction(R.string.predicted2yrOS, Icons.Default.FavoriteBorder),
-    Prediction(R.string.predicted2yrAFS, Icons.Default.DirectionsWalk),
+    Prediction(R.string.predicted2yrAFS, Icons.AutoMirrored.Filled.DirectionsWalk),
     Prediction(R.string.gnri, Icons.Default.Restaurant)
 )
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AboutScreen(
     locale: Locale,
-    onBack: (() -> Unit)? = null,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onBack: (() -> Unit)? = null
 ) {
     Scaffold(
         modifier = modifier,
@@ -54,7 +54,7 @@ fun AboutScreen(
                 navigationIcon = onBack?.let {
                     {
                         IconButton(onClick = it) {
-                            Icon(Icons.Default.ArrowBack, contentDescription = localizedString(R.string.back, locale))
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = localizedString(R.string.back, locale))
                         }
                     }
                 } ?: {}

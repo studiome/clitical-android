@@ -18,7 +18,6 @@ import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
@@ -27,7 +26,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -45,7 +43,6 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import org.studiomexx.clitical_android.IntendedUseDisclaimerStore
 import org.studiomexx.clitical_android.R
-import org.studiomexx.clitical_android.ui.theme.JsvsColor
 import java.util.Locale
 
 private data class DisclaimerPoint(val title: Int, val detail: Int)
@@ -78,17 +75,16 @@ fun IntendedUseGate(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun IntendedUseDisclaimerScreen(locale: Locale, onAcknowledge: () -> Unit) {
     val context = LocalContext.current
     val acknowledgeLabel = localizedString(R.string.disclaimerAcknowledge, locale)
     val termsLabel = localizedString(R.string.disclaimerReadTerms, locale)
+    val openTermsLabel = localizedString(R.string.openTermsInBrowser, locale)
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(localizedString(R.string.disclaimerTitle, locale)) },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
+                title = { Text(localizedString(R.string.disclaimerTitle, locale)) }
             )
         },
         bottomBar = {
@@ -130,7 +126,7 @@ fun IntendedUseDisclaimerScreen(locale: Locale, onAcknowledge: () -> Unit) {
                 modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Icon(Icons.Default.ErrorOutline, contentDescription = null, tint = JsvsColor)
+                Icon(Icons.Default.ErrorOutline, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                 Text(
                     localizedString(R.string.disclaimerHeadline, locale),
                     style = MaterialTheme.typography.titleMedium,
@@ -158,12 +154,11 @@ fun IntendedUseDisclaimerScreen(locale: Locale, onAcknowledge: () -> Unit) {
                 )
             }
             ListItem(
-                headlineContent = { Text(termsLabel) },
                 leadingContent = { Icon(Icons.Default.Description, contentDescription = null) },
                 trailingContent = { Icon(Icons.AutoMirrored.Filled.OpenInNew, contentDescription = null) },
                 colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                 modifier = Modifier
-                    .clickable {
+                    .clickable(onClickLabel = openTermsLabel) {
                         CustomTabsIntent.Builder().build().launchUrl(
                             context,
                             "https://studiome.github.io/clitical-legal/terms/${if (locale.language == "ja") "ja" else "en"}/".toUri()
@@ -171,8 +166,10 @@ fun IntendedUseDisclaimerScreen(locale: Locale, onAcknowledge: () -> Unit) {
                     }
                     .semantics(mergeDescendants = true) {
                         contentDescription = termsLabel
-                }
-            )
+                    }
+            ) {
+                Text(termsLabel)
+            }
             Spacer(modifier = Modifier.padding(bottom = 96.dp))
         }
     }
