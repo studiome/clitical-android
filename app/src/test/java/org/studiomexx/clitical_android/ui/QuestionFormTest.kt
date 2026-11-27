@@ -326,6 +326,35 @@ class QuestionFormTest {
         onFieldLabelled("年齢 [歳]").assertIsNotFocused()
     }
 
+    /**
+     * Pins the scroll targets of focusFirstInvalid: each target sits in a different card, so
+     * focus only lands if the list index it scrolls to still points at that card.
+     */
+    @Test
+    fun predictingWithOnlyAlbuminMissingFocusesTheAlbuminField() {
+        val viewModel = showForm()
+        viewModel.fillRequiredFields()
+        viewModel.albText = ""
+
+        predict()
+
+        onFieldLabelled("アルブミン値 [g/dl]").assertIsFocused()
+    }
+
+    @Test
+    fun predictingWithNoLesionSelectedFocusesTheLesionRow() {
+        val viewModel = showForm()
+        viewModel.fillRequiredFields()
+        scrollTo(rowLabelled("大動脈腸骨動脈領域病変"))
+        onSwitchLabelled("大動脈腸骨動脈領域病変").performClick()
+
+        // Back at the top, so the focus request has to bring the lesion card into view.
+        scrollTo(rowLabelled("基本情報"))
+        predict()
+
+        onSwitchLabelled("大動脈腸骨動脈領域病変").assertIsFocused()
+    }
+
     @Test
     fun lesionValidationErrorRemainsVisibleAfterSubmit() {
         val viewModel = showForm()

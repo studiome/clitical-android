@@ -81,6 +81,22 @@ private fun formatBound(value: Double): String =
 private val heightWeightPattern = Regex("^\\d{0,3}(\\.\\d{0,1})?$")
 private val albuminPattern = Regex("^\\d{0,2}(\\.\\d{0,1})?$")
 
+/**
+ * The form's list rows, emitted in declaration order. The scroll target of focusFirstInvalid is
+ * the entry's ordinal, so adding, removing or reordering a row can't leave it pointing at the
+ * wrong place.
+ */
+private enum class FormItem {
+    SCREEN_TITLE,
+    BASIC_INFO_TITLE, BASIC_INFO,
+    SOCIAL_HISTORY_TITLE, SOCIAL_HISTORY,
+    CLINICAL_INFO_TITLE, CLINICAL_INFO,
+    LESION_INFO_TITLE, LESION_INFO,
+    OTHER_LESION_INFO_TITLE, OTHER_LESION_INFO,
+    COMPLICATIONS_TITLE, COMPLICATIONS,
+    CLEAR_ACTION
+}
+
 @Composable
 fun QuestionForm(
     viewModel: MainViewModel,
@@ -141,15 +157,15 @@ fun QuestionForm(
 
     fun focusFirstInvalid() {
         val target = when {
-            ageError != null -> Pair(2, ageFocusRequester)
-            heightError != null -> Pair(2, heightFocusRequester)
-            weightError != null -> Pair(2, weightFocusRequester)
-            albError != null -> Pair(6, albFocusRequester)
-            lesionError != null -> Pair(8, lesionFocusRequester)
+            ageError != null -> Pair(FormItem.BASIC_INFO, ageFocusRequester)
+            heightError != null -> Pair(FormItem.BASIC_INFO, heightFocusRequester)
+            weightError != null -> Pair(FormItem.BASIC_INFO, weightFocusRequester)
+            albError != null -> Pair(FormItem.CLINICAL_INFO, albFocusRequester)
+            lesionError != null -> Pair(FormItem.LESION_INFO, lesionFocusRequester)
             else -> null
         } ?: return
         coroutineScope.launch {
-            listState.animateScrollToItem(target.first)
+            listState.animateScrollToItem(target.first.ordinal)
             withFrameNanos { }
             target.second.requestFocus()
         }
@@ -178,10 +194,13 @@ fun QuestionForm(
         modifier = Modifier.fillMaxSize(),
         contentPadding = readableContentPadding(maxWidth, bottom = PredictFabClearance)
     ) {
-        item { ScreenTitle(localizedString(R.string.questionFormTitle, locale)) }
+        FormItem.entries.forEach { formItem ->
+        item(key = formItem.name) {
+        when (formItem) {
+        FormItem.SCREEN_TITLE -> ScreenTitle(localizedString(R.string.questionFormTitle, locale))
 
-        item { SectionTitle(localizedString(R.string.basicInfo, locale)) }
-        item {
+        FormItem.BASIC_INFO_TITLE -> SectionTitle(localizedString(R.string.basicInfo, locale))
+        FormItem.BASIC_INFO -> {
             SectionCard(
                 rows = listOf(
                     {
@@ -228,8 +247,8 @@ fun QuestionForm(
             )
         }
 
-        item { SectionTitle(localizedString(R.string.socialHistory, locale)) }
-        item {
+        FormItem.SOCIAL_HISTORY_TITLE -> SectionTitle(localizedString(R.string.socialHistory, locale))
+        FormItem.SOCIAL_HISTORY -> {
             SectionCard(
                 rows = listOf(
                     {
@@ -253,8 +272,8 @@ fun QuestionForm(
             )
         }
 
-        item { SectionTitle(localizedString(R.string.clinicalInfo, locale)) }
-        item {
+        FormItem.CLINICAL_INFO_TITLE -> SectionTitle(localizedString(R.string.clinicalInfo, locale))
+        FormItem.CLINICAL_INFO -> {
             SectionCard(
                 rows = listOf(
                     {
@@ -322,8 +341,8 @@ fun QuestionForm(
             )
         }
 
-        item { SectionTitle(localizedString(R.string.lesionInfo, locale)) }
-        item {
+        FormItem.LESION_INFO_TITLE -> SectionTitle(localizedString(R.string.lesionInfo, locale))
+        FormItem.LESION_INFO -> {
             SectionCard(
                 rows = listOf(
                     {
@@ -365,8 +384,8 @@ fun QuestionForm(
             )
         }
 
-        item { SectionTitle(localizedString(R.string.otherLesionInfo, locale)) }
-        item {
+        FormItem.OTHER_LESION_INFO_TITLE -> SectionTitle(localizedString(R.string.otherLesionInfo, locale))
+        FormItem.OTHER_LESION_INFO -> {
             SectionCard(
                 rows = listOf(
                     {
@@ -389,8 +408,8 @@ fun QuestionForm(
             )
         }
 
-        item { SectionTitle(localizedString(R.string.complications, locale)) }
-        item {
+        FormItem.COMPLICATIONS_TITLE -> SectionTitle(localizedString(R.string.complications, locale))
+        FormItem.COMPLICATIONS -> {
             SectionCard(
                 rows = listOf(
                     {
@@ -442,7 +461,7 @@ fun QuestionForm(
         // the flow at the end: a destructive action shouldn't float within reach. It wipes
         // every answer at once, so it's offered only when there is something to clear and
         // can be undone from the snackbar rather than confirmed up front.
-        item {
+        FormItem.CLEAR_ACTION -> {
             Column(modifier = Modifier.padding(16.dp)) {
                 OutlinedButton(
                     onClick = {
@@ -464,6 +483,9 @@ fun QuestionForm(
                     Text(localizedString(R.string.reset, locale))
                 }
             }
+        }
+        }
+        }
         }
     }
         // The screen's one primary action. It floats over the form so it can be reached
