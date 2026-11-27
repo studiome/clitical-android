@@ -1,19 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-   Sample data extraction rules file; uncomment and customize as necessary.
-   See https://developer.android.com/about/versions/12/backup-restore#xml-changes
-   for details.
+   Backup and device-transfer rules for Android 12 and higher.
+   No patient data is ever persisted, so nothing sensitive can be backed up or transferred.
+   Only the preferences file holding the intended-use acknowledgement and the language
+   choice is kept; everything else is left out by omission of an include.
 -->
 <data-extraction-rules>
     <cloud-backup>
-        <!-- TODO: Use <include> and <exclude> to control what is backed up.
-        <include .../>
-        <exclude .../>
-        -->
+        <include domain="sharedpref" path="clitical_preferences.xml" />
     </cloud-backup>
-    <!--
     <device-transfer>
-        <include .../>
-        <exclude .../>
+        <include domain="sharedpref" path="clitical_preferences.xml" />
     </device-transfer>
-    -->
 </data-extraction-rules>

@@ -1,13 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-   Sample backup rules file; uncomment and customize as necessary.
-   See https://developer.android.com/guide/topics/data/autobackup
-   for details.
-   Note: This file is ignored for devices older than API 31
-   See https://developer.android.com/about/versions/12/backup-restore
+   Auto Backup rules for Android 11 and lower (API 31+ uses data_extraction_rules.xml).
+   No patient data is ever persisted, so nothing sensitive can be backed up. Only the
+   preferences file holding the intended-use acknowledgement and the language choice is
+   kept, so a restored install doesn't ask the user to start over. Everything else
+   (databases, files, other prefs) is left out by omission.
 -->
 <full-backup-content>
-    <!--
-   <include domain="sharedpref" path="."/>
-   <exclude domain="sharedpref" path="device.xml"/>
--->
+    <include domain="sharedpref" path="clitical_preferences.xml" />
 </full-backup-content>
