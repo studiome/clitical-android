@@ -22,6 +22,9 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
+import org.junit.rules.ExternalResource
+import android.content.Context
+import androidx.test.core.app.ApplicationProvider
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -32,7 +35,18 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 class MainActivityTest {
 
-    @get:Rule
+    // Robolectric's device language is English, which the app now follows; these tests read the
+    // Japanese UI, so choose it before the activity (the compose rule) launches.
+    @get:Rule(order = 0)
+    val savedLanguage = object : ExternalResource() {
+        override fun before() {
+            val context = ApplicationProvider.getApplicationContext<Context>()
+            context.getSharedPreferences("clitical_preferences", Context.MODE_PRIVATE)
+                .edit().putString("app_language", "ja").commit()
+        }
+    }
+
+    @get:Rule(order = 1)
     val composeTestRule = createAndroidComposeRule<MainActivity>()
 
     @Before

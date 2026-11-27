@@ -1,5 +1,7 @@
 package org.studiomexx.clitical_android.model
 
+import java.io.Serializable
+
 data class PatientData(
     val sex: Sex = Sex.FEMALE,
     val age: Int? = null,
@@ -27,7 +29,7 @@ data class PatientData(
     val hasContraLateralLesion: Boolean = false,
     val hasOtherVD: Boolean = false,
     val rutherford: RutherfordClassification = RutherfordClassification.CLASS4,
-) {
+) : Serializable {
     companion object {
         // Plausible clinical values, matching the iOS app. Anything outside is far more likely
         // a typo or a wrong unit than a patient, and would give a plausible-looking wrong risk.

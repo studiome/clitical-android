@@ -61,6 +61,30 @@ class MainViewModelTest {
         assertTrue(viewModel.patientData.isSmoking)
     }
 
+    // The snackbar outlives the user's next keystroke; Undo must not then overwrite it.
+    @Test
+    fun undoAfterTypingFollowingAClearIsANoOp() {
+        val viewModel = MainViewModel().apply { ageText = "65" }
+
+        viewModel.reset()
+        viewModel.heightText = "170"
+        viewModel.undoReset()
+
+        assertEquals("", viewModel.ageText)
+        assertEquals("170", viewModel.heightText)
+    }
+
+    @Test
+    fun undoAfterChangingAnAnswerFollowingAClearIsANoOp() {
+        val viewModel = MainViewModel().apply { ageText = "65" }
+
+        viewModel.reset()
+        viewModel.updatePatientData { it.copy(isSmoking = true) }
+        viewModel.undoReset()
+
+        assertEquals("", viewModel.ageText)
+    }
+
     @Test
     fun canResetOnlyOnceSomethingWasEntered() {
         val viewModel = MainViewModel()

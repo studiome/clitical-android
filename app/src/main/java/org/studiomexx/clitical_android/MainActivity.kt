@@ -40,6 +40,9 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
+import androidx.lifecycle.createSavedStateHandle
 import androidx.window.core.layout.WindowSizeClass
 import org.studiomexx.clitical_android.ui.MainViewModel
 import org.studiomexx.clitical_android.ui.AboutScreen
@@ -68,7 +71,17 @@ private enum class Tab(
 }
 
 class MainActivity : ComponentActivity() {
-    private val viewModel: MainViewModel by viewModels()
+    private val preferences by lazy {
+        getSharedPreferences(AppLanguage.PREFERENCES_NAME, MODE_PRIVATE)
+    }
+
+    private val viewModel: MainViewModel by viewModels {
+        viewModelFactory {
+            initializer {
+                MainViewModel(LanguageStore(preferences), createSavedStateHandle())
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -76,9 +89,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             CLiTICALAndroidTheme {
                 IntendedUseGate(
-                    store = IntendedUseDisclaimerStore(
-                        getSharedPreferences("clitical_preferences", MODE_PRIVATE)
-                    ),
+                    store = IntendedUseDisclaimerStore(preferences),
                     locale = viewModel.locale
                 ) {
                     CLiTICALApp(viewModel)
