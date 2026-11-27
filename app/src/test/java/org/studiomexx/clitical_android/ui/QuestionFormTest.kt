@@ -18,7 +18,11 @@ import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.isSelectable
 import androidx.compose.ui.test.isToggleable
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.input.InputMode
+import androidx.compose.ui.input.InputModeManager
+import androidx.compose.ui.platform.LocalInputModeManager
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextInput
@@ -38,9 +42,6 @@ import java.util.Locale
 @RunWith(RobolectricTestRunner::class)
 class QuestionFormTest {
 
-    // Still the v1 rule: under v2's StandardTestDispatcher the focus request that follows a failed
-    // submit never lands in predictingWithNoLesionSelectedFocusesTheLesionRow (waitUntil included).
-    @Suppress("DEPRECATION")
     @get:Rule
     val composeTestRule = createComposeRule()
 
@@ -344,16 +345,40 @@ class QuestionFormTest {
         onFieldLabelled("アルブミン値 [g/dl]").assertIsFocused()
     }
 
+    // A switch row is only focusable in keyboard (non-touch) input mode, as Compose clickables
+    // are, so a touch user gets the lesion card scrolled into view with its error, and a
+    // keyboard user also gets focus moved onto it.
+
     @Test
-    fun predictingWithNoLesionSelectedFocusesTheLesionRow() {
+    fun predictingWithNoLesionSelectedBringsTheLesionRowIntoView() {
         val viewModel = showForm()
         viewModel.fillRequiredFields()
         scrollTo(rowLabelled("大動脈腸骨動脈領域病変"))
         onSwitchLabelled("大動脈腸骨動脈領域病変").performClick()
 
-        // Back at the top, so the focus request has to bring the lesion card into view.
+        // Back at the top, so the failed submit has to bring the lesion card into view.
         scrollTo(rowLabelled("基本情報"))
         predict()
+
+        onSwitchLabelled("大動脈腸骨動脈領域病変").assertIsDisplayed()
+        composeTestRule.onNodeWithText("動脈病変を1つ以上選択してください。").assertIsDisplayed()
+    }
+
+    @Test
+    fun predictingWithNoLesionSelectedFocusesTheLesionRowForKeyboardUsers() {
+        val viewModel = MainViewModel().apply { locale = Locale.forLanguageTag("ja") }
+        lateinit var inputModeManager: InputModeManager
+        composeTestRule.setContent {
+            inputModeManager = LocalInputModeManager.current
+            QuestionForm(viewModel = viewModel)
+        }
+        // Driven through the model rather than taps, which would put the window in touch mode.
+        composeTestRule.runOnIdle {
+            inputModeManager.requestInputMode(InputMode.Keyboard)
+            viewModel.fillRequiredFields()
+            viewModel.updatePatientData { it.copy(hasAILesion = false) }
+            viewModel.calculateRisk()
+        }
 
         onSwitchLabelled("大動脈腸骨動脈領域病変").assertIsFocused()
     }
