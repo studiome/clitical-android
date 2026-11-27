@@ -132,7 +132,7 @@ private fun RiskResultContent(risk: PatientRisk, locale: Locale, modifier: Modif
         )
 
         // 30-day MALE
-        val maleVal = if (risk.predicted30DMALE.isNaN()) notAvailable else String.format(Locale.US, "%.1f%%", risk.predicted30DMALE * 100.0)
+        val maleVal = if (risk.predicted30DayMALE.isNaN()) notAvailable else String.format(Locale.US, "%.1f%%", risk.predicted30DayMALE * 100.0)
         InfoCard(
             title = localizedString(R.string.predicted30DMALE, locale),
             subtitle = localizedString(R.string.predicted30DMALEDescription, locale),

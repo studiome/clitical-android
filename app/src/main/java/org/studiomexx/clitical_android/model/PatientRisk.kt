@@ -12,7 +12,7 @@ class PatientRisk(patientData: PatientData) {
     val predictedAFS: Double
     val osRisk: OSRisk?
     val predicted30DDeathOrAmputation: Double
-    val predicted30DMALE: Double
+    val predicted30DayMALE: Double
 
     init {
         // Callers validate first; this guards the model against being fed unchecked data.
@@ -26,7 +26,7 @@ class PatientRisk(patientData: PatientData) {
             predictedAFS = Double.NaN
             osRisk = null
             predicted30DDeathOrAmputation = Double.NaN
-            predicted30DMALE = Double.NaN
+            predicted30DayMALE = Double.NaN
         } else {
             val covariates = extractCovariates(patientData, gnriRisk)
 
@@ -41,7 +41,7 @@ class PatientRisk(patientData: PatientData) {
             predicted30DDeathOrAmputation = sigmoid(dorASigma)
 
             val maleSigma = calculateSigma(shortMALECoefficients, covariates)
-            predicted30DMALE = sigmoid(maleSigma)
+            predicted30DayMALE = sigmoid(maleSigma)
         }
     }
 

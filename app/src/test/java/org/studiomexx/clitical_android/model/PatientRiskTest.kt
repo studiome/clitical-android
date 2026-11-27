@@ -234,7 +234,7 @@ class PatientRiskTest {
         assertEquals(want.predictedAFS, formatDouble(pr.predictedAFS, 2))
         assertEquals(want.osRisk, pr.osRisk)
         assertEquals(want.predicted30DDorA, formatDouble(pr.predicted30DDeathOrAmputation, 3))
-        assertEquals(want.predicted30DMALE, formatDouble(pr.predicted30DMALE, 3))
+        assertEquals(want.predicted30DMALE, formatDouble(pr.predicted30DayMALE, 3))
     }
 
     private fun formatDouble(v: Double, fractionDigits: Int): String {
