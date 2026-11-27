@@ -37,14 +37,14 @@ private val predictions = listOf(
     Prediction(R.string.predicted30DMALE, Icons.Default.Healing),
     Prediction(R.string.predicted2yrOS, Icons.Default.FavoriteBorder),
     Prediction(R.string.predicted2yrAFS, Icons.AutoMirrored.Filled.DirectionsWalk),
-    Prediction(R.string.gnri, Icons.Default.Restaurant)
+    Prediction(R.string.gnri, Icons.Default.Restaurant),
 )
 
 @Composable
 fun AboutScreen(
     locale: Locale,
     modifier: Modifier = Modifier,
-    onBack: (() -> Unit)? = null
+    onBack: (() -> Unit)? = null,
 ) {
     Scaffold(
         modifier = modifier,
@@ -57,16 +57,16 @@ fun AboutScreen(
                             Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = localizedString(R.string.back, locale))
                         }
                     }
-                } ?: {}
+                } ?: {},
             )
-        }
+        },
     ) { padding ->
         Column(
             modifier = Modifier
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
                 .readableWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp)
+                .padding(horizontal = 16.dp, vertical = 12.dp),
         ) {
             Column(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
                 Text("CLiTICAL", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.SemiBold)
@@ -74,19 +74,19 @@ fun AboutScreen(
                     localizedString(R.string.aboutTagline, locale),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(top = 4.dp)
+                    modifier = Modifier.padding(top = 4.dp),
                 )
             }
             AboutSection(R.string.aboutOverview, localizedString(R.string.aboutOverviewBody, locale), locale)
             AboutSection(R.string.aboutIntendedUse, localizedString(R.string.aboutIntendedUseBody, locale), locale)
             SectionTitle(localizedString(R.string.aboutPredictions, locale), modifier = Modifier.padding(horizontal = 0.dp))
-            predictions.forEach { prediction ->
+            predictions.forEach { (title, icon) ->
                 Row(modifier = Modifier.fillMaxWidth().padding(vertical = 7.dp)) {
-                    Icon(prediction.icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                    Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                     Text(
-                        localizedString(prediction.title, locale),
+                        localizedString(title, locale),
                         style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(start = 12.dp)
+                        modifier = Modifier.padding(start = 12.dp),
                     )
                 }
             }
@@ -94,7 +94,7 @@ fun AboutScreen(
                 localizedString(R.string.aboutPredictionsFooter, locale),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(bottom = 4.dp)
+                modifier = Modifier.padding(bottom = 4.dp),
             )
             AboutSection(R.string.aboutMethodology, localizedString(R.string.aboutMethodologyBody, locale), locale)
             AboutSection(R.string.aboutModelSource, localizedString(R.string.aboutModelSourceBody, locale), locale)

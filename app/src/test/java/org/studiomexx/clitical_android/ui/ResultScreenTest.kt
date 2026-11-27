@@ -29,13 +29,13 @@ class ResultScreenTest {
     private fun showResult(
         data: PatientData = normalCase,
         locale: String = "ja",
-        onBack: () -> Unit = {}
+        onBack: () -> Unit = {},
     ) {
         composeTestRule.setContent {
             ResultScreen(
                 risk = PatientRisk(data),
                 onBack = onBack,
-                locale = Locale.forLanguageTag(locale)
+                locale = Locale.forLanguageTag(locale),
             )
         }
     }
@@ -77,7 +77,7 @@ class ResultScreenTest {
     @Test
     fun backButtonInvokesTheCallback() {
         var backCount = 0
-        showResult(onBack = { backCount++ })
+        showResult { backCount++ }
 
         composeTestRule.onNodeWithContentDescription("戻る").performClick()
 

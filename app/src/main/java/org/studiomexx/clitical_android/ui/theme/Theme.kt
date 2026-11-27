@@ -36,7 +36,7 @@ private val LightColorScheme = lightColorScheme(
     surfaceContainerHigh = LightSurfaceContainerHigh,
     surfaceContainerHighest = LightSurfaceContainerHighest,
     surfaceDim = LightSurfaceDim,
-    surfaceBright = LightSurfaceBright
+    surfaceBright = LightSurfaceBright,
 )
 
 private val DarkColorScheme = darkColorScheme(
@@ -66,7 +66,7 @@ private val DarkColorScheme = darkColorScheme(
     surfaceContainerHigh = DarkSurfaceContainerHigh,
     surfaceContainerHighest = DarkSurfaceContainerHighest,
     surfaceDim = DarkSurfaceDim,
-    surfaceBright = DarkSurfaceBright
+    surfaceBright = DarkSurfaceBright,
 )
 
 @Composable
@@ -76,7 +76,7 @@ fun CLiTICALAndroidTheme(
     // Flutter app (clti_risk), which always uses ColorScheme.fromSeed(jsvsColor)
     // rather than the device wallpaper.
     dynamicColor: Boolean = false,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     val colorScheme = when {
         // Dynamic colour needs Android 12+, which minSdk already guarantees.
@@ -91,6 +91,6 @@ fun CLiTICALAndroidTheme(
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,
-        content = content
+        content = content,
     )
 }

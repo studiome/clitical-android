@@ -13,7 +13,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Analytics
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -37,12 +36,11 @@ import org.studiomexx.clitical_android.model.PatientRisk
 import org.studiomexx.clitical_android.ui.theme.CLiTICALAndroidTheme
 import java.util.Locale
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ResultScreen(
     risk: PatientRisk,
     onBack: () -> Unit,
-    locale: Locale
+    locale: Locale,
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     Scaffold(
@@ -52,27 +50,27 @@ fun ResultScreen(
                 title = {
                     Text(
                         localizedString(R.string.result, locale),
-                        modifier = Modifier.semantics { heading() }
+                        modifier = Modifier.semantics { heading() },
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = localizedString(R.string.back, locale)
+                            contentDescription = localizedString(R.string.back, locale),
                         )
                     }
                 },
-                scrollBehavior = scrollBehavior
+                scrollBehavior = scrollBehavior,
             )
-        }
+        },
     ) { innerPadding ->
         RiskResultContent(
             risk = risk,
             locale = locale,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
+                .padding(innerPadding),
         )
     }
 }
@@ -89,26 +87,26 @@ fun RiskResultPane(risk: PatientRisk?, locale: Locale, modifier: Modifier = Modi
         Column(
             modifier = modifier.padding(32.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Center,
         ) {
             Icon(
                 Icons.Default.Analytics,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.size(48.dp)
+                modifier = Modifier.size(48.dp),
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
                 localizedString(R.string.result, locale),
                 style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.semantics { heading() }
+                modifier = Modifier.semantics { heading() },
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 localizedString(R.string.resultEmptyMessage, locale),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
             )
         }
     }
@@ -121,7 +119,7 @@ private fun RiskResultContent(risk: PatientRisk, locale: Locale, modifier: Modif
             .padding(16.dp)
             .verticalScroll(rememberScrollState())
             .readableWidth(),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         val notAvailable = localizedString(R.string.notAvailable, locale)
 
@@ -130,7 +128,7 @@ private fun RiskResultContent(risk: PatientRisk, locale: Locale, modifier: Modif
         InfoCard(
             title = localizedString(R.string.predicted30DAD, locale),
             subtitle = localizedString(R.string.predicted30DADDescription, locale),
-            value = adVal
+            value = adVal,
         )
 
         // 30-day MALE
@@ -138,7 +136,7 @@ private fun RiskResultContent(risk: PatientRisk, locale: Locale, modifier: Modif
         InfoCard(
             title = localizedString(R.string.predicted30DMALE, locale),
             subtitle = localizedString(R.string.predicted30DMALEDescription, locale),
-            value = maleVal
+            value = maleVal,
         )
 
         // 2-year OS
@@ -148,7 +146,7 @@ private fun RiskResultContent(risk: PatientRisk, locale: Locale, modifier: Modif
             title = localizedString(R.string.predicted2yrOS, locale),
             subtitle = localizedString(R.string.predicted2yrOSDescription, locale),
             value = osVal,
-            extraLabel = osRiskLabel
+            extraLabel = osRiskLabel,
         )
 
         // 2-year AFS
@@ -156,7 +154,7 @@ private fun RiskResultContent(risk: PatientRisk, locale: Locale, modifier: Modif
         InfoCard(
             title = localizedString(R.string.predicted2yrAFS, locale),
             subtitle = localizedString(R.string.predicted2yrAFSDescription, locale),
-            value = afsVal
+            value = afsVal,
         )
 
         // GNRI
@@ -166,7 +164,7 @@ private fun RiskResultContent(risk: PatientRisk, locale: Locale, modifier: Modif
             title = localizedString(R.string.gnri, locale),
             subtitle = localizedString(R.string.gnriDescription, locale),
             value = gnriVal,
-            extraLabel = gnriRiskLabel
+            extraLabel = gnriRiskLabel,
         )
     }
 }
@@ -184,16 +182,16 @@ fun InfoCard(
     title: String,
     subtitle: String,
     value: String,
-    extraLabel: String? = null
+    extraLabel: String? = null,
 ) {
     OutlinedCard(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
                 text = title,
@@ -201,27 +199,27 @@ fun InfoCard(
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier
                     .align(Alignment.Start)
-                    .semantics { heading() }
+                    .semantics { heading() },
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = subtitle,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.align(Alignment.Start)
+                modifier = Modifier.align(Alignment.Start),
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = value,
                 style = MaterialTheme.typography.displayMedium,
-                fontWeight = FontWeight.SemiBold
+                fontWeight = FontWeight.SemiBold,
             )
             if (extraLabel != null) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = extraLabel,
                     style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Medium,
                 )
             }
         }

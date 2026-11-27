@@ -3,13 +3,11 @@ package org.studiomexx.clitical_android.ui
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -18,7 +16,6 @@ import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material3.Button
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
@@ -52,26 +49,25 @@ private val disclaimerPoints = listOf(
     DisclaimerPoint(R.string.disclaimerNotADevice, R.string.disclaimerNotADeviceBody),
     DisclaimerPoint(R.string.disclaimerValues, R.string.disclaimerValuesBody),
     DisclaimerPoint(R.string.disclaimerPopulation, R.string.disclaimerPopulationBody),
-    DisclaimerPoint(R.string.disclaimerResponsibility, R.string.disclaimerResponsibilityBody)
+    DisclaimerPoint(R.string.disclaimerResponsibility, R.string.disclaimerResponsibilityBody),
 )
 
 @Composable
 fun IntendedUseGate(
     store: IntendedUseDisclaimerStore,
     locale: Locale,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
-    var acknowledged by remember { mutableStateOf(store.isAcknowledged) }
+    var acknowledged by remember { mutableStateOf(value = store.isAcknowledged) }
     if (acknowledged) {
         content()
     } else {
         IntendedUseDisclaimerScreen(
             locale = locale,
-            onAcknowledge = {
-                store.acknowledge()
-                acknowledged = true
-            }
-        )
+        ) {
+            store.acknowledge()
+            acknowledged = true
+        }
     }
 }
 
@@ -84,7 +80,7 @@ fun IntendedUseDisclaimerScreen(locale: Locale, onAcknowledge: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(localizedString(R.string.disclaimerTitle, locale)) }
+                title = { Text(localizedString(R.string.disclaimerTitle, locale)) },
             )
         },
         bottomBar = {
@@ -94,13 +90,13 @@ fun IntendedUseDisclaimerScreen(locale: Locale, onAcknowledge: () -> Unit) {
                     .navigationBarsPadding()
                     .readableWidth()
                     .padding(horizontal = 16.dp, vertical = 10.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Button(
                     onClick = onAcknowledge,
                     modifier = Modifier.fillMaxWidth().semantics {
                         contentDescription = acknowledgeLabel
-                    }
+                    },
                 ) {
                     Text(acknowledgeLabel)
                 }
@@ -108,10 +104,10 @@ fun IntendedUseDisclaimerScreen(locale: Locale, onAcknowledge: () -> Unit) {
                     localizedString(R.string.disclaimerAcknowledgeFooter, locale),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
                 )
             }
-        }
+        },
     ) { padding ->
         Column(
             modifier = Modifier
@@ -120,11 +116,11 @@ fun IntendedUseDisclaimerScreen(locale: Locale, onAcknowledge: () -> Unit) {
                 .verticalScroll(rememberScrollState())
                 .readableWidth()
                 .padding(horizontal = 16.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Column(
                 modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Icon(Icons.Default.ErrorOutline, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                 Text(
@@ -132,25 +128,25 @@ fun IntendedUseDisclaimerScreen(locale: Locale, onAcknowledge: () -> Unit) {
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(top = 8.dp)
+                    modifier = Modifier.padding(top = 8.dp),
                 )
             }
-            disclaimerPoints.forEach { point ->
+            disclaimerPoints.forEach { (title, detail) ->
                 SectionCard(
                     rows = listOf {
                         Column(modifier = Modifier.padding(16.dp)) {
                             Text(
-                                localizedString(point.title, locale),
+                                localizedString(title, locale),
                                 style = MaterialTheme.typography.titleSmall,
-                                fontWeight = FontWeight.Bold
+                                fontWeight = FontWeight.Bold,
                             )
                             Text(
-                                localizedString(point.detail, locale),
+                                localizedString(detail, locale),
                                 style = MaterialTheme.typography.bodyMedium,
-                                modifier = Modifier.padding(top = 6.dp)
+                                modifier = Modifier.padding(top = 6.dp),
                             )
                         }
-                    }
+                    },
                 )
             }
             ListItem(
@@ -161,12 +157,12 @@ fun IntendedUseDisclaimerScreen(locale: Locale, onAcknowledge: () -> Unit) {
                     .clickable(onClickLabel = openTermsLabel) {
                         CustomTabsIntent.Builder().build().launchUrl(
                             context,
-                            "https://studiome.github.io/clitical-legal/terms/${if (locale.language == "ja") "ja" else "en"}/".toUri()
+                            "https://studiome.github.io/clitical-legal/terms/${if (locale.language == "ja") "ja" else "en"}/".toUri(),
                         )
                     }
                     .semantics(mergeDescendants = true) {
                         contentDescription = termsLabel
-                    }
+                    },
             ) {
                 Text(termsLabel)
             }

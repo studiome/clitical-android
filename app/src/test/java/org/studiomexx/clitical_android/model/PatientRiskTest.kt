@@ -19,7 +19,7 @@ class PatientRiskTest {
             age = 65,
             weight = 50.0,
             height = 1.50,
-            alb = 4.0
+            alb = 4.0,
         )
 
         val want = Want(
@@ -29,7 +29,7 @@ class PatientRiskTest {
             predictedAFS = "0.88",
             osRisk = OSRisk.LOW,
             predicted30DDorA = "0.013",
-            predicted30DMALE = "0.032"
+            predicted30DMALE = "0.032",
         )
 
         assertTestCase(pd, want)
@@ -44,7 +44,7 @@ class PatientRiskTest {
             height = 0.0,
             weight = 50.0,
             alb = 3.0,
-            activity = Activity.WHEELCHAIR
+            activity = Activity.WHEELCHAIR,
         )
 
         val e = assertThrows(FormatException::class.java) { PatientRisk(pd) }
@@ -76,7 +76,7 @@ class PatientRiskTest {
             isSmoking = true,
             hasContralateralLesion = false,
             hasOtherVD = true,
-            rutherford = RutherfordClassification.CLASS4
+            rutherford = RutherfordClassification.CLASS4,
         )
 
         val want = Want(
@@ -86,7 +86,7 @@ class PatientRiskTest {
             predictedAFS = "0.64",
             osRisk = OSRisk.LOW,
             predicted30DDorA = "0.088",
-            predicted30DMALE = "0.152"
+            predicted30DMALE = "0.152",
         )
 
         assertTestCase(pd, want)
@@ -117,7 +117,7 @@ class PatientRiskTest {
             isSmoking = false,
             hasContralateralLesion = true,
             hasOtherVD = false,
-            rutherford = RutherfordClassification.CLASS5
+            rutherford = RutherfordClassification.CLASS5,
         )
 
         val want = Want(
@@ -127,7 +127,7 @@ class PatientRiskTest {
             predictedAFS = "0.25",
             osRisk = OSRisk.MEDIUM,
             predicted30DDorA = "0.170",
-            predicted30DMALE = "0.175"
+            predicted30DMALE = "0.175",
         )
 
         assertTestCase(pd, want)
@@ -158,7 +158,7 @@ class PatientRiskTest {
             isSmoking = true,
             hasContralateralLesion = true,
             hasOtherVD = false,
-            rutherford = RutherfordClassification.CLASS5
+            rutherford = RutherfordClassification.CLASS5,
         )
 
         val want = Want(
@@ -168,7 +168,7 @@ class PatientRiskTest {
             predictedAFS = "0.03",
             osRisk = OSRisk.HIGH,
             predicted30DDorA = "0.100",
-            predicted30DMALE = "0.043"
+            predicted30DMALE = "0.043",
         )
 
         assertTestCase(pd, want)
@@ -199,7 +199,7 @@ class PatientRiskTest {
             isSmoking = true,
             hasContralateralLesion = false,
             hasOtherVD = true,
-            rutherford = RutherfordClassification.CLASS6
+            rutherford = RutherfordClassification.CLASS6,
         )
 
         val want = Want(
@@ -209,7 +209,7 @@ class PatientRiskTest {
             predictedAFS = "0.00",
             osRisk = OSRisk.HIGH,
             predicted30DDorA = "0.370",
-            predicted30DMALE = "0.122"
+            predicted30DMALE = "0.122",
         )
 
         assertTestCase(pd, want)
@@ -222,7 +222,7 @@ class PatientRiskTest {
         val predictedAFS: String,
         val osRisk: OSRisk?,
         val predicted30DDorA: String,
-        val predicted30DMALE: String
+        val predicted30DMALE: String,
     )
 
     private fun assertTestCase(pd: PatientData, want: Want) {

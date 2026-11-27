@@ -31,7 +31,7 @@ fun ScreenTitle(title: String, modifier: Modifier = Modifier) {
         modifier = modifier
             .fillMaxWidth()
             .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 8.dp)
-            .semantics { heading() }
+            .semantics { heading() },
     )
 }
 
@@ -49,7 +49,7 @@ fun SectionTitle(title: String, modifier: Modifier = Modifier) {
         modifier = modifier
             .fillMaxWidth()
             .padding(start = 16.dp, end = 16.dp, top = 24.dp, bottom = 8.dp)
-            .semantics { heading() }
+            .semantics { heading() },
     )
 }
 
@@ -62,7 +62,7 @@ fun SectionTitle(title: String, modifier: Modifier = Modifier) {
 @Composable
 fun SectionCard(
     modifier: Modifier = Modifier,
-    rows: List<@Composable () -> Unit>
+    rows: List<@Composable () -> Unit>,
 ) {
     Card(
         modifier = modifier
@@ -70,7 +70,7 @@ fun SectionCard(
             .padding(horizontal = 16.dp),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
     ) {
         Column {
             rows.forEachIndexed { index, row ->
@@ -97,8 +97,8 @@ private fun SectionCardPreview() {
             rows = listOf(
                 { Text("Row 1", modifier = Modifier.padding(16.dp)) },
                 { Text("Row 2", modifier = Modifier.padding(16.dp)) },
-                { Text("Row 3", modifier = Modifier.padding(16.dp)) }
-            )
+                { Text("Row 3", modifier = Modifier.padding(16.dp)) },
+            ),
         )
     }
 }

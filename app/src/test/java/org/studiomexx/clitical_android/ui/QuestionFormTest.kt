@@ -229,7 +229,7 @@ class QuestionFormTest {
 
         assertFalse(viewModel.hasSubmitted)
         composeTestRule.onNodeWithText(
-            "身長は 100〜250 cm の範囲で入力してください。入力値の単位をご確認ください。"
+            "身長は 100〜250 cm の範囲で入力してください。入力値の単位をご確認ください。",
         ).assertExists()
     }
 
@@ -253,7 +253,7 @@ class QuestionFormTest {
         onFieldLabelled("Serum Albumin [g/dl]").performTextInput("9.9")
 
         composeTestRule.onNodeWithText(
-            "Albumin must be between 1 and 6 g/dL. Check the unit of the value you entered."
+            "Albumin must be between 1 and 6 g/dL. Check the unit of the value you entered.",
         ).assertExists()
     }
 

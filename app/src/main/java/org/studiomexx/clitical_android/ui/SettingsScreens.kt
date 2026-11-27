@@ -42,7 +42,7 @@ import java.util.Locale
 fun SettingsScreen(
     viewModel: MainViewModel,
     modifier: Modifier = Modifier,
-    onAboutClick: () -> Unit = {}
+    onAboutClick: () -> Unit = {},
 ) {
     val locale = viewModel.locale
     Column(modifier = modifier.verticalScroll(rememberScrollState()).readableWidth()) {
@@ -50,8 +50,8 @@ fun SettingsScreen(
         SectionTitle(localizedString(R.string.language, locale))
         SectionCard(
             rows = listOf(
-                { LanguagePicker(viewModel = viewModel) }
-            )
+                { LanguagePicker(viewModel = viewModel) },
+            ),
         )
 
         SectionCard(
@@ -59,13 +59,13 @@ fun SettingsScreen(
             rows = listOf(
                 { LegalLinkRow(R.string.appTerms, R.string.openTermsInBrowser, "terms", locale) },
                 { LegalLinkRow(R.string.appPrivacyPolicy, R.string.openPrivacyInBrowser, "privacy", locale) },
-                { LegalLinkRow(R.string.appSupport, R.string.openSupportInBrowser, "support", locale) }
-            )
+                { LegalLinkRow(R.string.appSupport, R.string.openSupportInBrowser, "support", locale) },
+            ),
         )
 
         SectionTitle(localizedString(R.string.about, locale))
         Column(
-            modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
+            modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
         ) {
             // The bare version number, as clitical-ios shows it: a "Version:"
             // label would be one more string to translate for no added meaning.
@@ -75,14 +75,14 @@ fun SettingsScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable(onClickLabel = localizedString(R.string.openAbout, locale), onClick = onAboutClick)
-                    .semantics(mergeDescendants = true) { }
+                    .semantics(mergeDescendants = true) { },
             ) {
                 Text("CLiTICAL", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.weight(1f))
                 Text(
                     BuildConfig.VERSION_NAME,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
             Text(localizedString(R.string.appLegalese, locale), style = MaterialTheme.typography.bodySmall)
@@ -99,11 +99,11 @@ private fun LegalLinkRow(labelRes: Int, actionLabelRes: Int, page: String, local
         },
         colors = ListItemDefaults.colors(containerColor = Color.Transparent),
         modifier = Modifier.clickable(
-            onClickLabel = localizedString(actionLabelRes, locale)
+            onClickLabel = localizedString(actionLabelRes, locale),
         ) {
             CustomTabsIntent.Builder().build()
                 .launchUrl(context, legalPageUrl(page, locale).toUri())
-        }
+        },
     ) {
         Text(localizedString(labelRes, locale))
     }
@@ -124,14 +124,13 @@ private fun LanguagePicker(viewModel: MainViewModel, modifier: Modifier = Modifi
                 .selectable(
                     selected = (locale.language == "ja"),
                     role = Role.RadioButton,
-                    onClick = { viewModel.locale = Locale.forLanguageTag("ja") }
-                )
+                ) { viewModel.locale = Locale.forLanguageTag("ja") }
                 .padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             RadioButton(
                 selected = (locale.language == "ja"),
-                onClick = null
+                onClick = null,
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(localizedString(R.string.ja, locale))
@@ -142,14 +141,13 @@ private fun LanguagePicker(viewModel: MainViewModel, modifier: Modifier = Modifi
                 .selectable(
                     selected = (locale.language == "en"),
                     role = Role.RadioButton,
-                    onClick = { viewModel.locale = Locale.forLanguageTag("en") }
-                )
+                ) { viewModel.locale = Locale.forLanguageTag("en") }
                 .padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             RadioButton(
                 selected = (locale.language == "en"),
-                onClick = null
+                onClick = null,
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(localizedString(R.string.en, locale))
@@ -162,29 +160,29 @@ private data class Reference(val citation: String, val url: String)
 private val references = listOf(
     Reference(
         "1. Miyata T. et al, Risk prediction model for early outcomes of revascularization for chronic limb-threatening ischaemia. Br J Surg. 2022 Oct 14;109(11):1123.",
-        "https://doi.org/10.1093/bjs/znab036"
+        "https://doi.org/10.1093/bjs/znab036",
     ),
     Reference(
         "2. Miyata T. et al, Prediction Models for Two Year Overall Survival and Amputation Free Survival After Revascularisation for Chronic Limb Threatening Ischaemia. Eur J Vasc Endovasc Surg . 2022 Jun 7;S1078-5884(22)00340-9.",
-        "https://doi.org/10.1016/j.ejvs.2022.05.038"
-    )
+        "https://doi.org/10.1016/j.ejvs.2022.05.038",
+    ),
 )
 
 @Composable
 fun ReferencesScreen(locale: Locale, modifier: Modifier = Modifier) {
     val context = LocalContext.current
     Column(
-        modifier = modifier.verticalScroll(rememberScrollState()).readableWidth()
+        modifier = modifier.verticalScroll(rememberScrollState()).readableWidth(),
     ) {
         ScreenTitle(localizedString(R.string.references, locale))
         Text(
             localizedString(R.string.tapToOpenLink, locale),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
         )
         SectionCard(
-            rows = references.map { reference ->
+            rows = references.map { (citation, url) ->
                 {
                     ListItem(
                         trailingContent = {
@@ -192,16 +190,16 @@ fun ReferencesScreen(locale: Locale, modifier: Modifier = Modifier) {
                         },
                         colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                         modifier = Modifier.clickable(
-                            onClickLabel = localizedString(R.string.openReferenceInBrowser, locale)
+                            onClickLabel = localizedString(R.string.openReferenceInBrowser, locale),
                         ) {
                             CustomTabsIntent.Builder().build()
-                                .launchUrl(context, reference.url.toUri())
-                        }
+                                .launchUrl(context, url.toUri())
+                        },
                     ) {
-                        Text(reference.citation, style = MaterialTheme.typography.bodySmall)
+                        Text(citation, style = MaterialTheme.typography.bodySmall)
                     }
                 }
-            }
+            },
         )
     }
 }

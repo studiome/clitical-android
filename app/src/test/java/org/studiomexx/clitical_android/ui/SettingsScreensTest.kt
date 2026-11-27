@@ -76,9 +76,9 @@ class SettingsScreensTest {
     @Test
     fun tappingAboutVersionRowShowsDetailedAboutInformation() {
         val viewModel = MainViewModel().apply { locale = Locale.forLanguageTag("ja") }
-        var aboutVisible by mutableStateOf(false)
+        var aboutVisible by mutableStateOf(value = false)
         composeTestRule.setContent {
-            SettingsScreen(viewModel = viewModel, onAboutClick = { aboutVisible = true })
+            SettingsScreen(viewModel = viewModel) { aboutVisible = true }
             if (aboutVisible) AboutScreen(locale = viewModel.locale)
         }
 
@@ -185,11 +185,11 @@ class SettingsScreensTest {
 
         val japaneseAction = composeTestRule.onNode(hasText("利用規約"))
             .fetchSemanticsNode().config[SemanticsActions.OnClick]
-        assertEquals("ブラウザで利用規約を開く", japaneseAction?.label)
+        assertEquals("ブラウザで利用規約を開く", japaneseAction.label)
 
         viewModel.locale = Locale.forLanguageTag("en")
         val englishAction = composeTestRule.onNode(hasText("Terms of service"))
             .fetchSemanticsNode().config[SemanticsActions.OnClick]
-        assertEquals("Open terms of service in browser", englishAction?.label)
+        assertEquals("Open terms of service in browser", englishAction.label)
     }
 }

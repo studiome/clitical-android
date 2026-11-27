@@ -32,7 +32,9 @@ data class PatientData(
 ) : Serializable {
     companion object {
         // Pinned so a later field edit can't silently change the serialized form that
-        // SavedStateHandle writes for process-death restoration.
+        // SavedStateHandle writes for process-death restoration. Read reflectively by Java
+        // serialization, hence not referenced from Kotlin.
+        @Suppress("unused")
         private const val serialVersionUID = 1L
 
         // Plausible clinical values, matching the iOS app. Anything outside is far more likely
@@ -48,13 +50,13 @@ data class PatientData(
 
 /** The first problem that prevents a risk calculation, or null when the data is valid. */
 fun PatientData.validate(): ValidationError? {
-    if (age == null || height == null || weight == null || alb == null) {
+    if ((age == null) || (height == null) || (weight == null) || (alb == null)) {
         return ValidationError.EMPTY_FIELDS
     }
-    if (age !in PatientData.validAgeRange ||
-        height !in PatientData.validHeightRange ||
-        weight !in PatientData.validWeightRange ||
-        alb !in PatientData.validAlbRange
+    if ((age !in PatientData.validAgeRange) ||
+        (height !in PatientData.validHeightRange) ||
+        (weight !in PatientData.validWeightRange) ||
+        (alb !in PatientData.validAlbRange)
     ) {
         return ValidationError.OUT_OF_RANGE
     }

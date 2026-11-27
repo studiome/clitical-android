@@ -53,12 +53,12 @@ val ReadableContentMaxWidth = 640.dp
  */
 fun Modifier.readableWidth(): Modifier = layout { measurable, constraints ->
     val cap = ReadableContentMaxWidth.roundToPx()
-    if (!constraints.hasBoundedWidth || constraints.maxWidth <= cap) {
+    if (!constraints.hasBoundedWidth || (constraints.maxWidth <= cap)) {
         val placeable = measurable.measure(constraints)
         return@layout layout(placeable.width, placeable.height) { placeable.place(0, 0) }
     }
     val placeable = measurable.measure(
-        constraints.copy(minWidth = constraints.minWidth.coerceAtMost(cap), maxWidth = cap)
+        constraints.copy(minWidth = constraints.minWidth.coerceAtMost(cap), maxWidth = cap),
     )
     val width = constraints.maxWidth
     layout(width, placeable.height) { placeable.place((width - placeable.width) / 2, 0) }

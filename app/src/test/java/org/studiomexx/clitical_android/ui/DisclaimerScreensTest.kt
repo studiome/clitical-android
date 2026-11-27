@@ -24,7 +24,7 @@ class DisclaimerScreensTest {
     fun readTermsRowExposesALocalizedOpenInBrowserActionLabel() {
         var locale by mutableStateOf(Locale.forLanguageTag("ja"))
         composeTestRule.setContent {
-            IntendedUseDisclaimerScreen(locale = locale, onAcknowledge = {})
+            IntendedUseDisclaimerScreen(locale = locale) {}
         }
 
         val japaneseAction = composeTestRule.onNode(hasText("利用規約・免責事項を読む"))

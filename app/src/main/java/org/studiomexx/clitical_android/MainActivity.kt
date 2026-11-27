@@ -63,7 +63,7 @@ import org.studiomexx.clitical_android.ui.theme.CLiTICALAndroidTheme
 private enum class Tab(
     val icon: ImageVector,
     @StringRes val labelRes: Int,
-    @StringRes val a11yLabelRes: Int
+    @StringRes val a11yLabelRes: Int,
 ) {
     RISK(Icons.Default.Analytics, R.string.riskAssessmentTabShort, R.string.riskAssessmentTabA11y),
     REFERENCES(Icons.AutoMirrored.Filled.MenuBook, R.string.referencesTabShort, R.string.referencesTabA11y),
@@ -90,7 +90,7 @@ class MainActivity : ComponentActivity() {
             CLiTICALAndroidTheme {
                 IntendedUseGate(
                     store = IntendedUseDisclaimerStore(preferences),
-                    locale = viewModel.locale
+                    locale = viewModel.locale,
                 ) {
                     CLiTICALApp(viewModel)
                 }
@@ -103,7 +103,7 @@ class MainActivity : ComponentActivity() {
 private fun CLiTICALApp(viewModel: MainViewModel) {
     val risk = viewModel.calculatedRisk
     var selectedTab by rememberSaveable { mutableStateOf(Tab.RISK) }
-    var showAbout by rememberSaveable { mutableStateOf(false) }
+    var showAbout by rememberSaveable { mutableStateOf(value = false) }
     val locale = viewModel.locale
     val adaptiveInfo = currentWindowAdaptiveInfoV2()
     // Bottom bar on phones and folded devices; a rail along the edge once unfolded or on a tablet.
@@ -114,20 +114,20 @@ private fun CLiTICALApp(viewModel: MainViewModel) {
         .isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_EXPANDED_LOWER_BOUND)
     val fullScreenRisk = risk.takeUnless { isTwoPane }
 
-    BackHandler(enabled = fullScreenRisk != null || showAbout) {
+    BackHandler(enabled = (fullScreenRisk != null) || showAbout) {
         if (fullScreenRisk != null) viewModel.calculatedRisk = null else showAbout = false
     }
 
     AnimatedContent(
         targetState = fullScreenRisk,
         transitionSpec = { fadeIn() togetherWith fadeOut() },
-        label = "riskResultTransition"
+        label = "riskResultTransition",
     ) { targetRisk ->
         if (targetRisk != null) {
             ResultScreen(
                 risk = targetRisk,
                 onBack = { viewModel.calculatedRisk = null },
-                locale = locale
+                locale = locale,
             )
         } else if (showAbout) {
             AboutScreen(locale = locale, onBack = { showAbout = false }, modifier = Modifier.fillMaxSize())
@@ -144,7 +144,7 @@ private fun CLiTICALApp(viewModel: MainViewModel) {
                                     text = localizedString(tab.labelRes, locale),
                                     maxLines = 1,
                                     softWrap = false,
-                                    overflow = TextOverflow.Ellipsis
+                                    overflow = TextOverflow.Ellipsis,
                                 )
                             },
                             modifier = Modifier.semantics {
@@ -152,10 +152,10 @@ private fun CLiTICALApp(viewModel: MainViewModel) {
                             },
                             selected = selectedTab == tab,
                             onClick = { selectedTab = tab },
-                            navigationSuiteType = navigationSuiteType
+                            navigationSuiteType = navigationSuiteType,
                         )
                     }
-                }
+                },
             ) {
                 // No top app bar: it only repeated the selected tab's name. Each screen opens
                 // with its own heading, and the Scaffold still keeps content clear of the
@@ -168,14 +168,13 @@ private fun CLiTICALApp(viewModel: MainViewModel) {
                         Tab.RISK -> RiskAssessment(
                             viewModel = viewModel,
                             isTwoPane = isTwoPane,
-                            modifier = contentModifier
+                            modifier = contentModifier,
                         )
                         Tab.REFERENCES -> ReferencesScreen(locale = locale, modifier = contentModifier)
                         Tab.SETTINGS -> SettingsScreen(
                             viewModel = viewModel,
                             modifier = contentModifier,
-                            onAboutClick = { showAbout = true }
-                        )
+                        ) { showAbout = true }
                     }
                 }
             }
@@ -194,14 +193,14 @@ private fun RiskAssessment(viewModel: MainViewModel, isTwoPane: Boolean, modifie
         Row(Modifier.fillMaxSize()) {
             QuestionForm(
                 viewModel = viewModel,
-                modifier = if (isTwoPane) Modifier.width(formWidth).fillMaxHeight() else Modifier.fillMaxSize()
+                modifier = if (isTwoPane) Modifier.width(formWidth).fillMaxHeight() else Modifier.fillMaxSize(),
             )
             if (isTwoPane) {
                 VerticalDivider()
                 RiskResultPane(
                     risk = viewModel.calculatedRisk,
                     locale = viewModel.locale,
-                    modifier = Modifier.weight(1f).fillMaxHeight()
+                    modifier = Modifier.weight(1f).fillMaxHeight(),
                 )
             }
         }

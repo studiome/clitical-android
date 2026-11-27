@@ -121,22 +121,22 @@ class MainActivityTest {
 
     @Test
     fun compactWindowShowsTheTabsInABottomBar() {
-        val risk = tabBounds("リスク評価タブ")
-        val settings = tabBounds("設定タブ")
+        val (riskLeft, riskTop) = tabBounds("リスク評価タブ")
+        val (settingsLeft, settingsTop) = tabBounds("設定タブ")
 
-        assertEquals(risk.top, settings.top)
-        assertNotEquals(risk.left, settings.left)
+        assertEquals(riskTop, settingsTop)
+        assertNotEquals(riskLeft, settingsLeft)
     }
 
     // Pixel Fold-class inner display.
     @Test
     @Config(qualifiers = "w673dp-h841dp")
     fun unfoldedWindowShowsTheTabsInANavigationRail() {
-        val risk = tabBounds("リスク評価タブ")
-        val settings = tabBounds("設定タブ")
+        val (riskLeft, riskTop) = tabBounds("リスク評価タブ")
+        val (settingsLeft, settingsTop) = tabBounds("設定タブ")
 
-        assertEquals(risk.left, settings.left)
-        assertTrue(settings.top > risk.top)
+        assertEquals(riskLeft, settingsLeft)
+        assertTrue(settingsTop > riskTop)
     }
 
     @Test
@@ -200,7 +200,7 @@ class MainActivityTest {
 
         composeTestRule.onAllNodes(predictFab).assertCountEquals(1)
         composeTestRule.onAllNodes(
-            hasClickAction() and hasText("リスク予測") and hasAnyAncestor(hasScrollToIndexAction())
+            hasClickAction() and hasText("リスク予測") and hasAnyAncestor(hasScrollToIndexAction()),
         ).assertCountEquals(0)
     }
 

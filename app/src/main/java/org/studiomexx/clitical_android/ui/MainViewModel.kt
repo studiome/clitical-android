@@ -19,10 +19,10 @@ class MainViewModel(
     private val languageStore: LanguageStore? = null,
     // Null where nothing needs to survive process death (tests, previews). A default of
     // SavedStateHandle() would call a constructor the library reserves for tests.
-    private val savedStateHandle: SavedStateHandle? = null
+    private val savedStateHandle: SavedStateHandle? = null,
 ) : ViewModel() {
     private var localeState by mutableStateOf(
-        languageStore?.locale ?: Locale.forLanguageTag("ja")
+        languageStore?.locale ?: Locale.forLanguageTag("ja"),
     )
 
     /** Every change is saved, so the choice outlives the process. */
@@ -40,7 +40,7 @@ class MainViewModel(
      * in the background. [onChange] runs before a value that differs from the current one is stored.
      */
     private fun <T> saved(key: String, initial: T, onChange: () -> Unit = {}) = object : ReadWriteProperty<Any?, T> {
-        var state by mutableStateOf(savedStateHandle?.get<T>(key) ?: initial)
+        var state by mutableStateOf(savedStateHandle?.get(key) ?: initial)
         override fun getValue(thisRef: Any?, property: KProperty<*>): T = state
         override fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
             if (value != state) onChange()
@@ -72,7 +72,7 @@ class MainViewModel(
      * True after the user attempts analysis; keeps field validation visible until fixed. UI state,
      * not an answer, so changing it neither discards the result nor the pending Undo.
      */
-    var hasSubmitted by saved("hasSubmitted", false)
+    var hasSubmitted by saved("hasSubmitted", initial = false)
     var validationAttempt by mutableIntStateOf(0)
 
     /** Why the latest attempt failed, so every Predict entry point reports it the same way. */
@@ -86,14 +86,14 @@ class MainViewModel(
     /** Whether there is anything to clear: some answer differs from a fresh form. */
     val canReset: Boolean
         get() = ageText.isNotEmpty() || heightText.isNotEmpty() || weightText.isNotEmpty() ||
-            albText.isNotEmpty() || patientData != PatientData()
+            albText.isNotEmpty() || (patientData != PatientData())
 
     private class Answers(
         val ageText: String,
         val heightText: String,
         val weightText: String,
         val albText: String,
-        val patientData: PatientData
+        val patientData: PatientData,
     )
 
     /** What the last [reset] cleared, so its snackbar can offer Undo. */
@@ -132,7 +132,7 @@ class MainViewModel(
             age = ageText.toIntOrNull(),
             height = heightText.toDoubleOrNull()?.div(100.0),
             weight = weightText.toDoubleOrNull(),
-            alb = albText.toDoubleOrNull()
+            alb = albText.toDoubleOrNull(),
         )
 
         validationError = data.validate()
@@ -141,9 +141,9 @@ class MainViewModel(
     }
 
     /** Why a numeric field can't be used, for its inline message; null when fine. */
-    private fun <T : Comparable<T>> issueOf(value: T?, range: ClosedRange<T>): FieldIssue? = when {
-        value == null -> if (hasSubmitted) FieldIssue.MISSING else null
-        value !in range -> FieldIssue.OUT_OF_RANGE
+    private fun <T : Comparable<T>> issueOf(value: T?, range: ClosedRange<T>): FieldIssue? = when (value) {
+        null -> if (hasSubmitted) FieldIssue.MISSING else null
+        !in range -> FieldIssue.OUT_OF_RANGE
         else -> null
     }
 

@@ -24,7 +24,7 @@ class PatientRisk(patientData: PatientData) {
         val alb = data.alb ?: return Double.NaN
         var wi = weight / (22.0 * height.pow(2.0))
         if (wi >= 1.0) wi = 1.0
-        return 14.89 * alb + 41.7 * wi
+        return (14.89 * alb) + (41.7 * wi)
     }
 
     // Derived straight from the data (not from the gnriRisk property) so the sigma calculations
@@ -110,7 +110,7 @@ class PatientRisk(patientData: PatientData) {
         RUTHERFORD_4,
         RUTHERFORD_5,
         RUTHERFORD_6,
-        INTERCEPT
+        INTERCEPT,
     }
 
     private fun calcSigma(data: PatientData, coeff: Map<Covariates, Double>, gnriRisk: GNRIRisk?): Double {
@@ -235,7 +235,7 @@ class PatientRisk(patientData: PatientData) {
             Covariates.PAST_MALIGNANCY to 0.20,
             Covariates.TREATING_MALIGNANCY to 0.56,
             Covariates.LESION_FP to -0.07,
-            Covariates.LESION_BELOW_IP to 0.16
+            Covariates.LESION_BELOW_IP to 0.16,
         )
 
         const val AFS_H0_COEFF = 0.876
@@ -261,7 +261,7 @@ class PatientRisk(patientData: PatientData) {
             Covariates.ABNORMAL_WBC to 0.19,
             Covariates.LOCAL_INFECTION to 0.15,
             Covariates.LESION_FP to -0.07,
-            Covariates.LESION_BELOW_IP to 0.15
+            Covariates.LESION_BELOW_IP to 0.15,
         )
 
         val shortDeadOrAmputationCoeff = mapOf(
@@ -278,7 +278,7 @@ class PatientRisk(patientData: PatientData) {
             Covariates.HAS_NO_FP_LESION to 0.17229,
             Covariates.GNRI_MODERATE to 0.36795,
             Covariates.ACTIVITY_AMBULATORY to 0.54391,
-            Covariates.GNRI_NO_OR_LOW to 0.76479
+            Covariates.GNRI_NO_OR_LOW to 0.76479,
         )
 
         val shortMALECoeff = mapOf(
@@ -304,7 +304,7 @@ class PatientRisk(patientData: PatientData) {
             Covariates.IS_FEMALE to 0.24023,
             Covariates.GNRI_NO_OR_LOW to 0.32693,
             Covariates.AGE_OVER_85 to 0.46026,
-            Covariates.GNRI_MODERATE to 0.46838
+            Covariates.GNRI_MODERATE to 0.46838,
         )
     }
 }

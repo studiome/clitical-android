@@ -75,7 +75,7 @@ import java.util.Locale
 
 /** Whole bounds without a trailing ".0", e.g. 100.0 -> "100". */
 private fun formatBound(value: Double): String =
-    if (value == Math.rint(value)) value.toLong().toString() else value.toString()
+    if ((value % 1.0) == 0.0) value.toLong().toString() else value.toString()
 
 private val heightWeightPattern = Regex("^\\d{0,3}(\\.\\d?)?$")
 private val albuminPattern = Regex("^\\d{0,2}(\\.\\d?)?$")
@@ -100,7 +100,7 @@ private enum class FormItem {
 fun QuestionForm(
     viewModel: MainViewModel,
     modifier: Modifier = Modifier,
-    listState: LazyListState = rememberLazyListState()
+    listState: LazyListState = rememberLazyListState(),
 ) {
     val context = LocalContext.current
     val locale = viewModel.locale
@@ -117,7 +117,7 @@ fun QuestionForm(
         FieldIssue.MISSING -> localizedString(R.string.questionAgeError, locale)
         FieldIssue.OUT_OF_RANGE -> localizedString(
             R.string.questionAgeRangeError, locale,
-            PatientData.validAgeRange.first, PatientData.validAgeRange.last
+            PatientData.validAgeRange.first, PatientData.validAgeRange.last,
         )
         null -> null
     }
@@ -127,7 +127,7 @@ fun QuestionForm(
         FieldIssue.OUT_OF_RANGE -> localizedString(
             R.string.questionHeightRangeError, locale,
             formatBound(PatientData.validHeightRange.start * 100),
-            formatBound(PatientData.validHeightRange.endInclusive * 100)
+            formatBound(PatientData.validHeightRange.endInclusive * 100),
         )
         null -> null
     }
@@ -136,7 +136,7 @@ fun QuestionForm(
         FieldIssue.OUT_OF_RANGE -> localizedString(
             R.string.questionWeightRangeError, locale,
             formatBound(PatientData.validWeightRange.start),
-            formatBound(PatientData.validWeightRange.endInclusive)
+            formatBound(PatientData.validWeightRange.endInclusive),
         )
         null -> null
     }
@@ -145,17 +145,17 @@ fun QuestionForm(
         FieldIssue.OUT_OF_RANGE -> localizedString(
             R.string.questionAlbRangeError, locale,
             formatBound(PatientData.validAlbRange.start),
-            formatBound(PatientData.validAlbRange.endInclusive)
+            formatBound(PatientData.validAlbRange.endInclusive),
         )
         null -> null
     }
     val lesionError = if (
         viewModel.hasSubmitted &&
-        !patientData.hasAILesion && !patientData.hasFPLesion && !patientData.hasBKLesion
+        !patientData.run { hasAILesion || hasFPLesion || hasBKLesion }
     ) localizedString(R.string.lesionSelectionError, locale) else null
 
     fun focusFirstInvalid() {
-        val target = when {
+        val (formItem, focusRequester) = when {
             ageError != null -> Pair(FormItem.BASIC_INFO, ageFocusRequester)
             heightError != null -> Pair(FormItem.BASIC_INFO, heightFocusRequester)
             weightError != null -> Pair(FormItem.BASIC_INFO, weightFocusRequester)
@@ -164,9 +164,9 @@ fun QuestionForm(
             else -> null
         } ?: return
         coroutineScope.launch {
-            listState.animateScrollToItem(target.first.ordinal)
+            listState.animateScrollToItem(formItem.ordinal)
             withFrameNanos { }
-            target.second.requestFocus()
+            focusRequester.requestFocus()
         }
     }
 
@@ -191,7 +191,7 @@ fun QuestionForm(
         LazyColumn(
             state = listState,
             modifier = Modifier.fillMaxSize(),
-            contentPadding = readableContentPadding(maxWidth, bottom = PredictFabClearance)
+            contentPadding = readableContentPadding(maxWidth, bottom = PredictFabClearance),
         ) {
             FormItem.entries.forEach { formItem ->
                 item(key = formItem.name) {
@@ -207,10 +207,10 @@ fun QuestionForm(
                                             label = localizedString(R.string.questionAgeTitle, locale),
                                             value = viewModel.ageText,
                                             // 3 digits cover the range; more could overflow Int and read as "enter age".
-                                            onValueChange = { if (it.length <= 3 && it.all { c -> c.isDigit() }) viewModel.ageText = it },
+                                            onValueChange = { if ((it.length <= 3) && it.all { c -> c.isDigit() }) viewModel.ageText = it },
                                             isDecimal = false,
                                             errorMessage = ageError,
-                                            focusRequester = ageFocusRequester
+                                            focusRequester = ageFocusRequester,
                                         )
                                     },
                                     {
@@ -219,7 +219,7 @@ fun QuestionForm(
                                             options = Sex.entries,
                                             selectedOption = patientData.sex,
                                             onOptionSelected = { sex -> viewModel.updatePatientData { it.copy(sex = sex) } },
-                                            locale = locale
+                                            locale = locale,
                                         )
                                     },
                                     {
@@ -229,7 +229,7 @@ fun QuestionForm(
                                             onValueChange = { if (it.isEmpty() || it.matches(heightWeightPattern)) viewModel.heightText = it },
                                             isDecimal = true,
                                             errorMessage = heightError,
-                                            focusRequester = heightFocusRequester
+                                            focusRequester = heightFocusRequester,
                                         )
                                     },
                                     {
@@ -239,10 +239,10 @@ fun QuestionForm(
                                             onValueChange = { if (it.isEmpty() || it.matches(heightWeightPattern)) viewModel.weightText = it },
                                             isDecimal = true,
                                             errorMessage = weightError,
-                                            focusRequester = weightFocusRequester
+                                            focusRequester = weightFocusRequester,
                                         )
-                                    }
-                                )
+                                    },
+                                ),
                             )
                         }
 
@@ -255,7 +255,7 @@ fun QuestionForm(
                                             label = localizedString(R.string.questionSmokingTitle, locale),
                                             checked = patientData.isSmoking,
                                             onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(isSmoking = checked) } },
-                                            description = localizedString(R.string.questionSmokingDescription, locale)
+                                            description = localizedString(R.string.questionSmokingDescription, locale),
                                         )
                                     },
                                     {
@@ -264,10 +264,10 @@ fun QuestionForm(
                                             options = Activity.entries,
                                             selectedOption = patientData.activity,
                                             onOptionSelected = { activity -> viewModel.updatePatientData { it.copy(activity = activity) } },
-                                            locale = locale
+                                            locale = locale,
                                         )
-                                    }
-                                )
+                                    },
+                                ),
                             )
                         }
 
@@ -282,7 +282,7 @@ fun QuestionForm(
                                             onValueChange = { if (it.isEmpty() || it.matches(albuminPattern)) viewModel.albText = it },
                                             isDecimal = true,
                                             errorMessage = albError,
-                                            focusRequester = albFocusRequester
+                                            focusRequester = albFocusRequester,
                                         )
                                     },
                                     {
@@ -292,7 +292,7 @@ fun QuestionForm(
                                             selectedOption = patientData.ckd,
                                             onOptionSelected = { ckd -> viewModel.updatePatientData { it.copy(ckd = ckd) } },
                                             locale = locale,
-                                            description = localizedString(R.string.questionCKDDescription, locale)
+                                            description = localizedString(R.string.questionCKDDescription, locale),
                                         )
                                     },
                                     {
@@ -300,7 +300,7 @@ fun QuestionForm(
                                             label = localizedString(R.string.questionUrgentTitle, locale),
                                             checked = patientData.isUrgent,
                                             onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(isUrgent = checked) } },
-                                            description = localizedString(R.string.questionUrgentDescription, locale)
+                                            description = localizedString(R.string.questionUrgentDescription, locale),
                                         )
                                     },
                                     {
@@ -308,7 +308,7 @@ fun QuestionForm(
                                             label = localizedString(R.string.questionFeverTitle, locale),
                                             checked = patientData.hasFever,
                                             onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(hasFever = checked) } },
-                                            description = localizedString(R.string.questionFeverDescription, locale)
+                                            description = localizedString(R.string.questionFeverDescription, locale),
                                         )
                                     },
                                     {
@@ -316,7 +316,7 @@ fun QuestionForm(
                                             label = localizedString(R.string.questionAbnormalWBCTitle, locale),
                                             checked = patientData.hasAbnormalWBC,
                                             onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(hasAbnormalWBC = checked) } },
-                                            description = localizedString(R.string.questionAbnormalWBCDescription, locale)
+                                            description = localizedString(R.string.questionAbnormalWBCDescription, locale),
                                         )
                                     },
                                     {
@@ -324,7 +324,7 @@ fun QuestionForm(
                                             label = localizedString(R.string.questionLocalInfectionTitle, locale),
                                             checked = patientData.hasLocalInfection,
                                             onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(hasLocalInfection = checked) } },
-                                            description = localizedString(R.string.questionLocalInfectionDescription, locale)
+                                            description = localizedString(R.string.questionLocalInfectionDescription, locale),
                                         )
                                     },
                                     {
@@ -333,10 +333,10 @@ fun QuestionForm(
                                             options = RutherfordClassification.entries,
                                             selectedOption = patientData.rutherford,
                                             onOptionSelected = { rutherford -> viewModel.updatePatientData { it.copy(rutherford = rutherford) } },
-                                            locale = locale
+                                            locale = locale,
                                         )
-                                    }
-                                )
+                                    },
+                                ),
                             )
                         }
 
@@ -349,37 +349,37 @@ fun QuestionForm(
                                             label = localizedString(R.string.questionAILesionTitle, locale),
                                             checked = patientData.hasAILesion,
                                             onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(hasAILesion = checked) } },
-                                            focusRequester = lesionFocusRequester
+                                            focusRequester = lesionFocusRequester,
                                         )
                                     },
                                     {
                                         SwitchRow(
                                             label = localizedString(R.string.questionFPLesionTitle, locale),
                                             checked = patientData.hasFPLesion,
-                                            onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(hasFPLesion = checked) } }
+                                            onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(hasFPLesion = checked) } },
                                         )
                                     },
                                     {
                                         SwitchRow(
                                             label = localizedString(R.string.questionBKLesionTitle, locale),
                                             checked = patientData.hasBKLesion,
-                                            onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(hasBKLesion = checked) } }
+                                            onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(hasBKLesion = checked) } },
                                         )
                                     },
                                     {
-                                        if (lesionError != null) {
+                                        lesionError?.let { message ->
                                             Text(
-                                                text = lesionError,
+                                                text = message,
                                                 color = MaterialTheme.colorScheme.error,
                                                 style = MaterialTheme.typography.bodySmall,
                                                 modifier = Modifier
                                                     .fillMaxWidth()
                                                     .padding(16.dp)
-                                                    .semantics { error(lesionError) }
+                                                    .semantics { error(message) },
                                             )
                                         }
-                                    }
-                                )
+                                    },
+                                ),
                             )
                         }
 
@@ -392,7 +392,7 @@ fun QuestionForm(
                                             label = localizedString(R.string.questionContraTitle, locale),
                                             checked = patientData.hasContralateralLesion,
                                             onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(hasContralateralLesion = checked) } },
-                                            description = localizedString(R.string.questionContraDescription, locale)
+                                            description = localizedString(R.string.questionContraDescription, locale),
                                         )
                                     },
                                     {
@@ -400,10 +400,10 @@ fun QuestionForm(
                                             label = localizedString(R.string.questionOtherLesionTitle, locale),
                                             checked = patientData.hasOtherVD,
                                             onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(hasOtherVD = checked) } },
-                                            description = localizedString(R.string.questionOtherLesionDescription, locale)
+                                            description = localizedString(R.string.questionOtherLesionDescription, locale),
                                         )
-                                    }
-                                )
+                                    },
+                                ),
                             )
                         }
 
@@ -416,7 +416,7 @@ fun QuestionForm(
                                             label = localizedString(R.string.questionCHFTitle, locale),
                                             checked = patientData.hasCHF,
                                             onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(hasCHF = checked) } },
-                                            description = localizedString(R.string.questionCHFDescription, locale)
+                                            description = localizedString(R.string.questionCHFDescription, locale),
                                         )
                                     },
                                     {
@@ -424,7 +424,7 @@ fun QuestionForm(
                                             label = localizedString(R.string.questionCADTitle, locale),
                                             checked = patientData.hasCAD,
                                             onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(hasCAD = checked) } },
-                                            description = localizedString(R.string.questionCADDescription, locale)
+                                            description = localizedString(R.string.questionCADDescription, locale),
                                         )
                                     },
                                     {
@@ -432,7 +432,7 @@ fun QuestionForm(
                                             label = localizedString(R.string.questionCVDTitle, locale),
                                             checked = patientData.hasCVD,
                                             onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(hasCVD = checked) } },
-                                            description = localizedString(R.string.questionCVDDescription, locale)
+                                            description = localizedString(R.string.questionCVDDescription, locale),
                                         )
                                     },
                                     {
@@ -440,7 +440,7 @@ fun QuestionForm(
                                             label = localizedString(R.string.questionDLTitle, locale),
                                             checked = patientData.hasDyslipidemia,
                                             onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(hasDyslipidemia = checked) } },
-                                            description = localizedString(R.string.questionDLDescription, locale)
+                                            description = localizedString(R.string.questionDLDescription, locale),
                                         )
                                     },
                                     {
@@ -449,10 +449,10 @@ fun QuestionForm(
                                             options = MalignantNeoplasm.entries,
                                             selectedOption = patientData.malignant,
                                             onOptionSelected = { malignant -> viewModel.updatePatientData { it.copy(malignant = malignant) } },
-                                            locale = locale
+                                            locale = locale,
                                         )
-                                    }
-                                )
+                                    },
+                                ),
                             )
                         }
 
@@ -470,14 +470,14 @@ fun QuestionForm(
                                             val result = snackbarHostState.showSnackbar(
                                                 message = context.localizedString(R.string.resetDone, locale),
                                                 actionLabel = context.localizedString(R.string.undo, locale),
-                                                duration = SnackbarDuration.Long
+                                                duration = SnackbarDuration.Long,
                                             )
                                             if (result == SnackbarResult.ActionPerformed) viewModel.undoReset()
                                         }
                                     },
                                     enabled = viewModel.canReset,
                                     modifier = Modifier.fillMaxWidth(),
-                                    colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error)
+                                    colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
                                 ) {
                                     Text(localizedString(R.string.reset, locale))
                                 }
@@ -499,14 +499,14 @@ fun QuestionForm(
                 .align(Alignment.BottomEnd)
                 .padding(16.dp)
                 // Collapsed to its icon, the FAB still needs its name.
-                .semantics { contentDescription = predictLabel }
+                .semantics { contentDescription = predictLabel },
         )
         // Above the FAB, as Material places snackbars.
         SnackbarHost(
             hostState = snackbarHostState,
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .padding(bottom = PredictFabClearance)
+                .padding(bottom = PredictFabClearance),
         )
     }
 }
@@ -536,7 +536,7 @@ fun TextEditRow(
     onValueChange: (String) -> Unit,
     isDecimal: Boolean,
     errorMessage: String? = null,
-    focusRequester: FocusRequester? = null
+    focusRequester: FocusRequester? = null,
 ) {
     Column {
         ListItem(
@@ -551,29 +551,29 @@ fun TextEditRow(
                         .then(focusRequester?.let { Modifier.focusRequester(it) } ?: Modifier)
                         .semantics {
                             contentDescription = label
-                            if (errorMessage != null) error(errorMessage)
+                            errorMessage?.let { error(it) }
                         },
                     keyboardOptions = KeyboardOptions(
-                        keyboardType = if (isDecimal) KeyboardType.Decimal else KeyboardType.Number
+                        keyboardType = if (isDecimal) KeyboardType.Decimal else KeyboardType.Number,
                     ),
-                    singleLine = true
+                    singleLine = true,
                 )
             },
-            colors = transparentListItemColors
+            colors = transparentListItemColors,
         ) {
             Text(label)
         }
         // Under the whole row rather than as the field's supporting text, where the 110dp
         // field broke the message mid-phrase. The field already announces it as its error.
-        if (errorMessage != null) {
+        errorMessage?.let { message ->
             Text(
-                text = errorMessage,
+                text = message,
                 color = MaterialTheme.colorScheme.error,
                 style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 16.dp, end = 16.dp, bottom = 12.dp)
-                    .semantics { hideFromAccessibility() }
+                    .semantics { hideFromAccessibility() },
             )
         }
     }
@@ -585,7 +585,7 @@ fun SwitchRow(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
     description: String? = null,
-    focusRequester: FocusRequester? = null
+    focusRequester: FocusRequester? = null,
 ) {
     // Toggling on the row rather than the Switch merges the two into one node, so the
     // switch is announced with its label and the whole row becomes a tap target.
@@ -597,7 +597,7 @@ fun SwitchRow(
         trailingContent = {
             Switch(
                 checked = checked,
-                onCheckedChange = null
+                onCheckedChange = null,
             )
         },
         modifier = Modifier
@@ -605,9 +605,9 @@ fun SwitchRow(
             .toggleable(
                 value = checked,
                 onValueChange = onCheckedChange,
-                role = Role.Switch
+                role = Role.Switch,
             ),
-        colors = transparentListItemColors
+        colors = transparentListItemColors,
     ) {
         Text(label)
     }
@@ -620,9 +620,9 @@ fun <T> EnumChoiceRow(
     selectedOption: T,
     onOptionSelected: (T) -> Unit,
     locale: Locale,
-    description: String? = null
+    description: String? = null,
 ) where T : Enum<T>, T : Labeled {
-    var expanded by remember { mutableStateOf(false) }
+    var expanded by remember { mutableStateOf(value = false) }
 
     // The label/description Text nodes are purely visual: the OutlinedTextField below
     // carries an equivalent contentDescription, so a screen reader should focus that
@@ -633,19 +633,19 @@ fun <T> EnumChoiceRow(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(
             modifier = Modifier
                 .weight(1f)
-                .clearAndSetSemantics { }
+                .clearAndSetSemantics { },
         ) {
             Text(text = label, style = MaterialTheme.typography.bodyLarge)
-            if (description != null) {
+            description?.let {
                 Text(
-                    text = description,
+                    text = it,
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
         }
@@ -653,7 +653,7 @@ fun <T> EnumChoiceRow(
         ExposedDropdownMenuBox(
             expanded = expanded,
             onExpandedChange = { expanded = it },
-            modifier = Modifier.width(180.dp)
+            modifier = Modifier.width(180.dp),
         ) {
             OutlinedTextField(
                 value = localizedString(selectedOption.stringResId, locale),
@@ -664,11 +664,11 @@ fun <T> EnumChoiceRow(
                 modifier = Modifier
                     .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
                     .fillMaxWidth()
-                    .semantics { contentDescription = fieldDescription }
+                    .semantics { contentDescription = fieldDescription },
             )
             ExposedDropdownMenu(
                 expanded = expanded,
-                onDismissRequest = { expanded = false }
+                onDismissRequest = { expanded = false },
             ) {
                 options.forEach { option ->
                     val isSelected = option == selectedOption
@@ -681,7 +681,7 @@ fun <T> EnumChoiceRow(
                             onOptionSelected(option)
                             expanded = false
                         },
-                        modifier = Modifier.semantics { selected = isSelected }
+                        modifier = Modifier.semantics { selected = isSelected },
                     )
                 }
             }

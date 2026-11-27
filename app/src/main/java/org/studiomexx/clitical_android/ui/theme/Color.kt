@@ -2,6 +2,8 @@ package org.studiomexx.clitical_android.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
+// The brand seed the palette below was generated from; kept as the single source of record.
+@Suppress("unused")
 val JsvsColor = Color(0xFF2D6A7B)
 
 // Generated from ColorScheme.fromSeed(seedColor: jsvsColor) in the clti_risk
