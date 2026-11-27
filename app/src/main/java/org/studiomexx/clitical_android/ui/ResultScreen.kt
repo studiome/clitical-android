@@ -164,7 +164,7 @@ private fun RiskResultContent(risk: PatientRisk, locale: Locale, modifier: Modif
         val gnriRiskLabel = risk.gnriRisk?.let { localizedString(it.stringResId, locale) } ?: notAvailable
         InfoCard(
             title = localizedString(R.string.gnri, locale),
-            subtitle = localizedString(R.string.gnriDesctiption, locale),
+            subtitle = localizedString(R.string.gnriDescription, locale),
             value = gnriVal,
             extraLabel = gnriRiskLabel
         )

@@ -198,7 +198,7 @@ class PatientRisk(patientData: PatientData) {
         if (data.hasDyslipidemia) sigma += coeff[Covariates.HAS_DYSLIPIDEMIA] ?: 0.0
 
         // Contralateral
-        if (!data.hasContraLateralLesion) sigma += coeff[Covariates.HAS_NO_CONTRALATERAL] ?: 0.0
+        if (!data.hasContralateralLesion) sigma += coeff[Covariates.HAS_NO_CONTRALATERAL] ?: 0.0
 
         // Other VD
         if (data.hasOtherVD) sigma += coeff[Covariates.HAS_OTHER] ?: 0.0

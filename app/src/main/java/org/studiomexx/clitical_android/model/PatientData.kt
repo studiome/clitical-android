@@ -26,11 +26,15 @@ data class PatientData(
     val hasDyslipidemia: Boolean = false,
     val isSmoking: Boolean = false,
     val hasCAD: Boolean = false,
-    val hasContraLateralLesion: Boolean = false,
+    val hasContralateralLesion: Boolean = false,
     val hasOtherVD: Boolean = false,
     val rutherford: RutherfordClassification = RutherfordClassification.CLASS4,
 ) : Serializable {
     companion object {
+        // Pinned so a later field edit can't silently change the serialized form that
+        // SavedStateHandle writes for process-death restoration.
+        private const val serialVersionUID = 1L
+
         // Plausible clinical values, matching the iOS app. Anything outside is far more likely
         // a typo or a wrong unit than a patient, and would give a plausible-looking wrong risk.
         val validAgeRange = 18..120

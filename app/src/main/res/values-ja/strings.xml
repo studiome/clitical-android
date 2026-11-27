@@ -23,7 +23,7 @@
     <string name="questionContraTitle">対側動脈病変</string>
     <string name="questionOtherLesionTitle">その他血管病変</string>
     <string name="questionRutherfordTitle">ラザフォード分類</string>
-    <string name="questionCKDDescription">正常: 60以上, G3: 30-59, G4: 15-29, G5: 15以下, G5D: 透析\n*eGFR: 推定糸球体濾過量</string>
+    <string name="questionCKDDescription">正常: 60以上, G3: 30–59, G4: 15–29, G5: 15以下, G5D: 透析\n*eGFR: 推定糸球体濾過量</string>
     <string name="questionSmokingDescription">喫煙中・喫煙歴あり</string>
     <string name="questionUrgentDescription">緊急手術（待機手術は含まない）</string>
     <string name="questionFeverDescription">体温38℃以上</string>
@@ -60,17 +60,13 @@
     <string name="notAvailable">該当なし</string>
     <string name="tapToOpenLink">論文サイトを開きます。</string>
     <string name="appLegalese">2022 発行: 特定非営利法人日本血管外科学会、JCLIMB委員会、ソフトウェア制作: 宮原和洋</string>
-    <string name="aboutDescription">CLiTICAL は、血行再建術を受ける包括的慢性下肢虚血 (CLTI) 患者の周術期および中期予後を予測するアプリです。</string>
-    <string name="aboutDataSource">予測モデルは日本血管外科学会 JCLIMB レジストリの解析に基づいています。出典は「参考文献」タブに掲載しています。</string>
-    <string name="aboutPrivacyLegacy">入力された患者データは端末内でのみ扱われ、外部への送信や保存は行いません。</string>
-    <string name="aboutDisclaimerLegacy">予測値は臨床判断を補助する参考情報であり、診断や治療方針の決定に代わるものではありません。最終的な判断は担当医の責任において行ってください。</string>
     <string name="language">言語</string>
     <string name="en">English</string>
     <string name="ja">日本語</string>
     <string name="result">予測リスク</string>
     <string name="resultEmptyMessage">患者データを入力すると、ここに予測リスクが表示されます。</string>
     <string name="gnri">GNRI (Geriatric Nutritional Risk Index)</string>
-    <string name="gnriDesctiption">栄養リスク指標</string>
+    <string name="gnriDescription">栄養リスク指標</string>
     <string name="predicted30DAD">予測30日死亡・大切断率</string>
     <string name="predicted30DADDescription">血行再建後30日以内の死亡もしくは大切断率の予測</string>
     <string name="predicted30DMALE">予測30日MALE発生率</string>
@@ -82,7 +78,7 @@
     <string name="gnriNoRisk">リスクなし</string>
     <string name="gnriLowRisk">軽度栄養リスク</string>
     <string name="gnriModerateRisk">中等度栄養リスク</string>
-    <string name="gntiMajorRisk">高度栄養リスク</string>
+    <string name="gnriMajorRisk">高度栄養リスク</string>
     <string name="osLowRisk">低リスク</string>
     <string name="osMediumRisk">中等度リスク</string>
     <string name="osHighRisk">高リスク</string>

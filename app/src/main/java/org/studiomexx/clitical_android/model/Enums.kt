@@ -35,7 +35,7 @@ enum class RutherfordClassification(@get:StringRes override val stringResId: Int
 }
 
 enum class GNRIRisk(@get:StringRes override val stringResId: Int) : Labeled {
-    MAJOR(R.string.gntiMajorRisk),
+    MAJOR(R.string.gnriMajorRisk),
     MODERATE(R.string.gnriModerateRisk),
     LOW(R.string.gnriLowRisk),
     NO_RISK(R.string.gnriNoRisk)

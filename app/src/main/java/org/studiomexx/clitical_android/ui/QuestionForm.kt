@@ -19,7 +19,6 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExtendedFloatingActionButton
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenu
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -78,8 +77,8 @@ import java.util.Locale
 private fun formatBound(value: Double): String =
     if (value == Math.rint(value)) value.toLong().toString() else value.toString()
 
-private val heightWeightPattern = Regex("^\\d{0,3}(\\.\\d{0,1})?$")
-private val albuminPattern = Regex("^\\d{0,2}(\\.\\d{0,1})?$")
+private val heightWeightPattern = Regex("^\\d{0,3}(\\.\\d?)?$")
+private val albuminPattern = Regex("^\\d{0,2}(\\.\\d?)?$")
 
 /**
  * The form's list rows, emitted in declaration order. The scroll target of focusFirstInvalid is
@@ -189,305 +188,305 @@ fun QuestionForm(
     }
 
     BoxWithConstraints(modifier = modifier) {
-    LazyColumn(
-        state = listState,
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = readableContentPadding(maxWidth, bottom = PredictFabClearance)
-    ) {
-        FormItem.entries.forEach { formItem ->
-        item(key = formItem.name) {
-        when (formItem) {
-        FormItem.SCREEN_TITLE -> ScreenTitle(localizedString(R.string.questionFormTitle, locale))
+        LazyColumn(
+            state = listState,
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = readableContentPadding(maxWidth, bottom = PredictFabClearance)
+        ) {
+            FormItem.entries.forEach { formItem ->
+                item(key = formItem.name) {
+                    when (formItem) {
+                        FormItem.SCREEN_TITLE -> ScreenTitle(localizedString(R.string.questionFormTitle, locale))
 
-        FormItem.BASIC_INFO_TITLE -> SectionTitle(localizedString(R.string.basicInfo, locale))
-        FormItem.BASIC_INFO -> {
-            SectionCard(
-                rows = listOf(
-                    {
-                        TextEditRow(
-                            label = localizedString(R.string.questionAgeTitle, locale),
-                            value = viewModel.ageText,
-                            // 3 digits cover the range; more could overflow Int and read as "enter age".
-                            onValueChange = { if (it.length <= 3 && it.all { c -> c.isDigit() }) viewModel.ageText = it },
-                            isDecimal = false,
-                            errorMessage = ageError,
-                            focusRequester = ageFocusRequester
-                        )
-                    },
-                    {
-                        EnumChoiceRow(
-                            label = localizedString(R.string.questionSexTitle, locale),
-                            options = Sex.entries,
-                            selectedOption = patientData.sex,
-                            onOptionSelected = { sex -> viewModel.updatePatientData { it.copy(sex = sex) } },
-                            locale = locale
-                        )
-                    },
-                    {
-                        TextEditRow(
-                            label = localizedString(R.string.questionHeightTitle, locale),
-                            value = viewModel.heightText,
-                            onValueChange = { if (it.isEmpty() || it.matches(heightWeightPattern)) viewModel.heightText = it },
-                            isDecimal = true,
-                            errorMessage = heightError,
-                            focusRequester = heightFocusRequester
-                        )
-                    },
-                    {
-                        TextEditRow(
-                            label = localizedString(R.string.questionWeightTitle, locale),
-                            value = viewModel.weightText,
-                            onValueChange = { if (it.isEmpty() || it.matches(heightWeightPattern)) viewModel.weightText = it },
-                            isDecimal = true,
-                            errorMessage = weightError,
-                            focusRequester = weightFocusRequester
-                        )
-                    }
-                )
-            )
-        }
-
-        FormItem.SOCIAL_HISTORY_TITLE -> SectionTitle(localizedString(R.string.socialHistory, locale))
-        FormItem.SOCIAL_HISTORY -> {
-            SectionCard(
-                rows = listOf(
-                    {
-                        SwitchRow(
-                            label = localizedString(R.string.questionSmokingTitle, locale),
-                            checked = patientData.isSmoking,
-                            onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(isSmoking = checked) } },
-                            description = localizedString(R.string.questionSmokingDescription, locale)
-                        )
-                    },
-                    {
-                        EnumChoiceRow(
-                            label = localizedString(R.string.questionActivityTitle, locale),
-                            options = Activity.entries,
-                            selectedOption = patientData.activity,
-                            onOptionSelected = { activity -> viewModel.updatePatientData { it.copy(activity = activity) } },
-                            locale = locale
-                        )
-                    }
-                )
-            )
-        }
-
-        FormItem.CLINICAL_INFO_TITLE -> SectionTitle(localizedString(R.string.clinicalInfo, locale))
-        FormItem.CLINICAL_INFO -> {
-            SectionCard(
-                rows = listOf(
-                    {
-                        TextEditRow(
-                            label = localizedString(R.string.questionAlbTitle, locale),
-                            value = viewModel.albText,
-                            onValueChange = { if (it.isEmpty() || it.matches(albuminPattern)) viewModel.albText = it },
-                            isDecimal = true,
-                            errorMessage = albError,
-                            focusRequester = albFocusRequester
-                        )
-                    },
-                    {
-                        EnumChoiceRow(
-                            label = localizedString(R.string.questionCKDTitle, locale),
-                            options = CKD.entries,
-                            selectedOption = patientData.ckd,
-                            onOptionSelected = { ckd -> viewModel.updatePatientData { it.copy(ckd = ckd) } },
-                            locale = locale,
-                            description = localizedString(R.string.questionCKDDescription, locale)
-                        )
-                    },
-                    {
-                        SwitchRow(
-                            label = localizedString(R.string.questionUrgentTitle, locale),
-                            checked = patientData.isUrgent,
-                            onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(isUrgent = checked) } },
-                            description = localizedString(R.string.questionUrgentDescription, locale)
-                        )
-                    },
-                    {
-                        SwitchRow(
-                            label = localizedString(R.string.questionFeverTitle, locale),
-                            checked = patientData.hasFever,
-                            onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(hasFever = checked) } },
-                            description = localizedString(R.string.questionFeverDescription, locale)
-                        )
-                    },
-                    {
-                        SwitchRow(
-                            label = localizedString(R.string.questionAbnormalWBCTitle, locale),
-                            checked = patientData.hasAbnormalWBC,
-                            onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(hasAbnormalWBC = checked) } },
-                            description = localizedString(R.string.questionAbnormalWBCDescription, locale)
-                        )
-                    },
-                    {
-                        SwitchRow(
-                            label = localizedString(R.string.questionLocalInfectionTitle, locale),
-                            checked = patientData.hasLocalInfection,
-                            onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(hasLocalInfection = checked) } },
-                            description = localizedString(R.string.questionLocalInfectionDescription, locale)
-                        )
-                    },
-                    {
-                        EnumChoiceRow(
-                            label = localizedString(R.string.questionRutherfordTitle, locale),
-                            options = RutherfordClassification.entries,
-                            selectedOption = patientData.rutherford,
-                            onOptionSelected = { rutherford -> viewModel.updatePatientData { it.copy(rutherford = rutherford) } },
-                            locale = locale
-                        )
-                    }
-                )
-            )
-        }
-
-        FormItem.LESION_INFO_TITLE -> SectionTitle(localizedString(R.string.lesionInfo, locale))
-        FormItem.LESION_INFO -> {
-            SectionCard(
-                rows = listOf(
-                    {
-                        SwitchRow(
-                            label = localizedString(R.string.questionAILesionTitle, locale),
-                            checked = patientData.hasAILesion,
-                            onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(hasAILesion = checked) } },
-                            focusRequester = lesionFocusRequester
-                        )
-                    },
-                    {
-                        SwitchRow(
-                            label = localizedString(R.string.questionFPLesionTitle, locale),
-                            checked = patientData.hasFPLesion,
-                            onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(hasFPLesion = checked) } }
-                        )
-                    },
-                    {
-                        SwitchRow(
-                            label = localizedString(R.string.questionBKLesionTitle, locale),
-                            checked = patientData.hasBKLesion,
-                            onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(hasBKLesion = checked) } }
-                        )
-                    },
-                    {
-                        if (lesionError != null) {
-                            Text(
-                                text = lesionError,
-                                color = MaterialTheme.colorScheme.error,
-                                style = MaterialTheme.typography.bodySmall,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp)
-                                    .semantics { error(lesionError) }
+                        FormItem.BASIC_INFO_TITLE -> SectionTitle(localizedString(R.string.basicInfo, locale))
+                        FormItem.BASIC_INFO -> {
+                            SectionCard(
+                                rows = listOf(
+                                    {
+                                        TextEditRow(
+                                            label = localizedString(R.string.questionAgeTitle, locale),
+                                            value = viewModel.ageText,
+                                            // 3 digits cover the range; more could overflow Int and read as "enter age".
+                                            onValueChange = { if (it.length <= 3 && it.all { c -> c.isDigit() }) viewModel.ageText = it },
+                                            isDecimal = false,
+                                            errorMessage = ageError,
+                                            focusRequester = ageFocusRequester
+                                        )
+                                    },
+                                    {
+                                        EnumChoiceRow(
+                                            label = localizedString(R.string.questionSexTitle, locale),
+                                            options = Sex.entries,
+                                            selectedOption = patientData.sex,
+                                            onOptionSelected = { sex -> viewModel.updatePatientData { it.copy(sex = sex) } },
+                                            locale = locale
+                                        )
+                                    },
+                                    {
+                                        TextEditRow(
+                                            label = localizedString(R.string.questionHeightTitle, locale),
+                                            value = viewModel.heightText,
+                                            onValueChange = { if (it.isEmpty() || it.matches(heightWeightPattern)) viewModel.heightText = it },
+                                            isDecimal = true,
+                                            errorMessage = heightError,
+                                            focusRequester = heightFocusRequester
+                                        )
+                                    },
+                                    {
+                                        TextEditRow(
+                                            label = localizedString(R.string.questionWeightTitle, locale),
+                                            value = viewModel.weightText,
+                                            onValueChange = { if (it.isEmpty() || it.matches(heightWeightPattern)) viewModel.weightText = it },
+                                            isDecimal = true,
+                                            errorMessage = weightError,
+                                            focusRequester = weightFocusRequester
+                                        )
+                                    }
+                                )
                             )
                         }
-                    }
-                )
-            )
-        }
 
-        FormItem.OTHER_LESION_INFO_TITLE -> SectionTitle(localizedString(R.string.otherLesionInfo, locale))
-        FormItem.OTHER_LESION_INFO -> {
-            SectionCard(
-                rows = listOf(
-                    {
-                        SwitchRow(
-                            label = localizedString(R.string.questionContraTitle, locale),
-                            checked = patientData.hasContraLateralLesion,
-                            onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(hasContraLateralLesion = checked) } },
-                            description = localizedString(R.string.questionContraDescription, locale)
-                        )
-                    },
-                    {
-                        SwitchRow(
-                            label = localizedString(R.string.questionOtherLesionTitle, locale),
-                            checked = patientData.hasOtherVD,
-                            onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(hasOtherVD = checked) } },
-                            description = localizedString(R.string.questionOtherLesionDescription, locale)
-                        )
-                    }
-                )
-            )
-        }
-
-        FormItem.COMPLICATIONS_TITLE -> SectionTitle(localizedString(R.string.complications, locale))
-        FormItem.COMPLICATIONS -> {
-            SectionCard(
-                rows = listOf(
-                    {
-                        SwitchRow(
-                            label = localizedString(R.string.questionCHFTitle, locale),
-                            checked = patientData.hasCHF,
-                            onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(hasCHF = checked) } },
-                            description = localizedString(R.string.questionCHFDescription, locale)
-                        )
-                    },
-                    {
-                        SwitchRow(
-                            label = localizedString(R.string.questionCADTitle, locale),
-                            checked = patientData.hasCAD,
-                            onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(hasCAD = checked) } },
-                            description = localizedString(R.string.questionCADDescription, locale)
-                        )
-                    },
-                    {
-                        SwitchRow(
-                            label = localizedString(R.string.questionCVDTitle, locale),
-                            checked = patientData.hasCVD,
-                            onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(hasCVD = checked) } },
-                            description = localizedString(R.string.questionCVDDescription, locale)
-                        )
-                    },
-                    {
-                        SwitchRow(
-                            label = localizedString(R.string.questionDLTitle, locale),
-                            checked = patientData.hasDyslipidemia,
-                            onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(hasDyslipidemia = checked) } },
-                            description = localizedString(R.string.questionDLDescription, locale)
-                        )
-                    },
-                    {
-                        EnumChoiceRow(
-                            label = localizedString(R.string.questionMalignantTitle, locale),
-                            options = MalignantNeoplasm.entries,
-                            selectedOption = patientData.malignant,
-                            onOptionSelected = { malignant -> viewModel.updatePatientData { it.copy(malignant = malignant) } },
-                            locale = locale
-                        )
-                    }
-                )
-            )
-        }
-
-        // Predict is the floating action below, not a second button here. Clearing stays in
-        // the flow at the end: a destructive action shouldn't float within reach. It wipes
-        // every answer at once, so it's offered only when there is something to clear and
-        // can be undone from the snackbar rather than confirmed up front.
-        FormItem.CLEAR_ACTION -> {
-            Column(modifier = Modifier.padding(16.dp)) {
-                OutlinedButton(
-                    onClick = {
-                        viewModel.reset()
-                        coroutineScope.launch {
-                            snackbarHostState.currentSnackbarData?.dismiss()
-                            val result = snackbarHostState.showSnackbar(
-                                message = context.localizedString(R.string.resetDone, locale),
-                                actionLabel = context.localizedString(R.string.undo, locale),
-                                duration = SnackbarDuration.Long
+                        FormItem.SOCIAL_HISTORY_TITLE -> SectionTitle(localizedString(R.string.socialHistory, locale))
+                        FormItem.SOCIAL_HISTORY -> {
+                            SectionCard(
+                                rows = listOf(
+                                    {
+                                        SwitchRow(
+                                            label = localizedString(R.string.questionSmokingTitle, locale),
+                                            checked = patientData.isSmoking,
+                                            onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(isSmoking = checked) } },
+                                            description = localizedString(R.string.questionSmokingDescription, locale)
+                                        )
+                                    },
+                                    {
+                                        EnumChoiceRow(
+                                            label = localizedString(R.string.questionActivityTitle, locale),
+                                            options = Activity.entries,
+                                            selectedOption = patientData.activity,
+                                            onOptionSelected = { activity -> viewModel.updatePatientData { it.copy(activity = activity) } },
+                                            locale = locale
+                                        )
+                                    }
+                                )
                             )
-                            if (result == SnackbarResult.ActionPerformed) viewModel.undoReset()
                         }
-                    },
-                    enabled = viewModel.canReset,
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error)
-                ) {
-                    Text(localizedString(R.string.reset, locale))
+
+                        FormItem.CLINICAL_INFO_TITLE -> SectionTitle(localizedString(R.string.clinicalInfo, locale))
+                        FormItem.CLINICAL_INFO -> {
+                            SectionCard(
+                                rows = listOf(
+                                    {
+                                        TextEditRow(
+                                            label = localizedString(R.string.questionAlbTitle, locale),
+                                            value = viewModel.albText,
+                                            onValueChange = { if (it.isEmpty() || it.matches(albuminPattern)) viewModel.albText = it },
+                                            isDecimal = true,
+                                            errorMessage = albError,
+                                            focusRequester = albFocusRequester
+                                        )
+                                    },
+                                    {
+                                        EnumChoiceRow(
+                                            label = localizedString(R.string.questionCKDTitle, locale),
+                                            options = CKD.entries,
+                                            selectedOption = patientData.ckd,
+                                            onOptionSelected = { ckd -> viewModel.updatePatientData { it.copy(ckd = ckd) } },
+                                            locale = locale,
+                                            description = localizedString(R.string.questionCKDDescription, locale)
+                                        )
+                                    },
+                                    {
+                                        SwitchRow(
+                                            label = localizedString(R.string.questionUrgentTitle, locale),
+                                            checked = patientData.isUrgent,
+                                            onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(isUrgent = checked) } },
+                                            description = localizedString(R.string.questionUrgentDescription, locale)
+                                        )
+                                    },
+                                    {
+                                        SwitchRow(
+                                            label = localizedString(R.string.questionFeverTitle, locale),
+                                            checked = patientData.hasFever,
+                                            onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(hasFever = checked) } },
+                                            description = localizedString(R.string.questionFeverDescription, locale)
+                                        )
+                                    },
+                                    {
+                                        SwitchRow(
+                                            label = localizedString(R.string.questionAbnormalWBCTitle, locale),
+                                            checked = patientData.hasAbnormalWBC,
+                                            onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(hasAbnormalWBC = checked) } },
+                                            description = localizedString(R.string.questionAbnormalWBCDescription, locale)
+                                        )
+                                    },
+                                    {
+                                        SwitchRow(
+                                            label = localizedString(R.string.questionLocalInfectionTitle, locale),
+                                            checked = patientData.hasLocalInfection,
+                                            onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(hasLocalInfection = checked) } },
+                                            description = localizedString(R.string.questionLocalInfectionDescription, locale)
+                                        )
+                                    },
+                                    {
+                                        EnumChoiceRow(
+                                            label = localizedString(R.string.questionRutherfordTitle, locale),
+                                            options = RutherfordClassification.entries,
+                                            selectedOption = patientData.rutherford,
+                                            onOptionSelected = { rutherford -> viewModel.updatePatientData { it.copy(rutherford = rutherford) } },
+                                            locale = locale
+                                        )
+                                    }
+                                )
+                            )
+                        }
+
+                        FormItem.LESION_INFO_TITLE -> SectionTitle(localizedString(R.string.lesionInfo, locale))
+                        FormItem.LESION_INFO -> {
+                            SectionCard(
+                                rows = listOf(
+                                    {
+                                        SwitchRow(
+                                            label = localizedString(R.string.questionAILesionTitle, locale),
+                                            checked = patientData.hasAILesion,
+                                            onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(hasAILesion = checked) } },
+                                            focusRequester = lesionFocusRequester
+                                        )
+                                    },
+                                    {
+                                        SwitchRow(
+                                            label = localizedString(R.string.questionFPLesionTitle, locale),
+                                            checked = patientData.hasFPLesion,
+                                            onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(hasFPLesion = checked) } }
+                                        )
+                                    },
+                                    {
+                                        SwitchRow(
+                                            label = localizedString(R.string.questionBKLesionTitle, locale),
+                                            checked = patientData.hasBKLesion,
+                                            onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(hasBKLesion = checked) } }
+                                        )
+                                    },
+                                    {
+                                        if (lesionError != null) {
+                                            Text(
+                                                text = lesionError,
+                                                color = MaterialTheme.colorScheme.error,
+                                                style = MaterialTheme.typography.bodySmall,
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .padding(16.dp)
+                                                    .semantics { error(lesionError) }
+                                            )
+                                        }
+                                    }
+                                )
+                            )
+                        }
+
+                        FormItem.OTHER_LESION_INFO_TITLE -> SectionTitle(localizedString(R.string.otherLesionInfo, locale))
+                        FormItem.OTHER_LESION_INFO -> {
+                            SectionCard(
+                                rows = listOf(
+                                    {
+                                        SwitchRow(
+                                            label = localizedString(R.string.questionContraTitle, locale),
+                                            checked = patientData.hasContralateralLesion,
+                                            onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(hasContralateralLesion = checked) } },
+                                            description = localizedString(R.string.questionContraDescription, locale)
+                                        )
+                                    },
+                                    {
+                                        SwitchRow(
+                                            label = localizedString(R.string.questionOtherLesionTitle, locale),
+                                            checked = patientData.hasOtherVD,
+                                            onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(hasOtherVD = checked) } },
+                                            description = localizedString(R.string.questionOtherLesionDescription, locale)
+                                        )
+                                    }
+                                )
+                            )
+                        }
+
+                        FormItem.COMPLICATIONS_TITLE -> SectionTitle(localizedString(R.string.complications, locale))
+                        FormItem.COMPLICATIONS -> {
+                            SectionCard(
+                                rows = listOf(
+                                    {
+                                        SwitchRow(
+                                            label = localizedString(R.string.questionCHFTitle, locale),
+                                            checked = patientData.hasCHF,
+                                            onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(hasCHF = checked) } },
+                                            description = localizedString(R.string.questionCHFDescription, locale)
+                                        )
+                                    },
+                                    {
+                                        SwitchRow(
+                                            label = localizedString(R.string.questionCADTitle, locale),
+                                            checked = patientData.hasCAD,
+                                            onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(hasCAD = checked) } },
+                                            description = localizedString(R.string.questionCADDescription, locale)
+                                        )
+                                    },
+                                    {
+                                        SwitchRow(
+                                            label = localizedString(R.string.questionCVDTitle, locale),
+                                            checked = patientData.hasCVD,
+                                            onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(hasCVD = checked) } },
+                                            description = localizedString(R.string.questionCVDDescription, locale)
+                                        )
+                                    },
+                                    {
+                                        SwitchRow(
+                                            label = localizedString(R.string.questionDLTitle, locale),
+                                            checked = patientData.hasDyslipidemia,
+                                            onCheckedChange = { checked -> viewModel.updatePatientData { it.copy(hasDyslipidemia = checked) } },
+                                            description = localizedString(R.string.questionDLDescription, locale)
+                                        )
+                                    },
+                                    {
+                                        EnumChoiceRow(
+                                            label = localizedString(R.string.questionMalignantTitle, locale),
+                                            options = MalignantNeoplasm.entries,
+                                            selectedOption = patientData.malignant,
+                                            onOptionSelected = { malignant -> viewModel.updatePatientData { it.copy(malignant = malignant) } },
+                                            locale = locale
+                                        )
+                                    }
+                                )
+                            )
+                        }
+
+                        // Predict is the floating action below, not a second button here. Clearing stays in
+                        // the flow at the end: a destructive action shouldn't float within reach. It wipes
+                        // every answer at once, so it's offered only when there is something to clear and
+                        // can be undone from the snackbar rather than confirmed up front.
+                        FormItem.CLEAR_ACTION -> {
+                            Column(modifier = Modifier.padding(16.dp)) {
+                                OutlinedButton(
+                                    onClick = {
+                                        viewModel.reset()
+                                        coroutineScope.launch {
+                                            snackbarHostState.currentSnackbarData?.dismiss()
+                                            val result = snackbarHostState.showSnackbar(
+                                                message = context.localizedString(R.string.resetDone, locale),
+                                                actionLabel = context.localizedString(R.string.undo, locale),
+                                                duration = SnackbarDuration.Long
+                                            )
+                                            if (result == SnackbarResult.ActionPerformed) viewModel.undoReset()
+                                        }
+                                    },
+                                    enabled = viewModel.canReset,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error)
+                                ) {
+                                    Text(localizedString(R.string.reset, locale))
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
-        }
-        }
-        }
-    }
         // The screen's one primary action. It floats over the form so it can be reached
         // from anywhere in the long list, and keeps its label except while scrolling down.
         val predictLabel = localizedString(R.string.predictRisks, locale)
@@ -541,7 +540,6 @@ fun TextEditRow(
 ) {
     Column {
         ListItem(
-            headlineContent = { Text(label) },
             trailingContent = {
                 OutlinedTextField(
                     value = value,
@@ -562,7 +560,9 @@ fun TextEditRow(
                 )
             },
             colors = transparentListItemColors
-        )
+        ) {
+            Text(label)
+        }
         // Under the whole row rather than as the field's supporting text, where the 110dp
         // field broke the message mid-phrase. The field already announces it as its error.
         if (errorMessage != null) {
@@ -590,7 +590,6 @@ fun SwitchRow(
     // Toggling on the row rather than the Switch merges the two into one node, so the
     // switch is announced with its label and the whole row becomes a tap target.
     ListItem(
-        headlineContent = { Text(label) },
         // The clinical definition of "yes/no" lives here as supporting text.
         supportingContent = description?.let {
             { Text(it, style = MaterialTheme.typography.bodySmall) }
@@ -609,10 +608,11 @@ fun SwitchRow(
                 role = Role.Switch
             ),
         colors = transparentListItemColors
-    )
+    ) {
+        Text(label)
+    }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun <T> EnumChoiceRow(
     label: String,

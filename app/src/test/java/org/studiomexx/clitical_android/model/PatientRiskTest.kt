@@ -74,7 +74,7 @@ class PatientRiskTest {
             hasCAD = true,
             hasDyslipidemia = false,
             isSmoking = true,
-            hasContraLateralLesion = false,
+            hasContralateralLesion = false,
             hasOtherVD = true,
             rutherford = RutherfordClassification.CLASS4
         )
@@ -115,7 +115,7 @@ class PatientRiskTest {
             hasCAD = false,
             hasDyslipidemia = true,
             isSmoking = false,
-            hasContraLateralLesion = true,
+            hasContralateralLesion = true,
             hasOtherVD = false,
             rutherford = RutherfordClassification.CLASS5
         )
@@ -156,7 +156,7 @@ class PatientRiskTest {
             hasCAD = true,
             hasDyslipidemia = true,
             isSmoking = true,
-            hasContraLateralLesion = true,
+            hasContralateralLesion = true,
             hasOtherVD = false,
             rutherford = RutherfordClassification.CLASS5
         )
@@ -197,7 +197,7 @@ class PatientRiskTest {
             hasCAD = true,
             hasDyslipidemia = true,
             isSmoking = true,
-            hasContraLateralLesion = false,
+            hasContralateralLesion = false,
             hasOtherVD = true,
             rutherford = RutherfordClassification.CLASS6
         )
