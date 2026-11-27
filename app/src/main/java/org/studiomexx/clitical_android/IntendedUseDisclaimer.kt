@@ -1,6 +1,7 @@
 package org.studiomexx.clitical_android
 
 import android.content.SharedPreferences
+import androidx.core.content.edit
 
 /** Versioned record of the user's acknowledgement of the intended-use notice. */
 object IntendedUseDisclaimer {
@@ -17,8 +18,8 @@ class IntendedUseDisclaimerStore(private val preferences: SharedPreferences) {
         get() = acknowledgedVersion == IntendedUseDisclaimer.CURRENT_VERSION
 
     fun acknowledge() {
-        preferences.edit()
-            .putString(IntendedUseDisclaimer.STORAGE_KEY, IntendedUseDisclaimer.CURRENT_VERSION)
-            .apply()
+        preferences.edit {
+            putString(IntendedUseDisclaimer.STORAGE_KEY, IntendedUseDisclaimer.CURRENT_VERSION)
+        }
     }
 }

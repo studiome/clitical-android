@@ -17,7 +17,9 @@ import kotlin.reflect.KProperty
 
 class MainViewModel(
     private val languageStore: LanguageStore? = null,
-    private val savedStateHandle: SavedStateHandle = SavedStateHandle()
+    // Null where nothing needs to survive process death (tests, previews). A default of
+    // SavedStateHandle() would call a constructor the library reserves for tests.
+    private val savedStateHandle: SavedStateHandle? = null
 ) : ViewModel() {
     private var localeState by mutableStateOf(
         languageStore?.locale ?: Locale.forLanguageTag("ja")
@@ -38,12 +40,12 @@ class MainViewModel(
      * in the background. [onChange] runs before a value that differs from the current one is stored.
      */
     private fun <T> saved(key: String, initial: T, onChange: () -> Unit = {}) = object : ReadWriteProperty<Any?, T> {
-        var state by mutableStateOf(savedStateHandle.get<T>(key) ?: initial)
+        var state by mutableStateOf(savedStateHandle?.get<T>(key) ?: initial)
         override fun getValue(thisRef: Any?, property: KProperty<*>): T = state
         override fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
             if (value != state) onChange()
             state = value
-            savedStateHandle[key] = value
+            savedStateHandle?.set(key, value)
         }
     }
 

@@ -1,6 +1,7 @@
 package org.studiomexx.clitical_android
 
 import android.content.SharedPreferences
+import androidx.core.content.edit
 import java.util.Locale
 
 /** Where the in-app language choice is kept, in the same preferences file as the notice. */
@@ -22,6 +23,6 @@ class LanguageStore(private val preferences: SharedPreferences) {
             return Locale.forLanguageTag(tag)
         }
         set(value) {
-            preferences.edit().putString(AppLanguage.STORAGE_KEY, value.toLanguageTag()).apply()
+            preferences.edit { putString(AppLanguage.STORAGE_KEY, value.toLanguageTag()) }
         }
 }

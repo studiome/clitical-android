@@ -94,7 +94,6 @@ fun SettingsScreen(
 private fun LegalLinkRow(labelRes: Int, actionLabelRes: Int, page: String, locale: Locale) {
     val context = LocalContext.current
     ListItem(
-        headlineContent = { Text(localizedString(labelRes, locale)) },
         trailingContent = {
             Icon(Icons.AutoMirrored.Filled.OpenInNew, contentDescription = null)
         },
@@ -105,7 +104,9 @@ private fun LegalLinkRow(labelRes: Int, actionLabelRes: Int, page: String, local
             CustomTabsIntent.Builder().build()
                 .launchUrl(context, legalPageUrl(page, locale).toUri())
         }
-    )
+    ) {
+        Text(localizedString(labelRes, locale))
+    }
 }
 
 private fun legalPageUrl(page: String, locale: Locale): String {
@@ -156,6 +157,19 @@ private fun LanguagePicker(viewModel: MainViewModel, modifier: Modifier = Modifi
     }
 }
 
+private data class Reference(val citation: String, val url: String)
+
+private val references = listOf(
+    Reference(
+        "1. Miyata T. et al, Risk prediction model for early outcomes of revascularization for chronic limb-threatening ischaemia. Br J Surg. 2022 Oct 14;109(11):1123.",
+        "https://doi.org/10.1093/bjs/znab036"
+    ),
+    Reference(
+        "2. Miyata T. et al, Prediction Models for Two Year Overall Survival and Amputation Free Survival After Revascularisation for Chronic Limb Threatening Ischaemia. Eur J Vasc Endovasc Surg . 2022 Jun 7;S1078-5884(22)00340-9.",
+        "https://doi.org/10.1016/j.ejvs.2022.05.038"
+    )
+)
+
 @Composable
 fun ReferencesScreen(locale: Locale, modifier: Modifier = Modifier) {
     val context = LocalContext.current
@@ -170,15 +184,9 @@ fun ReferencesScreen(locale: Locale, modifier: Modifier = Modifier) {
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
         )
         SectionCard(
-            rows = listOf(
+            rows = references.map { reference ->
                 {
                     ListItem(
-                        headlineContent = {
-                            Text(
-                                "1. Miyata T. et al, Risk prediction model for early outcomes of revascularization for chronic limb-threatening ischaemia. Br J Surg. 2022 Oct 14;109(11):1123.",
-                                style = MaterialTheme.typography.bodySmall
-                            )
-                        },
                         trailingContent = {
                             Icon(Icons.AutoMirrored.Filled.OpenInNew, contentDescription = null)
                         },
@@ -187,31 +195,13 @@ fun ReferencesScreen(locale: Locale, modifier: Modifier = Modifier) {
                             onClickLabel = localizedString(R.string.openReferenceInBrowser, locale)
                         ) {
                             CustomTabsIntent.Builder().build()
-                                .launchUrl(context, "https://doi.org/10.1093/bjs/znab036".toUri())
+                                .launchUrl(context, reference.url.toUri())
                         }
-                    )
-                },
-                {
-                    ListItem(
-                        headlineContent = {
-                            Text(
-                                "2. Miyata T. et al, Prediction Models for Two Year Overall Survival and Amputation Free Survival After Revascularisation for Chronic Limb Threatening Ischaemia. Eur J Vasc Endovasc Surg . 2022 Jun 7;S1078-5884(22)00340-9.",
-                                style = MaterialTheme.typography.bodySmall
-                            )
-                        },
-                        trailingContent = {
-                            Icon(Icons.AutoMirrored.Filled.OpenInNew, contentDescription = null)
-                        },
-                        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-                        modifier = Modifier.clickable(
-                            onClickLabel = localizedString(R.string.openReferenceInBrowser, locale)
-                        ) {
-                            CustomTabsIntent.Builder().build()
-                                .launchUrl(context, "https://doi.org/10.1016/j.ejvs.2022.05.038".toUri())
-                        }
-                    )
+                    ) {
+                        Text(reference.citation, style = MaterialTheme.typography.bodySmall)
+                    }
                 }
-            )
+            }
         )
     }
 }

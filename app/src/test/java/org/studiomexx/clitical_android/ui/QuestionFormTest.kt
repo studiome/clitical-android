@@ -38,6 +38,9 @@ import java.util.Locale
 @RunWith(RobolectricTestRunner::class)
 class QuestionFormTest {
 
+    // Still the v1 rule: under v2's StandardTestDispatcher the focus request that follows a failed
+    // submit never lands in predictingWithNoLesionSelectedFocusesTheLesionRow (waitUntil included).
+    @Suppress("DEPRECATION")
     @get:Rule
     val composeTestRule = createComposeRule()
 
