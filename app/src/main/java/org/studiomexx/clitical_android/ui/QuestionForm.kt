@@ -67,11 +67,16 @@ import org.studiomexx.clitical_android.model.Activity
 import org.studiomexx.clitical_android.model.CKD
 import org.studiomexx.clitical_android.model.Labeled
 import org.studiomexx.clitical_android.model.MalignantNeoplasm
+import org.studiomexx.clitical_android.model.PatientData
 import org.studiomexx.clitical_android.model.RutherfordClassification
 import org.studiomexx.clitical_android.model.Sex
 import org.studiomexx.clitical_android.model.ValidationError
 import org.studiomexx.clitical_android.ui.theme.CLiTICALAndroidTheme
 import java.util.Locale
+
+/** Whole bounds without a trailing ".0", e.g. 100.0 -> "100". */
+private fun formatBound(value: Double): String =
+    if (value == Math.rint(value)) value.toLong().toString() else value.toString()
 
 private val heightWeightPattern = Regex("^\\d{0,3}(\\.\\d{0,1})?$")
 private val albuminPattern = Regex("^\\d{0,2}(\\.\\d{0,1})?$")
@@ -93,18 +98,42 @@ fun QuestionForm(
     val albFocusRequester = remember { FocusRequester() }
     val lesionFocusRequester = remember { FocusRequester() }
 
-    val ageError = if (viewModel.hasSubmitted && viewModel.ageText.toIntOrNull() == null) {
-        localizedString(R.string.questionAgeError, locale)
-    } else null
-    val heightError = if (viewModel.hasSubmitted && viewModel.heightText.toDoubleOrNull() == null) {
-        localizedString(R.string.questionHeightError, locale)
-    } else null
-    val weightError = if (viewModel.hasSubmitted && viewModel.weightText.toDoubleOrNull() == null) {
-        localizedString(R.string.questionWeightError, locale)
-    } else null
-    val albError = if (viewModel.hasSubmitted && viewModel.albText.toDoubleOrNull() == null) {
-        localizedString(R.string.questionAlbError, locale)
-    } else null
+    val ageError = when (viewModel.ageIssue) {
+        FieldIssue.MISSING -> localizedString(R.string.questionAgeError, locale)
+        FieldIssue.OUT_OF_RANGE -> localizedString(
+            R.string.questionAgeRangeError, locale,
+            PatientData.validAgeRange.first, PatientData.validAgeRange.last
+        )
+        null -> null
+    }
+    // The height field is in cm, the model's range in metres.
+    val heightError = when (viewModel.heightIssue) {
+        FieldIssue.MISSING -> localizedString(R.string.questionHeightError, locale)
+        FieldIssue.OUT_OF_RANGE -> localizedString(
+            R.string.questionHeightRangeError, locale,
+            formatBound(PatientData.validHeightRange.start * 100),
+            formatBound(PatientData.validHeightRange.endInclusive * 100)
+        )
+        null -> null
+    }
+    val weightError = when (viewModel.weightIssue) {
+        FieldIssue.MISSING -> localizedString(R.string.questionWeightError, locale)
+        FieldIssue.OUT_OF_RANGE -> localizedString(
+            R.string.questionWeightRangeError, locale,
+            formatBound(PatientData.validWeightRange.start),
+            formatBound(PatientData.validWeightRange.endInclusive)
+        )
+        null -> null
+    }
+    val albError = when (viewModel.albIssue) {
+        FieldIssue.MISSING -> localizedString(R.string.questionAlbError, locale)
+        FieldIssue.OUT_OF_RANGE -> localizedString(
+            R.string.questionAlbRangeError, locale,
+            formatBound(PatientData.validAlbRange.start),
+            formatBound(PatientData.validAlbRange.endInclusive)
+        )
+        null -> null
+    }
     val lesionError = if (
         viewModel.hasSubmitted &&
         !patientData.hasAILesion && !patientData.hasFPLesion && !patientData.hasBKLesion
@@ -137,6 +166,7 @@ fun QuestionForm(
         val msgId = when (viewModel.validationError) {
             ValidationError.NO_LESION_SELECTED -> R.string.analysisLesionErrorMessage
             ValidationError.EMPTY_FIELDS -> R.string.analysisNullErrorMessage
+            ValidationError.OUT_OF_RANGE -> R.string.analysisRangeErrorMessage
             null -> return@LaunchedEffect
         }
         snackbarHostState.showSnackbar(context.localizedString(msgId, locale))
@@ -158,7 +188,8 @@ fun QuestionForm(
                         TextEditRow(
                             label = localizedString(R.string.questionAgeTitle, locale),
                             value = viewModel.ageText,
-                            onValueChange = { if (it.isEmpty() || it.all { c -> c.isDigit() }) viewModel.ageText = it },
+                            // 3 digits cover the range; more could overflow Int and read as "enter age".
+                            onValueChange = { if (it.length <= 3 && it.all { c -> c.isDigit() }) viewModel.ageText = it },
                             isDecimal = false,
                             errorMessage = ageError,
                             focusRequester = ageFocusRequester

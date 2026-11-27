@@ -6,19 +6,8 @@ import kotlin.math.pow
 class PatientRisk(patientData: PatientData) {
 
     init {
-        if (patientData.weight == null ||
-            patientData.height == null ||
-            patientData.age == null ||
-            patientData.alb == null
-        ) {
-            throw FormatException("form is empty", ValidationError.EMPTY_FIELDS)
-        }
-        if (!patientData.hasAILesion &&
-            !patientData.hasFPLesion &&
-            !patientData.hasBKLesion
-        ) {
-            throw FormatException("wrong lesion choice", ValidationError.NO_LESION_SELECTED)
-        }
+        // Callers validate first; this guards the model against being fed unchecked data.
+        patientData.validate()?.let { throw FormatException("invalid patient data: $it", it) }
     }
 
     val gnri: Double = calcGNRI(patientData)
@@ -33,7 +22,6 @@ class PatientRisk(patientData: PatientData) {
         val height = data.height ?: return Double.NaN
         val weight = data.weight ?: return Double.NaN
         val alb = data.alb ?: return Double.NaN
-        if (height == 0.0) return Double.NaN
         var wi = weight / (22.0 * height.pow(2.0))
         if (wi >= 1.0) wi = 1.0
         return 14.89 * alb + 41.7 * wi

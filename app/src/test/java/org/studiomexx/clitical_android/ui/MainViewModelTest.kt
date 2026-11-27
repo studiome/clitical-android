@@ -6,6 +6,7 @@ import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import org.studiomexx.clitical_android.model.ValidationError
 
 /**
  * On a wide window the result sits beside the form, so a shown risk must never
@@ -74,6 +75,60 @@ class MainViewModelTest {
 
         viewModel.reset()
         assertFalse(viewModel.canReset)
+    }
+
+    @Test
+    fun heightInMetresTypedAsCentimetresIsOutOfRange() {
+        val viewModel = MainViewModel().apply {
+            ageText = "65"
+            heightText = "1.6"
+            weightText = "50"
+            albText = "4.0"
+        }
+
+        assertEquals(ValidationError.OUT_OF_RANGE, viewModel.calculateRisk())
+        assertNull(viewModel.calculatedRisk)
+        assertEquals(ValidationError.OUT_OF_RANGE, viewModel.validationError)
+    }
+
+    @Test
+    fun outOfRangeIsFlaggedBeforeAnySubmit() {
+        val viewModel = MainViewModel()
+
+        viewModel.heightText = "1.6"
+        viewModel.ageText = "999"
+        viewModel.weightText = "0"
+        viewModel.albText = "99.9"
+
+        assertEquals(FieldIssue.OUT_OF_RANGE, viewModel.heightIssue)
+        assertEquals(FieldIssue.OUT_OF_RANGE, viewModel.ageIssue)
+        assertEquals(FieldIssue.OUT_OF_RANGE, viewModel.weightIssue)
+        assertEquals(FieldIssue.OUT_OF_RANGE, viewModel.albIssue)
+    }
+
+    @Test
+    fun inRangeBoundsHaveNoIssue() {
+        val viewModel = MainViewModel().apply {
+            ageText = "18"
+            heightText = "250"
+            weightText = "20"
+            albText = "6.0"
+        }
+
+        assertNull(viewModel.ageIssue)
+        assertNull(viewModel.heightIssue)
+        assertNull(viewModel.weightIssue)
+        assertNull(viewModel.albIssue)
+    }
+
+    @Test
+    fun emptyFieldIsMissingOnlyAfterASubmit() {
+        val viewModel = MainViewModel()
+        assertNull(viewModel.ageIssue)
+
+        viewModel.calculateRisk()
+
+        assertEquals(FieldIssue.MISSING, viewModel.ageIssue)
     }
 
     @Test

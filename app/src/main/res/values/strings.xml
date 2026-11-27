@@ -110,6 +110,11 @@
     <string name="questionHeightError">Enter body height.</string>
     <string name="questionWeightError">Enter body weight.</string>
     <string name="questionAlbError">Enter serum albumin.</string>
+    <string name="questionAgeRangeError">Age must be between %1$s and %2$s years. Check the unit of the value you entered.</string>
+    <string name="questionHeightRangeError">Height must be between %1$s and %2$s cm. Check the unit of the value you entered.</string>
+    <string name="questionWeightRangeError">Weight must be between %1$s and %2$s kg. Check the unit of the value you entered.</string>
+    <string name="questionAlbRangeError">Albumin must be between %1$s and %2$s g/dL. Check the unit of the value you entered.</string>
+    <string name="analysisRangeErrorMessage">Some values are out of range. Check the numbers you entered.</string>
     <string name="lesionSelectionError">Select at least one artery lesion site.</string>
     <string name="openTermsInBrowser">Open terms of service in browser</string>
     <string name="openPrivacyInBrowser">Open privacy policy in browser</string>

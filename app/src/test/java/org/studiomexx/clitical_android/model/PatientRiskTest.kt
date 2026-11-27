@@ -35,8 +35,9 @@ class PatientRiskTest {
         assertTestCase(pd, want)
     }
 
+    // Height 0 used to yield NaN everywhere; implausible input must not reach the model.
     @Test
-    fun errorCase() {
+    fun outOfRangeHeightIsRejected() {
         val pd = PatientData(
             sex = Sex.MALE,
             age = 70,
@@ -46,17 +47,8 @@ class PatientRiskTest {
             activity = Activity.WHEELCHAIR
         )
 
-        val want = Want(
-            gnri = "NaN",
-            gnriRisk = null,
-            predictedOS = "NaN",
-            predictedAFS = "NaN",
-            osRisk = null,
-            predicted30DDorA = "NaN",
-            predicted30DMALE = "NaN"
-        )
-
-        assertTestCase(pd, want)
+        val e = assertThrows(FormatException::class.java) { PatientRisk(pd) }
+        assertEquals(ValidationError.OUT_OF_RANGE, e.source)
     }
 
     @Test

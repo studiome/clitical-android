@@ -24,6 +24,7 @@ import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.onNodeWithText
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -214,6 +215,53 @@ class QuestionFormTest {
 
         assertNull(viewModel.calculatedRisk)
         composeTestRule.onNodeWithText("数値入力を確認してください。").assertExists()
+    }
+
+    @Test
+    fun outOfRangeHeightIsFlaggedAsSoonAsItIsTyped() {
+        val viewModel = showForm()
+
+        onFieldLabelled("身長 [cm]").performTextInput("1.6")
+
+        assertFalse(viewModel.hasSubmitted)
+        composeTestRule.onNodeWithText(
+            "身長は 100〜250 cm の範囲で入力してください。入力値の単位をご確認ください。"
+        ).assertExists()
+    }
+
+    @Test
+    fun predictingWithAnOutOfRangeValueShowsTheRangeSnackbarAndNoRisk() {
+        val viewModel = showForm()
+        viewModel.fillRequiredFields()
+        viewModel.heightText = "1.6"
+
+        predict()
+
+        assertNull(viewModel.calculatedRisk)
+        composeTestRule.onNodeWithText("範囲外の数値があります。入力値をご確認ください。").assertExists()
+    }
+
+    @Test
+    fun englishRangeMessageQuotesTheBounds() {
+        showForm(locale = "en")
+
+        scrollTo(hasContentDescription("Serum Albumin [g/dl]"))
+        onFieldLabelled("Serum Albumin [g/dl]").performTextInput("9.9")
+
+        composeTestRule.onNodeWithText(
+            "Albumin must be between 1 and 6 g/dL. Check the unit of the value you entered."
+        ).assertExists()
+    }
+
+    @Test
+    fun rejectsAFourthDigitOfAge() {
+        val viewModel = showForm()
+
+        onFieldLabelled("年齢 [歳]").performTextInput("1234")
+
+        assertEquals("", viewModel.ageText)
+        onFieldLabelled("年齢 [歳]").performTextInput("123")
+        assertEquals("123", viewModel.ageText)
     }
 
     @Test

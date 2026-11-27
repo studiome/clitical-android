@@ -5,10 +5,10 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import org.studiomexx.clitical_android.model.FormatException
 import org.studiomexx.clitical_android.model.PatientData
 import org.studiomexx.clitical_android.model.PatientRisk
 import org.studiomexx.clitical_android.model.ValidationError
+import org.studiomexx.clitical_android.model.validate
 import java.util.Locale
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
@@ -102,13 +102,31 @@ class MainViewModel : ViewModel() {
             alb = albText.toDoubleOrNull()
         )
 
-        validationError = try {
-            calculatedRisk = PatientRisk(data)
-            null
-        } catch (e: FormatException) {
-            calculatedRisk = null
-            e.source
-        }
+        validationError = data.validate()
+        calculatedRisk = if (validationError == null) PatientRisk(data) else null
         return validationError
     }
+
+    /** Why a numeric field can't be used, for its inline message; null when fine. */
+    private fun <T : Comparable<T>> issueOf(value: T?, range: ClosedRange<T>): FieldIssue? = when {
+        value == null -> if (hasSubmitted) FieldIssue.MISSING else null
+        value !in range -> FieldIssue.OUT_OF_RANGE
+        else -> null
+    }
+
+    // Out of range shows as soon as it's typed; an empty field only once Predict was tried.
+    val ageIssue: FieldIssue?
+        get() = issueOf(ageText.toIntOrNull(), PatientData.validAgeRange)
+
+    /** The field is in cm, the model in metres. */
+    val heightIssue: FieldIssue?
+        get() = issueOf(heightText.toDoubleOrNull()?.div(100.0), PatientData.validHeightRange)
+
+    val weightIssue: FieldIssue?
+        get() = issueOf(weightText.toDoubleOrNull(), PatientData.validWeightRange)
+
+    val albIssue: FieldIssue?
+        get() = issueOf(albText.toDoubleOrNull(), PatientData.validAlbRange)
 }
+
+enum class FieldIssue { MISSING, OUT_OF_RANGE }

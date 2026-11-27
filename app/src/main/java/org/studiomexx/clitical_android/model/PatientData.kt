@@ -27,4 +27,31 @@ data class PatientData(
     val hasContraLateralLesion: Boolean = false,
     val hasOtherVD: Boolean = false,
     val rutherford: RutherfordClassification = RutherfordClassification.CLASS4,
-)
+) {
+    companion object {
+        // Plausible clinical values, matching the iOS app. Anything outside is far more likely
+        // a typo or a wrong unit than a patient, and would give a plausible-looking wrong risk.
+        val validAgeRange = 18..120
+
+        /** In metres like [height]; the form's field is in cm (100..250). */
+        val validHeightRange = 1.0..2.5
+        val validWeightRange = 20.0..300.0
+        val validAlbRange = 1.0..6.0
+    }
+}
+
+/** The first problem that prevents a risk calculation, or null when the data is valid. */
+fun PatientData.validate(): ValidationError? {
+    if (age == null || height == null || weight == null || alb == null) {
+        return ValidationError.EMPTY_FIELDS
+    }
+    if (age !in PatientData.validAgeRange ||
+        height !in PatientData.validHeightRange ||
+        weight !in PatientData.validWeightRange ||
+        alb !in PatientData.validAlbRange
+    ) {
+        return ValidationError.OUT_OF_RANGE
+    }
+    if (!hasAILesion && !hasFPLesion && !hasBKLesion) return ValidationError.NO_LESION_SELECTED
+    return null
+}

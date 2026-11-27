@@ -1,6 +1,5 @@
 package org.studiomexx.clitical_android.ui
 
-import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
@@ -73,15 +72,6 @@ class ResultScreenTest {
 
         composeTestRule.onNode(hasText("No Risk")).assertExists()
         composeTestRule.onNode(hasText("リスクなし")).assertDoesNotExist()
-    }
-
-    @Test
-    fun showsNotAvailableForEveryValueThatCannotBeComputed() {
-        // A zero height makes GNRI, and everything derived from it, NaN.
-        showResult(data = normalCase.copy(height = 0.0))
-
-        // Five card values plus the OS and GNRI risk labels all degrade to N/A.
-        composeTestRule.onAllNodes(hasText("該当なし")).assertCountEquals(7)
     }
 
     @Test

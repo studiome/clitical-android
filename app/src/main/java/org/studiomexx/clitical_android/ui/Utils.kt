@@ -34,6 +34,16 @@ fun localizedString(@StringRes id: Int, locale: Locale): String {
     return localizedContext.resources.getString(id)
 }
 
+@Composable
+fun localizedString(@StringRes id: Int, locale: Locale, vararg args: Any): String {
+    val context = LocalContext.current
+    val baseConfiguration = LocalConfiguration.current
+    val localizedContext = remember(context, baseConfiguration, locale) {
+        context.withLocale(baseConfiguration, locale)
+    }
+    return localizedContext.resources.getString(id, *args)
+}
+
 /** Widest a column of forms and text gets on an unfolded foldable or tablet before it's hard to scan. */
 val ReadableContentMaxWidth = 640.dp
 
