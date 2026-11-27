@@ -1,35 +1,57 @@
 package org.studiomexx.clitical_android.model
 
+import java.util.EnumSet
 import kotlin.math.exp
 import kotlin.math.pow
 
 class PatientRisk(patientData: PatientData) {
 
+    val gnri: Double
+    val gnriRisk: GNRIRisk?
+    val predictedOS: Double
+    val predictedAFS: Double
+    val osRisk: OSRisk?
+    val predicted30DDeathOrAmputation: Double
+    val predicted30DMALE: Double
+
     init {
         // Callers validate first; this guards the model against being fed unchecked data.
         patientData.validate()?.let { throw FormatException("invalid patient data: $it", it) }
-    }
 
-    val gnri: Double = calcGNRI(patientData)
-    val gnriRisk: GNRIRisk? = classifyGNRIRisk(gnri)
-    val predictedOS: Double = calcPredictedOS(patientData)
-    val predictedAFS: Double = calcPredictedAFS(patientData)
-    val osRisk: OSRisk? = classifyOSRisk(predictedOS)
-    val predicted30DDeathOrAmputation: Double = calc30DDorA(patientData)
-    val predicted30DMALE: Double = calc30DMALE(patientData)
+        gnri = calcGNRI(patientData)
+        gnriRisk = classifyGNRIRisk(gnri)
+
+        if (gnriRisk == null) {
+            predictedOS = Double.NaN
+            predictedAFS = Double.NaN
+            osRisk = null
+            predicted30DDeathOrAmputation = Double.NaN
+            predicted30DMALE = Double.NaN
+        } else {
+            val covariates = extractCovariates(patientData, gnriRisk)
+
+            val osSigma = calcSigma(osCoeff, covariates)
+            predictedOS = OS_H0_COEFF.pow(exp(osSigma))
+            osRisk = classifyOSRisk(predictedOS)
+
+            val afsSigma = calcSigma(afsCoeff, covariates)
+            predictedAFS = AFS_H0_COEFF.pow(exp(afsSigma))
+
+            val dorASigma = calcSigma(shortDeadOrAmputationCoeff, covariates)
+            predicted30DDeathOrAmputation = sigmoid(dorASigma)
+
+            val maleSigma = calcSigma(shortMALECoeff, covariates)
+            predicted30DMALE = sigmoid(maleSigma)
+        }
+    }
 
     private fun calcGNRI(data: PatientData): Double {
         val height = data.height ?: return Double.NaN
         val weight = data.weight ?: return Double.NaN
         val alb = data.alb ?: return Double.NaN
-        var wi = weight / (22.0 * height.pow(2.0))
-        if (wi >= 1.0) wi = 1.0
+        val wi = (weight / (22.0 * height * height)).coerceAtMost(1.0)
         return (14.89 * alb) + (41.7 * wi)
     }
-
-    // Derived straight from the data (not from the gnriRisk property) so the sigma calculations
-    // below do not depend on property declaration order.
-    private fun gnriRiskOf(data: PatientData): GNRIRisk? = classifyGNRIRisk(calcGNRI(data))
 
     private fun classifyGNRIRisk(gnri: Double): GNRIRisk? {
         if (gnri.isNaN()) return null
@@ -41,18 +63,6 @@ class PatientRisk(patientData: PatientData) {
         }
     }
 
-    private fun calcPredictedOS(data: PatientData): Double {
-        val sigma = calcSigma(data, osCoeff, gnriRiskOf(data))
-        if (sigma.isNaN()) return Double.NaN
-        return OS_H0_COEFF.pow(exp(sigma))
-    }
-
-    private fun calcPredictedAFS(data: PatientData): Double {
-        val sigma = calcSigma(data, afsCoeff, gnriRiskOf(data))
-        if (sigma.isNaN()) return Double.NaN
-        return AFS_H0_COEFF.pow(exp(sigma))
-    }
-
     private fun classifyOSRisk(overallSurvival: Double): OSRisk? {
         if (overallSurvival.isNaN()) return null
         return when {
@@ -62,20 +72,13 @@ class PatientRisk(patientData: PatientData) {
         }
     }
 
-    private fun calc30DDorA(data: PatientData): Double {
-        val sigma = calcSigma(data, shortDeadOrAmputationCoeff, gnriRiskOf(data))
-        if (sigma.isNaN()) return Double.NaN
-        return 1.0 / (1.0 + exp(sigma))
-    }
-
-    private fun calc30DMALE(data: PatientData): Double {
-        val sigma = calcSigma(data, shortMALECoeff, gnriRiskOf(data))
+    private fun sigmoid(sigma: Double): Double {
         if (sigma.isNaN()) return Double.NaN
         return 1.0 / (1.0 + exp(sigma))
     }
 
     // Covariates mapping helper
-    enum class Covariates {
+    private enum class Covariates {
         IS_FEMALE,
         AGE_65_TO_74,
         AGE_75_TO_84,
@@ -113,109 +116,88 @@ class PatientRisk(patientData: PatientData) {
         INTERCEPT,
     }
 
-    private fun calcSigma(data: PatientData, coeff: Map<Covariates, Double>, gnriRisk: GNRIRisk?): Double {
-        var sigma = 0.0
-        val age = data.age ?: return Double.NaN
+    private fun extractCovariates(data: PatientData, gnriRisk: GNRIRisk): Set<Covariates> {
+        val covariates = EnumSet.noneOf(Covariates::class.java)
+        val age = data.age ?: return covariates
 
-        // sex
-        if (data.sex == Sex.FEMALE) sigma += coeff[Covariates.IS_FEMALE] ?: 0.0
+        if (data.sex == Sex.FEMALE) covariates.add(Covariates.IS_FEMALE)
 
-        // age
         when {
-            age >= 85 -> sigma += coeff[Covariates.AGE_OVER_85] ?: 0.0
-            age >= 75 -> sigma += coeff[Covariates.AGE_75_TO_84] ?: 0.0
-            age >= 65 -> sigma += coeff[Covariates.AGE_65_TO_74] ?: 0.0
+            age >= 85 -> covariates.add(Covariates.AGE_OVER_85)
+            age >= 75 -> covariates.add(Covariates.AGE_75_TO_84)
+            age >= 65 -> covariates.add(Covariates.AGE_65_TO_74)
         }
 
-        // CHF
-        if (data.hasCHF) sigma += coeff[Covariates.HAS_CHF] ?: 0.0
+        if (data.hasCHF) covariates.add(Covariates.HAS_CHF)
+        if (data.hasCVD) covariates.add(Covariates.HAS_CVD)
 
-        // CVD
-        if (data.hasCVD) sigma += coeff[Covariates.HAS_CVD] ?: 0.0
-
-        // CKD
-        sigma += when (data.ckd) {
-            CKD.G3 -> coeff[Covariates.HAS_CKD_G3] ?: 0.0
-            CKD.G4 -> coeff[Covariates.HAS_CKD_G4] ?: 0.0
-            CKD.G5 -> coeff[Covariates.HAS_CKD_G5] ?: 0.0
-            CKD.G5D -> coeff[Covariates.HAS_CKD_G5D] ?: 0.0
-            else -> 0.0
+        when (data.ckd) {
+            CKD.G3 -> covariates.add(Covariates.HAS_CKD_G3)
+            CKD.G4 -> covariates.add(Covariates.HAS_CKD_G4)
+            CKD.G5 -> covariates.add(Covariates.HAS_CKD_G5)
+            CKD.G5D -> covariates.add(Covariates.HAS_CKD_G5D)
+            else -> {}
         }
 
-        // GNRI Risk
-        val risk = gnriRisk ?: return Double.NaN
-        sigma += when (risk) {
-            GNRIRisk.NO_RISK, GNRIRisk.LOW -> coeff[Covariates.GNRI_NO_OR_LOW] ?: 0.0
-            GNRIRisk.MODERATE -> coeff[Covariates.GNRI_MODERATE] ?: 0.0
-            GNRIRisk.MAJOR -> coeff[Covariates.GNRI_MAJOR] ?: 0.0
+        when (gnriRisk) {
+            GNRIRisk.NO_RISK, GNRIRisk.LOW -> covariates.add(Covariates.GNRI_NO_OR_LOW)
+            GNRIRisk.MODERATE -> covariates.add(Covariates.GNRI_MODERATE)
+            GNRIRisk.MAJOR -> covariates.add(Covariates.GNRI_MAJOR)
         }
 
-        // Activity
-        sigma += when (data.activity) {
-            Activity.AMBULATORY -> coeff[Covariates.ACTIVITY_AMBULATORY] ?: 0.0
-            Activity.WHEELCHAIR -> coeff[Covariates.ACTIVITY_WHEELCHAIR] ?: 0.0
-            Activity.IMMOBILE -> coeff[Covariates.ACTIVITY_IMMOBILE] ?: 0.0
+        when (data.activity) {
+            Activity.AMBULATORY -> covariates.add(Covariates.ACTIVITY_AMBULATORY)
+            Activity.WHEELCHAIR -> covariates.add(Covariates.ACTIVITY_WHEELCHAIR)
+            Activity.IMMOBILE -> covariates.add(Covariates.ACTIVITY_IMMOBILE)
         }
 
-        // Malignancy
-        sigma += when (data.malignant) {
-            MalignantNeoplasm.PAST_HISTORY -> coeff[Covariates.PAST_MALIGNANCY] ?: 0.0
-            MalignantNeoplasm.UNDER_TREATMENT -> coeff[Covariates.TREATING_MALIGNANCY] ?: 0.0
-            else -> 0.0
+        when (data.malignant) {
+            MalignantNeoplasm.PAST_HISTORY -> covariates.add(Covariates.PAST_MALIGNANCY)
+            MalignantNeoplasm.UNDER_TREATMENT -> covariates.add(Covariates.TREATING_MALIGNANCY)
+            else -> {}
         }
 
-        // Occlusive lesion
-        if (!data.hasAILesion) sigma += coeff[Covariates.HAS_NO_AI_LESION] ?: 0.0
-        if (!data.hasFPLesion) sigma += coeff[Covariates.HAS_NO_FP_LESION] ?: 0.0
+        if (!data.hasAILesion) covariates.add(Covariates.HAS_NO_AI_LESION)
+        if (!data.hasFPLesion) covariates.add(Covariates.HAS_NO_FP_LESION)
 
         if (!data.hasAILesion) {
             if (data.hasFPLesion) {
-                sigma += coeff[Covariates.LESION_FP] ?: 0.0
+                covariates.add(Covariates.LESION_FP)
             } else if (data.hasBKLesion) {
-                sigma += coeff[Covariates.LESION_BELOW_IP] ?: 0.0
+                covariates.add(Covariates.LESION_BELOW_IP)
             }
         }
 
-        // Urgent
-        if (data.isUrgent) sigma += coeff[Covariates.IS_URGENT] ?: 0.0
+        if (data.isUrgent) covariates.add(Covariates.IS_URGENT)
+        if (data.hasFever) covariates.add(Covariates.FEVER)
+        if (data.hasAbnormalWBC) covariates.add(Covariates.ABNORMAL_WBC)
+        if (data.hasLocalInfection) covariates.add(Covariates.LOCAL_INFECTION)
+        if (data.hasCAD) covariates.add(Covariates.HAS_CAD)
+        if (data.isSmoking) covariates.add(Covariates.IS_SMOKING)
+        if (data.hasDyslipidemia) covariates.add(Covariates.HAS_DYSLIPIDEMIA)
+        if (!data.hasContralateralLesion) covariates.add(Covariates.HAS_NO_CONTRALATERAL)
+        if (data.hasOtherVD) covariates.add(Covariates.HAS_OTHER)
 
-        // Fever
-        if (data.hasFever) sigma += coeff[Covariates.FEVER] ?: 0.0
-
-        // WBC
-        if (data.hasAbnormalWBC) sigma += coeff[Covariates.ABNORMAL_WBC] ?: 0.0
-
-        // Local Infection
-        if (data.hasLocalInfection) sigma += coeff[Covariates.LOCAL_INFECTION] ?: 0.0
-
-        // CAD
-        if (data.hasCAD) sigma += coeff[Covariates.HAS_CAD] ?: 0.0
-
-        // Smoking
-        if (data.isSmoking) sigma += coeff[Covariates.IS_SMOKING] ?: 0.0
-
-        // Dyslipidemia
-        if (data.hasDyslipidemia) sigma += coeff[Covariates.HAS_DYSLIPIDEMIA] ?: 0.0
-
-        // Contralateral
-        if (!data.hasContralateralLesion) sigma += coeff[Covariates.HAS_NO_CONTRALATERAL] ?: 0.0
-
-        // Other VD
-        if (data.hasOtherVD) sigma += coeff[Covariates.HAS_OTHER] ?: 0.0
-
-        // Rutherford
-        sigma += when (data.rutherford) {
-            RutherfordClassification.CLASS4 -> coeff[Covariates.RUTHERFORD_4] ?: 0.0
-            RutherfordClassification.CLASS5 -> coeff[Covariates.RUTHERFORD_5] ?: 0.0
-            RutherfordClassification.CLASS6 -> coeff[Covariates.RUTHERFORD_6] ?: 0.0
+        when (data.rutherford) {
+            RutherfordClassification.CLASS4 -> covariates.add(Covariates.RUTHERFORD_4)
+            RutherfordClassification.CLASS5 -> covariates.add(Covariates.RUTHERFORD_5)
+            RutherfordClassification.CLASS6 -> covariates.add(Covariates.RUTHERFORD_6)
         }
 
-        sigma += coeff[Covariates.INTERCEPT] ?: 0.0
+        return covariates
+    }
 
+    private fun calcSigma(coeff: Map<Covariates, Double>, patientCovariates: Set<Covariates>): Double {
+        var sigma = coeff[Covariates.INTERCEPT] ?: 0.0
+        for ((covariate, weight) in coeff) {
+            if (covariate != Covariates.INTERCEPT && covariate in patientCovariates) {
+                sigma += weight
+            }
+        }
         return sigma
     }
 
-    companion object {
+    private companion object {
         const val OS_H0_COEFF = 0.922
         val osCoeff = mapOf(
             Covariates.IS_FEMALE to -0.25,
