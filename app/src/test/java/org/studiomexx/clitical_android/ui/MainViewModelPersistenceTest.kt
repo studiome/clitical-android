@@ -59,6 +59,14 @@ class MainViewModelPersistenceTest {
     }
 
     @Test
+    fun submittedStateIsRestoredFromTheSavedStateHandle() {
+        val handle = SavedStateHandle()
+        MainViewModel(savedStateHandle = handle).calculateRisk()
+
+        assertTrue(MainViewModel(savedStateHandle = handle).hasSubmitted)
+    }
+
+    @Test
     fun inputsAreWrittenThroughToTheHandle() {
         val handle = SavedStateHandle()
         val viewModel = MainViewModel(savedStateHandle = handle)

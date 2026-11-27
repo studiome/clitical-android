@@ -34,22 +34,27 @@ class MainViewModel(
     var calculatedRisk by mutableStateOf<PatientRisk?>(null)
 
     /**
-     * Input state whose edits discard [calculatedRisk]. On a wide window the result sits
-     * beside the form, and it must never be shown next to data it wasn't computed from.
+     * Observable state written through to the handle so it survives the process being killed
+     * in the background. [onChange] runs before a value that differs from the current one is stored.
      */
-    private fun <T> input(key: String, initial: T) = object : ReadWriteProperty<Any?, T> {
-        // Written through to the handle so answers survive the process being killed in the background.
+    private fun <T> saved(key: String, initial: T, onChange: () -> Unit = {}) = object : ReadWriteProperty<Any?, T> {
         var state by mutableStateOf(savedStateHandle.get<T>(key) ?: initial)
         override fun getValue(thisRef: Any?, property: KProperty<*>): T = state
         override fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
-            if (value != state) {
-                calculatedRisk = null
-                // Newer input makes the snapshot behind a pending Undo stale.
-                clearedAnswers = null
-            }
+            if (value != state) onChange()
             state = value
             savedStateHandle[key] = value
         }
+    }
+
+    /**
+     * Answers: saved state whose edits discard [calculatedRisk]. On a wide window the result sits
+     * beside the form, and it must never be shown next to data it wasn't computed from.
+     */
+    private fun <T> input(key: String, initial: T) = saved(key, initial) {
+        calculatedRisk = null
+        // Newer input makes the snapshot behind a pending Undo stale.
+        clearedAnswers = null
     }
 
     // Text buffers for numeric inputs, kept separate so partially-typed values can be edited freely
@@ -61,8 +66,11 @@ class MainViewModel(
     var patientData by input("patientData", PatientData())
         private set
 
-    /** True after the user attempts analysis; keeps field validation visible until fixed. */
-    var hasSubmitted by input("hasSubmitted", false)
+    /**
+     * True after the user attempts analysis; keeps field validation visible until fixed. UI state,
+     * not an answer, so changing it neither discards the result nor the pending Undo.
+     */
+    var hasSubmitted by saved("hasSubmitted", false)
     var validationAttempt by mutableIntStateOf(0)
 
     /** Why the latest attempt failed, so every Predict entry point reports it the same way. */

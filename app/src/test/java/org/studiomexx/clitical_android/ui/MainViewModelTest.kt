@@ -85,6 +85,19 @@ class MainViewModelTest {
         assertEquals("", viewModel.ageText)
     }
 
+    // Pressing Predict flips hasSubmitted, which is UI state rather than an answer, so it
+    // must not make the pending Undo stale.
+    @Test
+    fun undoAfterPredictingFollowingAClearStillRestoresTheInput() {
+        val viewModel = MainViewModel().apply { ageText = "65" }
+
+        viewModel.reset()
+        viewModel.calculateRisk()
+        viewModel.undoReset()
+
+        assertEquals("65", viewModel.ageText)
+    }
+
     @Test
     fun canResetOnlyOnceSomethingWasEntered() {
         val viewModel = MainViewModel()
