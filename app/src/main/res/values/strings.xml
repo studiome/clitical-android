@@ -25,7 +25,7 @@
     <string name="questionRutherfordTitle">Rutherford Classification</string>
     <string name="questionCKDDescription">Normal: 60 or higher, G3: 30–59, G4: 15–29, G5: below 15, G5D: dialysis\n*eGFR: estimated glomerular filtration rate</string>
     <string name="questionSmokingDescription">Smoker or ex-smoker</string>
-    <string name="questionUrgentDescription">Emergent revascularization (excludes elective)</string>
+    <string name="questionUrgentDescription">Emergent revascularisation (excludes elective)</string>
     <string name="questionFeverDescription">Body temperature higher than 38℃</string>
     <string name="questionAbnormalWBCDescription">White blood cell count > 8000 [/µl]</string>
     <string name="questionLocalInfectionDescription">Suppurative wound, or at least two of heat, erythema, lymphangitis, lymph node swelling, oedema, and pain</string>
@@ -68,9 +68,9 @@
     <string name="gnri">GNRI</string>
     <string name="gnriDescription">Geriatric Nutritional Risk Index</string>
     <string name="predicted30DAD">Predicted 30-day Amputation/Death</string>
-    <string name="predicted30DADDescription">Predicted risk of major amputation and/or death 30 days after revascularization</string>
+    <string name="predicted30DADDescription">Predicted risk of major amputation and/or death 30 days after revascularisation</string>
     <string name="predicted30DMALE">Predicted 30-day MALE</string>
-    <string name="predicted30DMALEDescription">Predicted risk of major adverse limb event 30 days after revascularization.\n*MALE: major adverse limb events; above-ankle amputation of the index limb or major reintervention (new bypass graft, jump/ interposition graft revision, or thrombectomy/thrombolysis)</string>
+    <string name="predicted30DMALEDescription">Predicted risk of major adverse limb event 30 days after revascularisation.\n*MALE: major adverse limb events; above-ankle amputation of the index limb or major reintervention (new bypass graft, jump/ interposition graft revision, or thrombectomy/thrombolysis)</string>
     <string name="predicted2yrOS">Predicted 2-year OS</string>
     <string name="predicted2yrOSDescription">Predicted 2 year Overall Survival post-revascularisation</string>
     <string name="predicted2yrAFS">Predicted 2-year AFS</string>

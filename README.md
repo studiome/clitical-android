@@ -131,7 +131,7 @@ app/src/main/java/org/studiomexx/clitical_android/
 │   ├── PatientData.kt       Immutable data class holding one patient's inputs
 │   ├── PatientRisk.kt       All five predictions, plus the published model coefficients
 │   ├── Enums.kt             Sex, Activity, CKD, MalignantNeoplasm, Rutherford, risk levels
-│   ├── Labeled.kt           Maps enum cases to string resources for the pickers
+│   ├── Labelled.kt          Maps enum cases to string resources for the pickers
 │   └── ValidationError.kt   Empty fields / no lesion selected
 └── ui/
     ├── MainViewModel.kt     Form state, text buffers for numeric input, calculation entry point

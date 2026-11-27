@@ -64,7 +64,7 @@ import kotlinx.coroutines.launch
 import org.studiomexx.clitical_android.R
 import org.studiomexx.clitical_android.model.Activity
 import org.studiomexx.clitical_android.model.CKD
-import org.studiomexx.clitical_android.model.Labeled
+import org.studiomexx.clitical_android.model.Labelled
 import org.studiomexx.clitical_android.model.MalignantNeoplasm
 import org.studiomexx.clitical_android.model.PatientData
 import org.studiomexx.clitical_android.model.RutherfordClassification
@@ -621,7 +621,7 @@ fun <T> EnumChoiceRow(
     onOptionSelected: (T) -> Unit,
     locale: Locale,
     description: String? = null,
-) where T : Enum<T>, T : Labeled {
+) where T : Enum<T>, T : Labelled {
     var expanded by remember { mutableStateOf(value = false) }
 
     // The label/description Text nodes are purely visual: the OutlinedTextField below

@@ -125,7 +125,7 @@ app/src/main/java/org/studiomexx/clitical_android/
 │   ├── PatientData.kt       患者 1 人分の入力を保持するイミュータブルなデータクラス
 │   ├── PatientRisk.kt       5 つの予測値と、論文由来のモデル係数
 │   ├── Enums.kt             性別・ADL・CKD・悪性新生物・Rutherford・リスク区分
-│   ├── Labeled.kt           enum と文字列リソースの対応（ピッカー表示用）
+│   ├── Labelled.kt          enum と文字列リソースの対応（ピッカー表示用）
 │   └── ValidationError.kt   未入力／病変部位未選択
 └── ui/
     ├── MainViewModel.kt     フォーム状態、数値入力のテキストバッファ、計算の入口

@@ -18,7 +18,7 @@ class PatientRisk(patientData: PatientData) {
         // Callers validate first; this guards the model against being fed unchecked data.
         patientData.validate()?.let { throw FormatException("invalid patient data: $it", it) }
 
-        gnri = calcGNRI(patientData)
+        gnri = calculateGNRI(patientData)
         gnriRisk = classifyGNRIRisk(gnri)
 
         if (gnriRisk == null) {
@@ -30,22 +30,22 @@ class PatientRisk(patientData: PatientData) {
         } else {
             val covariates = extractCovariates(patientData, gnriRisk)
 
-            val osSigma = calcSigma(osCoeff, covariates)
-            predictedOS = OS_H0_COEFF.pow(exp(osSigma))
+            val osSigma = calculateSigma(osCoefficients, covariates)
+            predictedOS = OS_H0_COEFFICIENT.pow(exp(osSigma))
             osRisk = classifyOSRisk(predictedOS)
 
-            val afsSigma = calcSigma(afsCoeff, covariates)
-            predictedAFS = AFS_H0_COEFF.pow(exp(afsSigma))
+            val afsSigma = calculateSigma(afsCoefficients, covariates)
+            predictedAFS = AFS_H0_COEFFICIENT.pow(exp(afsSigma))
 
-            val dorASigma = calcSigma(shortDeadOrAmputationCoeff, covariates)
+            val dorASigma = calculateSigma(shortDeadOrAmputationCoefficients, covariates)
             predicted30DDeathOrAmputation = sigmoid(dorASigma)
 
-            val maleSigma = calcSigma(shortMALECoeff, covariates)
+            val maleSigma = calculateSigma(shortMALECoefficients, covariates)
             predicted30DMALE = sigmoid(maleSigma)
         }
     }
 
-    private fun calcGNRI(data: PatientData): Double {
+    private fun calculateGNRI(data: PatientData): Double {
         val height = data.height ?: return Double.NaN
         val weight = data.weight ?: return Double.NaN
         val alb = data.alb ?: return Double.NaN
@@ -188,9 +188,9 @@ class PatientRisk(patientData: PatientData) {
         return covariates
     }
 
-    private fun calcSigma(coeff: Map<Covariates, Double>, patientCovariates: Set<Covariates>): Double {
-        var sigma = coeff[Covariates.INTERCEPT] ?: 0.0
-        for ((covariate, weight) in coeff) {
+    private fun calculateSigma(coefficients: Map<Covariates, Double>, patientCovariates: Set<Covariates>): Double {
+        var sigma = coefficients[Covariates.INTERCEPT] ?: 0.0
+        for ((covariate, weight) in coefficients) {
             if (covariate != Covariates.INTERCEPT && covariate in patientCovariates) {
                 sigma += weight
             }
@@ -199,8 +199,8 @@ class PatientRisk(patientData: PatientData) {
     }
 
     private companion object {
-        const val OS_H0_COEFF = 0.922
-        val osCoeff = mapOf(
+        const val OS_H0_COEFFICIENT = 0.922
+        val osCoefficients = mapOf(
             Covariates.IS_FEMALE to -0.25,
             Covariates.AGE_65_TO_74 to 0.31,
             Covariates.AGE_75_TO_84 to 0.76,
@@ -221,8 +221,8 @@ class PatientRisk(patientData: PatientData) {
             Covariates.LESION_BELOW_IP to 0.16,
         )
 
-        const val AFS_H0_COEFF = 0.876
-        val afsCoeff = mapOf(
+        const val AFS_H0_COEFFICIENT = 0.876
+        val afsCoefficients = mapOf(
             Covariates.IS_FEMALE to -0.21,
             Covariates.AGE_65_TO_74 to 0.19,
             Covariates.AGE_75_TO_84 to 0.42,
@@ -247,7 +247,7 @@ class PatientRisk(patientData: PatientData) {
             Covariates.LESION_BELOW_IP to 0.15,
         )
 
-        val shortDeadOrAmputationCoeff = mapOf(
+        val shortDeadOrAmputationCoefficients = mapOf(
             Covariates.INTERCEPT to 2.86452,
             Covariates.ABNORMAL_WBC to -0.59896,
             Covariates.IS_URGENT to -0.64861,
@@ -264,7 +264,7 @@ class PatientRisk(patientData: PatientData) {
             Covariates.GNRI_NO_OR_LOW to 0.76479,
         )
 
-        val shortMALECoeff = mapOf(
+        val shortMALECoefficients = mapOf(
             Covariates.INTERCEPT to 2.2575,
             Covariates.ABNORMAL_WBC to -0.50671,
             Covariates.FEVER to -0.33461,
