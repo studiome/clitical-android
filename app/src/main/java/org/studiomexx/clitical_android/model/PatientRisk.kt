@@ -118,7 +118,8 @@ class PatientRisk(patientData: PatientData) {
 
     private fun extractCovariates(data: PatientData, gnriRisk: GNRIRisk): Set<Covariates> {
         val covariates = EnumSet.noneOf(Covariates::class.java)
-        val age = data.age ?: return covariates
+        // validate() rejects a missing age; failing loudly beats scoring a partial covariate set.
+        val age = checkNotNull(data.age) { "age is required" }
 
         if (data.sex == Sex.FEMALE) covariates.add(Covariates.IS_FEMALE)
 
